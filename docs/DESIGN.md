@@ -2,7 +2,48 @@
 
 The product is used daily by operators who decide spend in seconds. **Every screen, state, and control must be designed on purpose.** Do not ship a default admin table, leftover template chrome, or “good enough” spacing.
 
-Visual and interaction baseline: the live Neon dashboard ([neon-neetrino.vercel.app](https://neon-neetrino.vercel.app)) and `neetrino/neon` `components/dashboard/*`. Preserve what already works; raise polish. No Figma file — the baseline plus this document are the spec.
+Interaction baseline: the live Neon dashboard ([neon-neetrino.vercel.app](https://neon-neetrino.vercel.app)) and `neetrino/neon` `components/dashboard/*` — keep the **workflows**. Visual bar: **clearly more refined** than that live UI. No Figma file — this document is the visual spec.
+
+### Beauty without gradients (mandatory)
+
+The current Neon board is functional and a bit generic (white cards, default black buttons, even teal chips). CostOps must look like a **designed product**, not a restyle of the same boxes.
+
+**Forbidden**
+
+- CSS/SVG/canvas **gradients** (`linear-gradient`, `radial-gradient`, mesh, glow fades, gradient text, gradient chart fills)
+- Glassmorphism, neon glow, rainbow accents
+- Copying Neon 1:1 “because it already works”
+
+**How to be more beautiful instead**
+
+| Lever | Raise above Neon |
+|-------|------------------|
+| Type | Distinct display + UI + tabular money faces; tighter tracking on KPI figures; not one default sans everywhere |
+| Surface | Layered paper: page canvas ≠ sidebar ≠ card. Hairline borders, one restrained shadow. Slightly warmer or cooler canvas than pure `#fff` |
+| Accent | One solid brand color (not Neon teal-by-default unless it still fits). Active chip = solid fill + weight, not a loud outline |
+| Buttons | Primary / secondary / ghost with real hierarchy. Sync now is not a raw black brick |
+| Charts | Flat solid series colors, thin grid, generous plot padding, legend as a designed list — no area gradients |
+| Cards | Clear header / metrics / alert footer zones; over-limit = solid semantic tint, not a rainbow |
+| Rhythm | 4/8px grid, aligned KPI columns, consistent radius (one or two values) |
+
+If a screen still looks like “Tailwind defaults on white”, it is not done.
+
+### Observed live (2026-09-05)
+
+Inspected in the browser at `https://neon-neetrino.vercel.app/` (signed in). CostOps UI must keep this density and not flatten it into a generic admin.
+
+- Light theme, white cards, soft shadow, teal accent on the active period (`Current month`)
+- Header: Neon mark + “Neon usage”, sync chip (`Synced YYYY-MM-DD · N rows`), **Sync now**, search, Sign out
+- Left filter rail: period chips, UTC From/To, chart metric, Daily/Monthly step, project select, **Refresh data**
+- KPI strip: Compute, Storage avg, History avg, Network, **Estimated cost** — each with an info control; copy that costs are approximate
+- Project comparison bars (Usage / Estimated cost toggle), USD axis, ranked colored bars
+- Usage over time: multi-series lines + scrollable ranked legend (`$` + CU-hrs)
+- Projects: **Cards** (default) / **List**; card shows name, region, Neon id, last snapshot, CU-hrs period/day, snapshot rows, storage, estimated total
+- Inline Telegram limit `$` + escalation `%` + **Set** on every card
+- “Other metrics · Show” expand — do not drop
+- ~60 projects in the All-projects filter; search is first-class
+
+CostOps adds Overview / multi-provider / freshness / credential health **on top of** this language. Do not replace the rail + KPI + two charts + cards stack with a single table.
 
 When implementing UI, follow [`.agents/skills/figma-to-production`](../.agents/skills/figma-to-production/SKILL.md) (design analysis + browser verification), even without Figma.
 
@@ -26,7 +67,8 @@ If a screen does not answer those without hunting, it is not done.
 ## Do not
 
 - Drop in unstyled HTML or generic shadcn pages “to fill the route”
-- Invent a second visual language that fights the Neon dashboard
+- Invent a second visual language that fights CostOps tokens
+- Use gradients, mesh backgrounds, or glow fades
 - Hide freshness so `$0` looks like a real day
 - Require a settings wizard to change a daily limit
 - Leave empty / loading / error as a blank page or raw JSON
@@ -43,7 +85,7 @@ Reuse and extend Neon tokens (CSS variables / Tailwind theme). Name new values. 
 | Layer | Expectation |
 |-------|-------------|
 | Type | Clear hierarchy: page title, KPI figure, table, meta/freshness. Tabular nums for money |
-| Color | Semantic: ok / warning / over-limit / stale / error. Charts use a stable project palette (`chart-colors`) |
+| Color | **Solid only.** Semantic: ok / warning / over-limit / stale / error. Charts: stable flat palette (`chart-colors`) |
 | Space | Consistent card padding, KPI strip rhythm, sidebar vs main |
 | Motion | Short CSS transitions on hover/focus. No novelty animation |
 | Density | Desktop-first dashboard; usable at 1280px; filters stay reachable on smaller widths |

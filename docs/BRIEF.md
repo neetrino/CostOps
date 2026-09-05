@@ -49,7 +49,7 @@ Single-organization internal use. Not a customer-facing billing portal.
 ## Design
 
 - No Figma file. Baseline: https://neon-neetrino.vercel.app plus [DESIGN.md](./DESIGN.md)
-- Modern FinOps console: charts, KPI, cards/list, inline limits — every state designed, not accidental
+- More refined than the live Neon board: type, surfaces, hierarchy — **no gradients**
 - Browser-verify UX (empty, loading, error, freshness, filters). Do not ship “default admin” UI
 
 ---
