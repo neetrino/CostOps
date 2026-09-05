@@ -1,7 +1,7 @@
 import type { BudgetScopeFilter, CostRow } from '@/core/cost/types';
 import { aggregateCostRows } from '@/core/cost/freshness';
 
-export function filterRowsForScope(rows: CostRow[], filter: BudgetScopeFilter): CostRow[] {
+export function filterRowsForScope<T extends CostRow>(rows: T[], filter: BudgetScopeFilter): T[] {
   switch (filter.scope) {
     case 'PROJECT_PROVIDER':
       return rows.filter((row) => row.projectProviderId === filter.projectProviderId);

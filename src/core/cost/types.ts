@@ -10,6 +10,23 @@ export type CostRow = {
   providerKey: string;
 };
 
+export type CostEntryRow = CostRow & {
+  bucketDate: Date;
+  resourceId: string | null;
+  providerAccountId: string;
+};
+
+/**
+ * Dashboard cost payload. `costUsd` is null for missing/error — never a bare 0.
+ */
+export type CostView = {
+  costUsd: number | null;
+  sourceType: CostSourceType | null;
+  sourceStatus: Freshness;
+  isPartial: boolean;
+  lastSuccessfulSyncAt: string | null;
+};
+
 export type CostAggregate =
   | {
       kind: 'value';

@@ -39,3 +39,11 @@ export const NEON_CREDENTIAL_ENV_VARS = ['NEON_API_KEY', 'NEON_ORG_ID'] as const
 
 export const SYNC_NOW_RATE_LIMIT_PER_MINUTE = 5;
 export const SYNC_NOW_RATE_WINDOW_MS = 60_000;
+
+export const MAX_DASHBOARD_RANGE_DAYS = 400;
+export const NEAR_LIMIT_USAGE_PERCENT = 70;
+export const NEAR_LIMIT_MAX_ROWS = 20;
+export const ALERT_EVENT_QUERY_LIMIT = 500;
+export const UNMAPPED_RESOURCE_QUERY_LIMIT = 500;
+export const COST_SERIES_METRIC = 'cost';
+export const MS_PER_DAY = 86_400_000;

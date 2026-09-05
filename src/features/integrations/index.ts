@@ -1,2 +1,2 @@
-/** Integrations feature public API. Implemented in a later Phase 1 slice. */
-export {};
+export { loadIntegrations } from './load-integrations';
+export { patchProviderAccountCredential, credentialPatchBodySchema } from './patch-credential';

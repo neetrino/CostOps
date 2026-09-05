@@ -57,8 +57,8 @@ Every cost payload includes:
 type Freshness = "fresh" | "partial" | "final" | "stale" | "error" | "missing";
 
 type CostView = {
-  costUsd: number;
-  sourceType: "API" | "ESTIMATED" | "FIXED" | "MANUAL";
+  costUsd: number | null;
+  sourceType: "API" | "ESTIMATED" | "FIXED" | "MANUAL" | null;
   sourceStatus: Freshness;
   isPartial: boolean;
   lastSuccessfulSyncAt: string | null;

@@ -1,7 +1,7 @@
 # Progress — Neetrino CostOps
 
-**Phase.** 1 — Neon adapter + sync slice done  
-**Overall.** 48% (foundation + pull/sync/alerts; dashboard still next)  
+**Phase.** 1 — read APIs done; dashboard UI next  
+**Overall.** 62% (foundation + sync/alerts + dashboard reads)  
 **Updated.** 2026-09-05
 
 ---
@@ -11,7 +11,7 @@
 | Phase | Status | Progress |
 |-------|--------|----------|
 | 0. Architecture + docs | ✅ TECH_CARD confirmed | 100% |
-| 1. Core + Neon parity | 🔄 Adapter/sync/alerts done | 45% |
+| 1. Core + Neon parity | 🔄 Read APIs done; UI next | 62% |
 | 2. Vercel | ⏳ | 0% |
 | 3. Project totals | ⏳ | 0% |
 | 4. Next providers | ⏳ | 0% |
@@ -46,25 +46,27 @@
 - [x] Cron: `GET /api/cron/sync`, `GET /api/cron/reconcile-yesterday`; `vercel.json` `0 * * * *` and `0 2 * * *`
 - [x] `POST /api/sync/now` (session + rate limit), `GET /api/sync/status`
 - [x] Vitest: aggregation, alerts, freshness, Neon formula, credential 401, adapter contract
+- [x] Dashboard read APIs: overview, projects, providers, usage series/totals, alerts, integrations, unmapped
+- [x] Shared UTC date presets + Zod range (`current_month` / `previous_month` / 1 / 7 / 30 / 60 / custom, 400-day cap)
+- [x] CostView on every cost (`costUsd` null when missing/error — never a bare 0)
+- [x] Inline writes: project-provider budget, project rename/archive, resource mapping, credential expiry/rotate
 
 ---
 
 ## In progress
 
 - [ ] Dashboard boards (Overview / Projects / Neon)
-- [ ] Read APIs beyond sync status
 - [ ] `scripts/migrate-from-neon.ts`
 
-**Blocker.** None for the dashboard / read-API slice.
+**Blocker.** None for the dashboard UI slice — read APIs and inline budget PATCH are in place.
 
 ---
 
 ## Next
 
-1. Read APIs (`/api/overview`, projects, series) + dashboard port per `docs/DESIGN.md`
-2. Inline budget PATCH + mapping UI
-3. History copy from `OLD_NEON_PROJECT_DATABASE_URL`
-4. Preview deploy + 7-day Neon parity
+1. Dashboard port per `docs/DESIGN.md` (filters, charts, cards/list, inline limits, freshness)
+2. History copy from `OLD_NEON_PROJECT_DATABASE_URL`
+3. Preview deploy + 7-day Neon parity
 
 ---
 
@@ -86,6 +88,13 @@
 - `OLD_NEON_PROJECT_DATABASE_URL` is unused in this slice.
 - Neon pooled `DATABASE_URL` (PgBouncer) rejects startup `statement_timeout`. Runtime skips those `-c` options on `*-pooler.*` hosts; unpooled/local still apply TECH_CARD 30s/15s/10s.
 - Live forced sync against the configured `NEON_API_KEY` succeeded (378 rows read, 336 written). Telegram may have sent first-breach messages if daily spend already exceeded the $1 default.
+
+### 2026-09-05 — dashboard read APIs
+
+- Session-gated JSON reads for Overview / Projects / Providers / usage series+totals / alerts / integrations / unmapped. `GET /api/sync/status` reused as-is.
+- Inline writes: `PATCH /api/project-providers/[id]/budget` (limit + escalation; setting a limit enables the rule), project rename/archive, resource mapping, credential expiry / mark rotated.
+- Missing/error costs return `costUsd: null` plus `sourceStatus` — never a bare `$0`.
+- Neon-shaped aliases (`/api/usage/projects`, spend-alert) and the visual dashboard are still outstanding.
 - **Phase 1 safety:** ignored Neon project IDs ported; auto-created PROJECT_PROVIDER rules default to `enabled: false`; one-shot `pnpm exec tsx src/scripts/disable-default-project-provider-rules.ts` disables existing env-default ($1) rules.
 
 ---
