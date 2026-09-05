@@ -8,7 +8,7 @@ Internal multi-provider FinOps platform. Pulls usage and cost from infrastructur
 
 ## Status
 
-Phase 0 (architecture and docs) is complete. **Do not scaffold or implement** until `docs/TECH_CARD.md` 🔄 rows are confirmed.
+Phase 0 is complete. `docs/TECH_CARD.md` is **confirmed**. Next: Phase 1 scaffold (`docs/IMPLEMENTATION_PLAN.md`).
 
 Docs index: [docs/README.md](./docs/README.md).
 
@@ -26,7 +26,7 @@ Production migrations run from the deploy job (`prisma migrate deploy`), not fro
 
 ---
 
-## Stack (proposed)
+## Stack
 
 Next.js App Router · TypeScript strict · PostgreSQL + Prisma · Tailwind 4 · Recharts · Zod · Pino · Vercel Cron · Telegram Bot API.
 

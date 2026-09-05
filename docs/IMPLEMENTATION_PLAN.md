@@ -1,6 +1,6 @@
 # Implementation plan — Neetrino CostOps
 
-No broad implementation until `docs/TECH_CARD.md` is confirmed.
+`docs/TECH_CARD.md` is confirmed. Phase 1 may start.
 
 ---
 
@@ -10,9 +10,9 @@ No broad implementation until `docs/TECH_CARD.md` is confirmed.
 - [x] TECH_CARD, architecture, data model, adapter contract, alert rules
 - [x] Neon audit + migration map
 - [x] Cursor rules adapted
-- [ ] Human confirmation of 🔄 TECH_CARD rows
+- [x] Human confirmation of TECH_CARD rows
 
-**Exit:** TECH_CARD confirmed. No application scaffold yet.
+**Exit:** TECH_CARD confirmed. Env names match Neon. Scaffold is the next step.
 
 ---
 

@@ -180,7 +180,7 @@ See [DATA_MODEL.md](./DATA_MODEL.md) and [05-DATABASE.md](./05-DATABASE.md).
 - Cron: `Authorization: Bearer CRON_SECRET`
 - Dashboard: password session when configured (required in production)
 - Structured logs without secrets
-- v1 credentials: env refs on `ProviderAccount` (ADR-003)
+- v1 credentials: same env names as Neon (`NEON_API_KEY`, `NEON_ORG_ID`). ADR-003
 
 ---
 

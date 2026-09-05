@@ -1,6 +1,6 @@
 # Tech stack — Neetrino CostOps
 
-Aligned with `docs/TECH_CARD.md` and the Neon baseline. Confirm 🔄 rows on the tech card before locking versions in `package.json`.
+Aligned with the confirmed `docs/TECH_CARD.md` and the Neon baseline.
 
 ---
 
@@ -9,7 +9,7 @@ Aligned with `docs/TECH_CARD.md` and the Neon baseline. Confirm 🔄 rows on the
 | Piece | Version | Role |
 |-------|---------|------|
 | pnpm | 10.x | Package manager |
-| Node.js | 24.x LTS (proposed) | Runtime |
+| Node.js | 24.x LTS | Runtime |
 | TypeScript | 5.9, strict | Language |
 
 ---
@@ -18,7 +18,7 @@ Aligned with `docs/TECH_CARD.md` and the Neon baseline. Confirm 🔄 rows on the
 
 | Piece | Version | Role |
 |-------|---------|------|
-| Next.js | 16.x (proposed; Neon is 15) | App Router, RSC, Route Handlers |
+| Next.js | 16.x (Neon baseline is 15 — port UI) | App Router, RSC, Route Handlers |
 | React | 19 | UI |
 | Tailwind CSS | 4.x | Styling |
 | Recharts | 2.x | Charts (reuse Neon panels) |
@@ -34,7 +34,7 @@ No Zustand, next-intl, next-themes platform, or Framer Motion in v1.
 | Piece | Version | Role |
 |-------|---------|------|
 | PostgreSQL | 17 (Neon) | History and config |
-| Prisma | 7.x (proposed; Neon is 6) | ORM + migrations |
+| Prisma | 7.x | ORM + migrations |
 
 ---
 

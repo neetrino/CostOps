@@ -10,7 +10,7 @@ This repository is **Neetrino CostOps**, an internal multi-provider FinOps platf
 2. Read `docs/TECH_CARD.md` and `docs/01-ARCHITECTURE.md`.
 3. For domain work, read the matching doc: adapter contract, alert rules, data model, or Neon migration map.
 4. Preserve the existing architecture and approved project decisions.
-5. Do not start Phase 1 implementation until `docs/TECH_CARD.md` is confirmed.
+5. `docs/TECH_CARD.md` is confirmed. Implement from `docs/IMPLEMENTATION_PLAN.md`.
 
 ## Instruction locations
 

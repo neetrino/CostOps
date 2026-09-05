@@ -11,7 +11,7 @@ Old Neon stays live. Cut over only after 7-day parity (spec §26–28).
 | `NeonProject.neonProjectId` | `Resource.externalId` + `Resource.resourceType=neon_project` | Same Neon id |
 | `NeonProject.name` | `Project.name` + `Resource.displayName` | Create `Project.slug` from name (unique, collision suffix) |
 | — | `Provider` row `NEON` | Seed |
-| — | `ProviderAccount` | One account from `NEON_ORG_ID` + `credentialRef=NEON_PRIMARY` |
+| — | `ProviderAccount` | One account from `NEON_ORG_ID` + `credentialRef=NEON` (`NEON_API_KEY`) |
 | — | `ProjectProvider` | Each migrated project × NEON |
 | `spendAlertThresholdUsd` | `BudgetRule.limitUsd` | Scope PROJECT_PROVIDER; null → env default, still persist a rule if the UI showed an override |
 | `spendAlertEscalationPercentOfThreshold` | `BudgetRule.escalationPercent` | Null → 30 |

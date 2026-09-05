@@ -1,7 +1,7 @@
 # Progress — Neetrino CostOps
 
-**Phase.** 0 — architecture  
-**Overall.** 15% (docs + rules; no application code)  
+**Phase.** 1 — authorized (not started)  
+**Overall.** 18% (docs confirmed; no application code)  
 **Updated.** 2026-09-05
 
 ---
@@ -10,8 +10,8 @@
 
 | Phase | Status | Progress |
 |-------|--------|----------|
-| 0. Architecture + docs | 🔄 Awaiting TECH_CARD confirmation | 95% |
-| 1. Core + Neon parity | ⏳ Blocked on confirmation | 0% |
+| 0. Architecture + docs | ✅ TECH_CARD confirmed | 100% |
+| 1. Core + Neon parity | ⏳ Authorized, not started | 0% |
 | 2. Vercel | ⏳ | 0% |
 | 3. Project totals | ⏳ | 0% |
 | 4. Next providers | ⏳ | 0% |
@@ -34,18 +34,18 @@
 
 ## In progress
 
-- [ ] Confirm TECH_CARD 🔄 rows (Node, Next, Prisma, pool, timeouts, coverage, rate limit, Sentry, domain)
+- [x] Confirm TECH_CARD
+- [x] Align Neon env names with `neetrino/neon` (`NEON_API_KEY`, `NEON_ORG_ID`)
 
-**Blocker.** Phase 1 scaffold waits on that confirmation.
+**Blocker.** None for Phase 1 start.
 
 ---
 
 ## Next
 
-1. Confirm TECH_CARD
-2. Provide dev database + Neon API credentials (when starting Phase 1)
-3. Scaffold app and apply first migration
-4. Port Neon adapter and dashboard
+1. Scaffold Next.js 16 + Prisma 7 + Vitest + CI
+2. Apply first migration
+3. Port Neon adapter and dashboard
 
 ---
 
@@ -55,7 +55,8 @@
 
 - Size B: feature modules + provider plugins; not Size A (too much domain) and not Size C (spec forbids microservice/K8s theater).
 - Neon remains the visual and operational baseline. Intraday hourly cron does not write `SyncRun` today — CostOps will record account-scoped runs for both cadences.
-- Adaptive DB limits proposed: pool 5, statement 30s, idle-in-tx 15s, lock 10s.
+- Adaptive DB limits confirmed: pool 5, statement 30s, idle-in-tx 15s, lock 10s.
+- Neon env: only `NEON_API_KEY` + `NEON_ORG_ID` (+ `NEON_PRICING_PLAN`). Removed `NEON_PRIMARY_*` duplicates.
 
 ---
 

@@ -280,7 +280,7 @@ model SyncRun {
 }
 ```
 
-`credentialRef` is an env prefix (example: `NEON_PRIMARY` → `NEON_PRIMARY_API_KEY`). No raw secrets in the table in v1.
+`credentialRef` for the first Neon account is `NEON`. The adapter reads `NEON_API_KEY` and `NEON_ORG_ID` — the same names as `neetrino/neon`. No raw secrets in the table. No `NEON_PRIMARY_*` aliases.
 
 ---
 

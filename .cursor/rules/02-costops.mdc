@@ -18,4 +18,5 @@ Internal multi-provider FinOps. Spec: `docs/Neetrino_CostOps_CURSOR_SPEC.md`. St
 - Reuse proven Neon dashboard UX: period filters, charts, cards/list, inline limits, retry, Telegram, escalation, SyncRun.
 - Validate provider API responses with Zod at the adapter boundary. No `any` on those boundaries.
 - Schema changes go through `safe-database-migration`. Update `docs/PROGRESS.md` after milestones.
-- Phase 1 starts only after `docs/TECH_CARD.md` is confirmed. Do not retire old Neon until parity tests pass.
+- `docs/TECH_CARD.md` is confirmed. Follow `docs/IMPLEMENTATION_PLAN.md`. Do not retire old Neon until parity tests pass.
+- Neon env names match the baseline app: `NEON_API_KEY`, `NEON_ORG_ID`. Do not add `NEON_PRIMARY_*` aliases.
