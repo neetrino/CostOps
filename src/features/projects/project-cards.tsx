@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import type { ProjectListRow } from '@/features/projects/types';
 import { BudgetInlineField } from '@/features/projects/budget-inline-field';
 import { CostViewDisplay } from '@/shared/ui/cost-view-display';
@@ -43,9 +44,13 @@ function ProjectCard({
       }`}
     >
       <div className="border-b border-[var(--line)] bg-[var(--sidebar)] px-4 py-3.5">
-        <h3 className="truncate text-lg font-semibold text-[var(--ink)]" title={project.name}>
+        <Link
+          href={`/projects/${project.slug}`}
+          className="block truncate text-lg font-semibold text-[var(--ink)] transition hover:text-[var(--accent)]"
+          title={project.name}
+        >
           {project.name}
-        </h3>
+        </Link>
         <p className="mt-1 font-[family-name:var(--font-mono)] text-[11px] text-[var(--muted)]">
           {project.slug}
         </p>

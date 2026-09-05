@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import type { ProjectListRow } from '@/features/projects/types';
 import { BudgetInlineField } from '@/features/projects/budget-inline-field';
 import { CostViewDisplay } from '@/shared/ui/cost-view-display';
@@ -32,7 +33,12 @@ export function ProjectListView({ projects, onBudgetSaved }: ProjectListViewProp
             return (
               <tr key={project.id} className="align-top">
                 <td className="px-4 py-3">
-                  <p className="font-medium text-[var(--ink)]">{project.name}</p>
+                  <Link
+                    href={`/projects/${project.slug}`}
+                    className="font-medium text-[var(--ink)] transition hover:text-[var(--accent)]"
+                  >
+                    {project.name}
+                  </Link>
                   <p className="font-[family-name:var(--font-mono)] text-[11px] text-[var(--muted)]">
                     {project.slug}
                   </p>

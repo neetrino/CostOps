@@ -1,7 +1,7 @@
 # Progress — Neetrino CostOps
 
-**Phase.** 1 — dashboard UI shipped (Overview + Projects)  
-**Overall.** 72% (foundation + sync/alerts + dashboard reads + first UI)  
+**Phase.** 1 — dashboard UI complete (Overview through Integrations)  
+**Overall.** 82% (foundation + sync/alerts + dashboard reads + Phase 1 UI)  
 **Updated.** 2026-09-05
 
 ---
@@ -11,7 +11,7 @@
 | Phase | Status | Progress |
 |-------|--------|----------|
 | 0. Architecture + docs | ✅ TECH_CARD confirmed | 100% |
-| 1. Core + Neon parity | 🔄 Dashboard UI shipped; detail routes next | 72% |
+| 1. Core + Neon parity | 🔄 Phase 1 UI complete; history copy next | 82% |
 | 2. Vercel | ⏳ | 0% |
 | 3. Project totals | ⏳ | 0% |
 | 4. Next providers | ⏳ | 0% |
@@ -51,24 +51,22 @@
 - [x] CostView on every cost (`costUsd` null when missing/error — never a bare 0)
 - [x] Inline writes: project-provider budget, project rename/archive, resource mapping, credential expiry/rotate
 - [x] Visual dashboard: app shell, Overview `/`, Projects `/projects` (URL filters, KPI strip, Recharts, cards/list, inline budget, freshness, sync chip)
+- [x] Phase 1 detail routes: `/projects/[slug]`, `/providers/[key]`, `/unmapped`, `/integrations` (filter rail, charts, inline budget, mapping, credential health)
+- [x] Nav: Overview, Projects, Neon, Unmapped, Integrations; project cards link to detail
 - [x] Design tokens extended in `globals.css` (warning/stale/chart solids; no gradients)
 
 ---
 
 ## In progress
 
-- [ ] Project detail `/projects/[slug]`, provider board, Unmapped, Integrations
 - [ ] `scripts/migrate-from-neon.ts`
-
-**Blocker.** None for the next UI slice — detail/provider boards are scope, not infrastructure.
 
 ---
 
 ## Next
 
-1. Project detail + Neon provider board per `docs/DESIGN.md`
-2. History copy from `OLD_NEON_PROJECT_DATABASE_URL`
-3. Preview deploy + 7-day Neon parity
+1. History copy from `OLD_NEON_PROJECT_DATABASE_URL`
+2. Preview deploy + 7-day Neon parity
 
 ---
 
@@ -97,8 +95,16 @@
 - Overview `/`: hero today + period totals as `CostView`, provider/project mix, near-limit, sync/credential/unmapped health.
 - Projects `/projects`: filter rail (presets, UTC from/to, groupBy, refresh), URL-backed query string, KPI strip from `/api/usage/totals`, project comparison bars + usage-over-time lines (Recharts, flat solids), cards/list toggle, search, inline daily limit + escalation → `PATCH /api/project-providers/[id]/budget`.
 - Freshness badge on every cost; missing/error never renders bare `$0`.
-- **Leftover (honest):** `/projects/[slug]`, `/providers/neon`, Unmapped, Integrations — not stubbed.
 - Added `recharts` dependency.
+
+### 2026-09-05 — Phase 1 detail routes
+
+- Nav extended: Neon (`/providers/neon`), Unmapped, Integrations; project cards/list link to `/projects/[slug]`.
+- `/projects/[slug]`: filter rail, today/period hero, provider compare + usage series (`projectId`), provider/resource breakdown, inline budget, rename, archive confirm.
+- `/providers/[key]`: Neon-board quality — today/period/unmapped KPIs, compare + series (`providerKey`), project cards/list with Set limit.
+- `/unmapped`: inbox list with CostView, project picker → `PATCH /api/resources/[id]/mapping`.
+- `/integrations`: account status, last error, credential health badge, rotate external link, expiry + mark rotated (no secrets).
+- Verified at ~1280px on `:3001`: Overview/Projects regression OK; project detail, Neon board, empty unmapped, integrations health + rotate link.
 
 ### 2026-09-05 — dashboard read APIs
 
