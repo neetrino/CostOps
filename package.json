@@ -17,6 +17,7 @@
     "db:migrate": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
+    "migrate:from-neon": "tsx scripts/migrate-from-neon.ts",
     "postinstall": "prisma generate",
     "prepare": "husky"
   },

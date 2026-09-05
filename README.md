@@ -25,6 +25,10 @@ Docs index: [docs/README.md](./docs/README.md).
 
 Production migrations run from the deploy job (`prisma migrate deploy`), not from a laptop.
 
+### History copy (old Neon app DB)
+
+`pnpm migrate:from-neon` reads **only** `OLD_NEON_PROJECT_DATABASE_URL` (SELECT) and defaults to dry-run counts. Pass `--apply` to write CostOps `DATABASE_URL` through existing MetricEntry / CostEntry / AlertEvent keys. `--create-missing-rules` is opt-in. The script aborts if the two URLs look like the same database. Do not point runtime `DATABASE_URL` at the old Neon app.
+
 ---
 
 ## Stack

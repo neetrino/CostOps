@@ -25,6 +25,7 @@ CostOps/
 │   │   ├── budgets/              # scope resolve + usage %
 │   │   ├── alerts/               # first breach + escalation
 │   │   └── mapping/              # resource → project
+│   ├── scripts/                  # CLI helpers (migrate-from-neon)
 │   ├── providers/
 │   │   ├── registry.ts           # key → adapter
 │   │   ├── neon/
@@ -85,7 +86,7 @@ Forbidden:
 
 | Script | Purpose |
 |--------|---------|
-| `scripts/migrate-from-neon.ts` | Map old Neon DB → CostOps (Phase 1) |
+| `scripts/migrate-from-neon.ts` | Read-only old Neon history → CostOps (`pnpm migrate:from-neon`, dry-run default) |
 | `scripts/backfill.ts` | Date-range backfill via adapters |
 | `scripts/reconcile.ts` | Compare provider API vs stored rows |
 

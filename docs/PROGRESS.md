@@ -1,7 +1,7 @@
 # Progress — Neetrino CostOps
 
-**Phase.** 1 — dashboard UI complete (Overview through Integrations)  
-**Overall.** 82% (foundation + sync/alerts + dashboard reads + Phase 1 UI)  
+**Phase.** 1 — dashboard UI complete; Neon history hose ready (dry-run default)  
+**Overall.** 86% (foundation + sync/alerts + dashboard + history copy script)  
 **Updated.** 2026-09-05
 
 ---
@@ -11,7 +11,7 @@
 | Phase | Status | Progress |
 |-------|--------|----------|
 | 0. Architecture + docs | ✅ TECH_CARD confirmed | 100% |
-| 1. Core + Neon parity | 🔄 Phase 1 UI complete; history copy next | 82% |
+| 1. Core + Neon parity | 🔄 UI + history script; preview/parity next | 86% |
 | 2. Vercel | ⏳ | 0% |
 | 3. Project totals | ⏳ | 0% |
 | 4. Next providers | ⏳ | 0% |
@@ -54,18 +54,19 @@
 - [x] Phase 1 detail routes: `/projects/[slug]`, `/providers/[key]`, `/unmapped`, `/integrations` (filter rail, charts, inline budget, mapping, credential health)
 - [x] Nav: Overview, Projects, Neon, Unmapped, Integrations; project cards link to detail
 - [x] Design tokens extended in `globals.css` (warning/stale/chart solids; no gradients)
+- [x] `scripts/migrate-from-neon.ts` (dry-run default; `--apply` not run in this slice)
 
 ---
 
 ## In progress
 
-- [ ] `scripts/migrate-from-neon.ts`
+- [ ] Dry-run against a real `OLD_NEON_PROJECT_DATABASE_URL` (correct key; not yet set)
 
 ---
 
 ## Next
 
-1. History copy from `OLD_NEON_PROJECT_DATABASE_URL`
+1. Set `OLD_NEON_PROJECT_DATABASE_URL` (correct name) and review a dry-run
 2. Preview deploy + 7-day Neon parity
 
 ---
@@ -113,6 +114,15 @@
 - Missing/error costs return `costUsd: null` plus `sourceStatus` — never a bare `$0`.
 - Neon-shaped aliases (`/api/usage/projects`, spend-alert) still outstanding.
 - **Phase 1 safety:** ignored Neon project IDs ported; auto-created PROJECT_PROVIDER rules default to `enabled: false`; one-shot `pnpm exec tsx src/scripts/disable-default-project-provider-rules.ts` disables existing env-default ($1) rules.
+
+### 2026-09-05 — Neon history hose
+
+- `pnpm migrate:from-neon` reads only `OLD_NEON_PROJECT_DATABASE_URL` via a read-only `pg` client (SELECT). The typo key is ignored. Aborts when old URL is missing or host+db match CostOps `DATABASE_URL`.
+- Maps `neon_projects` → Resource `neon_project` + Project (slug + collision suffix) + ProjectProvider; explicit `spendAlertThresholdUsd` enables a PROJECT_PROVIDER rule; null keeps the rule disabled.
+- `usage_snapshots` → 7× MetricEntry + CostEntry `ESTIMATED` via `estimateProjectCost` (`periodHours=24`) using existing upsert keys (merge with live sync). Ignored Neon IDs are archived and history is kept.
+- `spend_alert_sent` → AlertEvent after a rule exists; skip+log unless `--create-missing-rules`. `sync_runs` optional, idempotent on `metadata.oldSyncRunId`.
+- Manual remap table is an empty stub — no Degusto-style merges by name.
+- Default is dry-run. This slice did not run `--apply` against a live database.
 
 ---
 

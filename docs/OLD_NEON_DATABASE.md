@@ -47,6 +47,6 @@ Not on first scaffold. Use after:
 2. Neon adapter can upsert idempotently
 3. Mapping script is reviewed
 
-Command shape (Phase 1): `pnpm migrate:from-neon` reading `OLD_NEON_PROJECT_DATABASE_URL` and writing `DATABASE_URL`.
+Command: `pnpm migrate:from-neon` (default **dry-run**, counts only). `--apply` writes to CostOps `DATABASE_URL`. `--create-missing-rules` invents a `BudgetRule` for orphan `SpendAlertSent` rows.
 
-If the var is empty, the script exits with a clear error — do not invent a connection string.
+If `OLD_NEON_PROJECT_DATABASE_URL` is empty, the script exits with a clear error — do not invent a connection string. Do not use a similarly named typo key.
