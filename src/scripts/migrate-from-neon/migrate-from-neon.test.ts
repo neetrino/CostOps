@@ -8,6 +8,7 @@ import {
   readOldNeonDatabaseUrl,
   urlsPointAtSameDatabase,
 } from '@/scripts/migrate-from-neon/env-guard';
+import { mergeBudgetRule } from '@/scripts/migrate-from-neon/budget-merge';
 import { assignProjectSlugs, planBudgetRuleFromOld } from '@/scripts/migrate-from-neon/mapping';
 import { buildNeonHistoryPlan } from '@/scripts/migrate-from-neon/plan';
 import type {
@@ -112,6 +113,42 @@ describe('migrate-from-neon env guard', () => {
       oldUrl: OLD_URL,
       costopsUrl: COSTOPS_URL,
     });
+  });
+});
+
+describe('mergeBudgetRule', () => {
+  it('creates a planned rule when none exists (explicit or env-default)', () => {
+    expect(
+      mergeBudgetRule(null, { limitUsd: 2.5, escalationPercent: 30, enabled: true }),
+    ).toEqual({
+      action: 'create',
+      rule: { limitUsd: 2.5, escalationPercent: 30, enabled: true },
+    });
+    expect(mergeBudgetRule(null, { limitUsd: 1, escalationPercent: 30, enabled: false })).toEqual({
+      action: 'create',
+      rule: { limitUsd: 1, escalationPercent: 30, enabled: false },
+    });
+  });
+
+  it('updates limit and escalation when old Neon had an explicit threshold', () => {
+    expect(
+      mergeBudgetRule(
+        { limitUsd: 2.5, escalationPercent: 25, enabled: true },
+        { limitUsd: 5, escalationPercent: 20, enabled: true },
+      ),
+    ).toEqual({
+      action: 'update',
+      rule: { limitUsd: 5, escalationPercent: 20, enabled: true },
+    });
+  });
+
+  it('keeps operator UI sets when old Neon only had the env-default threshold', () => {
+    expect(
+      mergeBudgetRule(
+        { limitUsd: 2.5, escalationPercent: 25, enabled: true },
+        { limitUsd: 1, escalationPercent: 30, enabled: false },
+      ),
+    ).toEqual({ action: 'keep' });
   });
 });
 

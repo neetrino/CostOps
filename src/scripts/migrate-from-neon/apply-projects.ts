@@ -4,6 +4,7 @@ import type { ResourceLink } from '@/core/sync/upsert-resources';
 import { NEON_RESOURCE_TYPE } from '@/config/constants';
 import { prisma } from '@/shared/db';
 import { getEnv } from '@/shared/env';
+import { mergeBudgetRule } from '@/scripts/migrate-from-neon/budget-merge';
 import type { PlannedBudgetRule, PlannedProject } from '@/scripts/migrate-from-neon/types';
 
 type ProjectLink = {
@@ -63,6 +64,23 @@ export async function upsertBudgetRule(
     scope: 'PROJECT_PROVIDER',
     projectProviderId: link.projectProviderId,
   });
+  const existing = await prisma.budgetRule.findUnique({ where: { scopeKey } });
+  const merge = mergeBudgetRule(
+    existing
+      ? {
+          limitUsd: Number(existing.limitUsd),
+          escalationPercent: Number(existing.escalationPercent),
+          enabled: existing.enabled,
+        }
+      : null,
+    budget,
+  );
+
+  if (merge.action === 'keep') {
+    return existing!.id;
+  }
+
+  const rule = merge.rule;
   const row = await prisma.budgetRule.upsert({
     where: { scopeKey },
     create: {
@@ -71,14 +89,14 @@ export async function upsertBudgetRule(
       projectId: link.projectId,
       projectProviderId: link.projectProviderId,
       providerKey: 'NEON',
-      limitUsd: budget.limitUsd.toFixed(4),
-      escalationPercent: budget.escalationPercent.toFixed(2),
-      enabled: budget.enabled,
+      limitUsd: rule.limitUsd.toFixed(4),
+      escalationPercent: rule.escalationPercent.toFixed(2),
+      enabled: rule.enabled,
     },
     update: {
-      limitUsd: budget.limitUsd.toFixed(4),
-      escalationPercent: budget.escalationPercent.toFixed(2),
-      enabled: budget.enabled,
+      limitUsd: rule.limitUsd.toFixed(4),
+      escalationPercent: rule.escalationPercent.toFixed(2),
+      enabled: rule.enabled,
     },
   });
   return row.id;

@@ -1,5 +1,5 @@
 import { Client } from 'pg';
-import { parseIsoDateOnly } from '@/shared/dates';
+import { parseIsoDateOnly, toUtcDateOnly } from '@/shared/dates';
 import type {
   OldNeonProjectRow,
   OldSpendAlertRow,
@@ -40,8 +40,12 @@ function optionalBigint(value: string | number | bigint | null): bigint | null {
   return BigInt(value);
 }
 
-function asDate(value: Date | string): Date {
-  return value instanceof Date ? value : parseIsoDateOnly(value);
+function asDateOnly(value: Date | string): Date {
+  return value instanceof Date ? toUtcDateOnly(value) : parseIsoDateOnly(value);
+}
+
+function asDateTime(value: Date | string): Date {
+  return value instanceof Date ? value : new Date(value);
 }
 
 type ProjectQueryRow = {
@@ -132,7 +136,7 @@ export async function readOldNeonHistory(connectionString: string): Promise<OldN
       })),
       snapshots: snapshots.rows.map((row) => ({
         neonProjectId: row.neon_project_id,
-        snapshotDate: asDate(row.snapshot_date),
+        snapshotDate: asDateOnly(row.snapshot_date),
         computeUnitSeconds: optionalBigint(row.compute_unit_seconds),
         rootBranchBytesMonth: optionalBigint(row.root_branch_bytes_month),
         childBranchBytesMonth: optionalBigint(row.child_branch_bytes_month),
@@ -143,20 +147,20 @@ export async function readOldNeonHistory(connectionString: string): Promise<OldN
       })),
       alerts: alerts.rows.map((row) => ({
         neonProjectId: row.neon_project_id,
-        snapshotDate: asDate(row.snapshot_date),
-        sentAt: asDate(row.sent_at),
+        snapshotDate: asDateOnly(row.snapshot_date),
+        sentAt: asDateTime(row.sent_at),
         spendUsd: requiredNumber(row.spend_usd, 'spend_usd'),
         thresholdUsd: requiredNumber(row.threshold_usd, 'threshold_usd'),
         lastNotifiedSpendUsd: optionalNumber(row.last_notified_spend_usd),
       })),
       syncRuns: syncRuns.rows.map((row) => ({
         id: row.id,
-        startedAt: asDate(row.started_at),
-        finishedAt: row.finished_at ? asDate(row.finished_at) : null,
+        startedAt: asDateTime(row.started_at),
+        finishedAt: row.finished_at ? asDateTime(row.finished_at) : null,
         status: row.status,
         errorMessage: row.error_message,
         rowsUpserted: row.rows_upserted,
-        targetDate: asDate(row.target_date),
+        targetDate: asDateOnly(row.target_date),
       })),
     };
   } finally {

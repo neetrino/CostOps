@@ -1,3 +1,4 @@
+import { prisma } from '@/shared/db';
 import { getEnv } from '@/shared/env';
 import { PRICING_RATES } from '@/providers/neon/pricing';
 import { MIGRATE_FROM_NEON_HELP, parseMigrateCliArgs } from '@/scripts/migrate-from-neon/cli-args';
@@ -43,9 +44,12 @@ export async function runMigrateFromNeon(argv: string[]): Promise<void> {
   const targets = assertMigrationEnv(process.env);
   const env = getEnv();
   const history = await readOldNeonHistory(targets.oldUrl);
+  const takenSlugs = (await prisma.project.findMany({ select: { slug: true } })).map(
+    (row) => row.slug,
+  );
   const plan = buildNeonHistoryPlan({
     ...history,
-    takenSlugs: [],
+    takenSlugs,
     remap: MANUAL_NEON_PROJECT_REMAP,
     createMissingRules: options.createMissingRules,
     defaults: {
@@ -61,6 +65,7 @@ export async function runMigrateFromNeon(argv: string[]): Promise<void> {
     process.stdout.write(
       'No writes (dry-run). Pass --apply to persist into CostOps DATABASE_URL.\n',
     );
+    await prisma.$disconnect();
     return;
   }
 

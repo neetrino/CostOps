@@ -123,6 +123,7 @@
 - `spend_alert_sent` → AlertEvent after a rule exists; skip+log unless `--create-missing-rules`. `sync_runs` optional, idempotent on `metadata.oldSyncRunId`.
 - Manual remap table is an empty stub — no Degusto-style merges by name.
 - Default is dry-run. This slice did not run `--apply` against a live database.
+- `mergeBudgetRule` on apply: explicit old thresholds update; env-default rows no longer clobber operator UI sets.
 
 ---
 
