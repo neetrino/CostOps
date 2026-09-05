@@ -7,7 +7,7 @@ alwaysApply: false
 # Documentation
 
 - Keep project documents proportional to Size B and `docs/TECH_CARD.md`.
-- Required CostOps set: `BRIEF`, `TECH_CARD`, `01-ARCHITECTURE`, `02-TECH_STACK`, `03-STRUCTURE`, `04-API`, `05-DATABASE`, `DATA_MODEL`, `PROVIDER_ADAPTER_CONTRACT`, `ALERT_RULES`, `EXISTING_NEON_AUDIT`, `MIGRATION_MAP`, `IMPLEMENTATION_PLAN`, `PROGRESS`, `DECISIONS`.
+- Required CostOps set: `BRIEF`, `TECH_CARD`, `01-ARCHITECTURE`, `02-TECH_STACK`, `03-STRUCTURE`, `04-API`, `05-DATABASE`, `DATA_MODEL`, `PROVIDER_ADAPTER_CONTRACT`, `ALERT_RULES`, `CREDENTIAL_ROTATION`, `EXISTING_NEON_AUDIT`, `MIGRATION_MAP`, `IMPLEMENTATION_PLAN`, `PROGRESS`, `DECISIONS`.
 - **README** at repo root: how to run, test, env vars (see `.env.example`).
 - **ADR** under `docs/decisions/` for significant architectural decisions.
 - Code, comments, commits, schemas, and technical docs: **English**. Spec source may be Russian.

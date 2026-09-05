@@ -36,6 +36,7 @@ Generalize Neon `/api/usage/*`. Keep response fields stable enough to port UI, t
 | GET | `/api/sync/status` | Recent SyncRuns + account freshness |
 | GET | `/api/resources/unmapped` | Discovered resources without `projectId` |
 | GET | `/api/alerts` | Alert events for a date range |
+| GET | `/api/integrations` | Provider accounts + credential health + create-token URLs |
 
 ### Shared query
 
@@ -80,6 +81,7 @@ Do not emit `0` when status is `missing` or `error` without also sending that st
 | PATCH | `/api/resources/[id]/mapping` | Assign or unassign Project |
 | POST | `/api/sync/now` | Manual sync (rate limited) |
 | POST | `/api/sync/backfill` | Range backfill for one account |
+| PATCH | `/api/provider-accounts/[id]/credential` | Set `credentialExpiresAt` or mark rotated |
 
 Inline budget PATCH must stay as small as Neon `spend-alert` (limit + escalation only).
 

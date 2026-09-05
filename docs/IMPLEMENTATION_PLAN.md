@@ -25,13 +25,14 @@ Goal: CostOps can replace the Neon dashboard for Neon-only use.
 3. Apply schema from `DATA_MODEL.md` via migration
 4. Seed Provider `NEON` + ProviderAccount from env
 5. Core: upsert, aggregates, freshness, budget eval, Telegram
-6. Neon adapter (port client, metrics, pricing, day + intraday sync)
-7. Scheduler routes + SyncRun
-8. UI: Overview shell, Projects, Project detail (Neon only), Neon provider board
-9. Port filters, charts, cards/list, inline limits
-10. `scripts/migrate-from-neon.ts` + backfill/reconcile
-11. Unit tests (aggregates, alerts, formula) + Neon fixture parity tests
-12. Deploy to a CostOps preview; run parallel with old Neon
+6. Credential health: expiry warnings (30d / 7d / expired), 401/403 alerts, Settings Integrations UI + Telegram with create-token URL ([CREDENTIAL_ROTATION.md](./CREDENTIAL_ROTATION.md))
+7. Neon adapter (port client, metrics, pricing, day + intraday sync) + Neon `credentials` meta (org API keys page; no auto-expiry)
+8. Scheduler routes + SyncRun
+9. UI: Overview shell, Projects, Project detail (Neon only), Neon provider board
+10. Port filters, charts, cards/list, inline limits
+11. `scripts/migrate-from-neon.ts` + backfill/reconcile
+12. Unit tests (aggregates, alerts, formula, credential rotation) + Neon fixture parity tests
+13. Deploy to a CostOps preview; run parallel with old Neon
 
 **DoD:** Neon mode is functionally equivalent or better for essential workflows.
 
@@ -40,7 +41,7 @@ Goal: CostOps can replace the Neon dashboard for Neon-only use.
 ## Phase 2 — Vercel
 
 1. Verify current Vercel billing/usage API (record real payload shape)
-2. Vercel adapter + account connection
+2. Vercel adapter + account connection (`credentials` → [account tokens](https://vercel.com/account/tokens); operator stores 1-year `credentialExpiresAt`)
 3. Discover projects, mapping UI, unmapped inbox
 4. Costs/metrics, board, Project × Vercel budgets, alerts
 5. Tests
@@ -60,7 +61,7 @@ Goal: CostOps can replace the Neon dashboard for Neon-only use.
 
 ## Phase 4 — Next providers
 
-Upstash → GCP → Hetzner, one adapter at a time. If core must change, write an ADR first.
+Upstash → GCP → Hetzner, one adapter at a time. Each adapter must include `credentialCreateUrl` and auth-failure detection. If core must change, write an ADR first.
 
 ---
 

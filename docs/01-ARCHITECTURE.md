@@ -149,13 +149,14 @@ Optional DASHBOARD_PASSWORD
 |--------|---------|
 | Project | Neetrino business project (Degusto, Mobee, …) |
 | Provider | NEON, VERCEL, … |
-| ProviderAccount | Connected org/team + credential ref + sync settings |
+| ProviderAccount | Connected org/team + credential ref, optional expiry, sync settings |
 | ProjectProvider | Degusto × Neon — main daily budget target |
 | Resource | External object; `projectId` null = unmapped |
 | CostEntry | Normalized USD cost for a UTC day (+ dimension) |
 | MetricEntry | Provider-specific usage point |
 | BudgetRule | Limit + escalation for a scope |
 | AlertEvent | First breach + escalation anchor per rule/day |
+| CredentialAlert | Token expiry / auth-failure dedupe per account |
 | SyncRun | Operational audit row |
 
 See [DATA_MODEL.md](./DATA_MODEL.md) and [05-DATABASE.md](./05-DATABASE.md).
@@ -181,6 +182,7 @@ See [DATA_MODEL.md](./DATA_MODEL.md) and [05-DATABASE.md](./05-DATABASE.md).
 - Dashboard: password session when configured (required in production)
 - Structured logs without secrets
 - v1 credentials: same env names as Neon (`NEON_API_KEY`, `NEON_ORG_ID`). ADR-003
+- Token expiry and 401 alerts: [CREDENTIAL_ROTATION.md](./CREDENTIAL_ROTATION.md)
 
 ---
 

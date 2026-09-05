@@ -93,18 +93,43 @@ model ProviderAccount {
   lastSuccessfulSyncAt           DateTime?             @map("last_successful_sync_at")
   lastErrorAt                    DateTime?             @map("last_error_at")
   lastErrorMessage               String?               @map("last_error_message") @db.Text
+  lastAuthFailureAt              DateTime?             @map("last_auth_failure_at")
+  lastAuthFailureCode            String?               @map("last_auth_failure_code")
   credentialRef                  String                @map("credential_ref")
+  credentialExpiresAt            DateTime?             @map("credential_expires_at")
+  credentialRotatedAt            DateTime?             @map("credential_rotated_at")
   createdAt                      DateTime              @default(now()) @map("created_at")
   updatedAt                      DateTime              @updatedAt @map("updated_at")
 
   provider      Provider       @relation(fields: [providerKey], references: [key])
-  resources     Resource[]
-  costEntries   CostEntry[]
-  metricEntries MetricEntry[]
-  syncRuns      SyncRun[]
+  resources         Resource[]
+  costEntries       CostEntry[]
+  metricEntries     MetricEntry[]
+  syncRuns          SyncRun[]
+  credentialAlerts  CredentialAlert[]
 
   @@unique([providerKey, externalAccountId])
   @@map("provider_accounts")
+}
+
+enum CredentialAlertKind {
+  EXPIRING_30D
+  EXPIRING_7D
+  EXPIRED
+  AUTH_FAILED
+}
+
+model CredentialAlert {
+  id                String              @id @default(cuid())
+  providerAccountId String              @map("provider_account_id")
+  kind              CredentialAlertKind
+  windowKey         String              @map("window_key")
+  sentAt            DateTime            @default(now()) @map("sent_at")
+
+  providerAccount ProviderAccount @relation(fields: [providerAccountId], references: [id], onDelete: Cascade)
+
+  @@unique([providerAccountId, kind, windowKey])
+  @@map("credential_alerts")
 }
 
 model ProjectProvider {

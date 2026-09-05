@@ -36,6 +36,7 @@
 
 - [x] Confirm TECH_CARD
 - [x] Align Neon env names with `neetrino/neon` (`NEON_API_KEY`, `NEON_ORG_ID`)
+- [x] Document credential expiry / 401 alerts for every provider (`docs/CREDENTIAL_ROTATION.md`)
 
 **Blocker.** None for Phase 1 start.
 
@@ -57,6 +58,7 @@
 - Neon remains the visual and operational baseline. Intraday hourly cron does not write `SyncRun` today — CostOps will record account-scoped runs for both cadences.
 - Adaptive DB limits confirmed: pool 5, statement 30s, idle-in-tx 15s, lock 10s.
 - Neon env: only `NEON_API_KEY` + `NEON_ORG_ID` (+ `NEON_PRICING_PLAN`). Removed `NEON_PRIMARY_*` duplicates.
+- Credential rotation: warn 30d / 7d / expired and on 401; Telegram + Settings; each adapter ships a create-token URL. Neon keys do not auto-expire; Vercel 1-year expiry is stored as `credentialExpiresAt` (API does not return it).
 
 ---
 

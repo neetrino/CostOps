@@ -29,9 +29,10 @@ Single-organization internal use. Not a customer-facing billing portal.
 5. **Overview / Projects / Project detail / Provider boards** — high
 6. **Resource mapping + unmapped spend** — high
 7. **Freshness states** — never show missing data as `$0` — high
-8. **Optional aggregate budgets** — project total, provider total, global total — medium
-9. **Upstash / GCP / Hetzner adapters** — medium
-10. **Anomaly / forecast / extra channels** — low (Phase 5)
+8. **Credential rotation** — expiry + 401 alerts in admin and Telegram, with a create-token link per provider — high
+9. **Optional aggregate budgets** — project total, provider total, global total — medium
+10. **Upstash / GCP / Hetzner adapters** — medium
+11. **Anomaly / forecast / extra channels** — low (Phase 5)
 
 ---
 

@@ -14,7 +14,8 @@ Technical docs are **English**. The source spec may be Russian.
 | [05-DATABASE.md](./05-DATABASE.md) | DB operations |
 | [DATA_MODEL.md](./DATA_MODEL.md) | Prisma proposal |
 | [PROVIDER_ADAPTER_CONTRACT.md](./PROVIDER_ADAPTER_CONTRACT.md) | Adapter interface |
-| [ALERT_RULES.md](./ALERT_RULES.md) | Telegram engine |
+| [ALERT_RULES.md](./ALERT_RULES.md) | Telegram spend engine |
+| [CREDENTIAL_ROTATION.md](./CREDENTIAL_ROTATION.md) | Token expiry / 401 alerts + rotate links |
 | [EXISTING_NEON_AUDIT.md](./EXISTING_NEON_AUDIT.md) | What to reuse from Neon |
 | [MIGRATION_MAP.md](./MIGRATION_MAP.md) | Old → new entities/files |
 | [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) | Phases |

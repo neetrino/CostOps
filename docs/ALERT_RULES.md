@@ -14,6 +14,8 @@ Skip evaluation when Telegram env is unset (same as Neon: log and return).
 
 Do not alert from clearly invalid or missing cost (`error` / `missing`). `partial` current-day cost **may** alert — Neon already alerts on intraday estimates.
 
+Provider **credential** failures and token expiry are a separate engine: [CREDENTIAL_ROTATION.md](./CREDENTIAL_ROTATION.md). They must not be folded into spend first-breach. A dead token must never become a silent `$0` day.
+
 ---
 
 ## Scopes
@@ -104,6 +106,8 @@ Status: partial current day
 Keep messages compact. Escape `<`, `>`, `&` in names.
 
 Implementation: `NotificationChannel.send`. First class: `TelegramNotificationChannel`. Do not add Apprise/Slack in v1.
+
+Credential Telegram copy and per-provider create-token URLs: [CREDENTIAL_ROTATION.md](./CREDENTIAL_ROTATION.md).
 
 ---
 

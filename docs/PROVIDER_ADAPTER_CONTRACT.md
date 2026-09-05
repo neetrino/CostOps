@@ -55,11 +55,21 @@ export type NormalizedMetric = {
   metadata?: Record<string, unknown>;
 };
 
+export type ProviderCredentialMeta = {
+  envVarNames: string[];
+  credentialCreateUrl: string;
+  credentialDocsUrl: string;
+  credentialCreatePath: string;
+  supportsExpiryDate: boolean;
+  isAuthFailure(error: unknown): boolean;
+};
+
 export interface CostProviderAdapter {
   providerKey: string;
   supportsIntraday: boolean;
   supportsBackfill: boolean;
   recommendedSyncIntervalMinutes?: number;
+  credentials: ProviderCredentialMeta;
 
   syncResources(ctx: ProviderContext): Promise<ResourceSyncResult>;
 
@@ -85,7 +95,8 @@ Exact type names may live in `src/core` once Phase 1 starts. The split of respon
 5. Estimated cost must stay labeled estimated in UI and Telegram.
 6. Adapters never send Telegram, never evaluate BudgetRules, never write generic columns for one-off metrics.
 7. Credentials are read via `credentialRef` → env. No secrets in adapter source.
-8. If docs disagree with a live response, record it in `docs/PROGRESS.md` and adapter comments. Observed API wins for implementation, documented as a discrepancy.
+8. Every adapter **must** ship `credentials` metadata (create URL, docs, auth-failure detector). See [CREDENTIAL_ROTATION.md](./CREDENTIAL_ROTATION.md).
+9. If docs disagree with a live response, record it in `docs/PROGRESS.md` and adapter comments. Observed API wins for implementation, documented as a discrepancy.
 
 ---
 
