@@ -1,20 +1,15 @@
-# ☑️ Նախագծի ստարտ — չեկլիստ
+# CostOps start checklist
 
-> Կարճ հաջորդականություն՝ ռեպո-ից մինչև env և որակ
+- [x] Repository opened from the rules template
+- [x] Spec read (`docs/Neetrino_CostOps_CURSOR_SPEC.md`)
+- [x] Project size set: **B**
+- [x] `docs/BRIEF.md` filled
+- [x] `docs/TECH_CARD.md` filled (confirm 🔄 before code)
+- [x] Architecture and Phase 0 docs written
+- [x] `.env.example` updated (no secrets)
+- [ ] Confirm TECH_CARD adaptive rows
+- [ ] Create local `.env` with **dev** credentials only
+- [ ] Phase 1 scaffold (after confirmation)
+- [ ] Quality: branch protection + migrate-on-deploy job (when the app exists)
 
----
-
-- [ ] **1.** Ստեղծել ռեպո կաղապարից (Use this template), կլոնավորել և բացել Cursor-ում
-- [ ] **2.** Լրացնել `docs/BRIEF.md` — նպատակ, ֆունկցիաներ, ինտեգրացիաներ
-- [ ] **3.** Chat-ում AI-ին տալ. «Կարդա՛ BRIEF, սկսի՛ր ըստ `.agents/skills/project-onboarding/SKILL.md`»
-- [ ] **4.** Որոշել նախագծի չափը (A/B/C) և ամրագրել TECH_CARD-ում
-- [ ] **5.** Լրացնել և հաստատել `docs/TECH_CARD.md` — stack, սերվիսներ, հոսթինգ
-- [ ] **6.** Հաստատել ճարտարապետությունը (թղթապանակներ, մոդուլներ) — կոդից առաջ
-- [ ] **7.** Ստեղծել `.env` + `.env.example`, `.gitignore`-ում ավելացնել `.env`, `.env.local`
-- [ ] **8.** Միացնել սերվիսներ ըստ need-ի. Neon → R2 → Resend/Upstash (անհրաժեշտության դեպքում), արժեքները `.env`-ում
-- [ ] **9.** Լոկալ ստուգել. ԲԶ (migrate/հարցում), R2/փոստ — անհրաժեշտության դեպքում
-- [ ] **10.** Որակ. Branch Protection, Secret Protection, Dependabot — տե՛ս QUALITY_AUTOMATION_PLAN
-
----
-
-*Բոլոր կետերը հաստատելուց հետո — կարող ես անցնել կոդին։*
+After TECH_CARD confirmation, implementation may start from `docs/IMPLEMENTATION_PLAN.md` Phase 1.

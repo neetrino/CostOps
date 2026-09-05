@@ -8,6 +8,7 @@ alwaysApply: false
 
 - Select tests by risk and behavior changed; do not require the same test mix for every change.
 - Prioritize critical business logic, auth, payments, permissions, data integrity, regressions, and complex transformations.
+- CostOps: unit-test aggregations, first-breach, escalation, dedupe, UTC day reset, freshness, and Neon estimated-cost fixtures before UI work.
 - Use **unit tests** for isolated logic, **integration tests** for meaningful boundaries, and **E2E** for critical user flows; keep tests deterministic.
 - Treat coverage targets as project-specific signals, not substitutes for behavior verification.
 - **Factories/fixtures** for test data; isolate tests — no shared mutable state.

@@ -13,6 +13,8 @@ alwaysApply: false
 - **`next/image`** for images; **`next/link`** for navigation.
 - **Metadata** (`generateMetadata` / static) for SEO where applicable.
 - **Loading / error / not-found** UI for route segments.
+- Dashboard filters (period, grouping, presentation) belong in the **URL** and optional local prefs — follow the Neon dashboard patterns in `docs/EXISTING_NEON_AUDIT.md`.
+- Reuse Neon chart/table/KPI structure before inventing a new FinOps layout.
 
 ## Forbidden
 

@@ -1,10 +1,12 @@
 ---
-description: NestJS — modules, controllers, services, guards, pipes, validation.
-globs: ["**/api/**", "**/server/**", "**/backend/**", "**/*.service.ts", "**/*.controller.ts", "**/*.module.ts"]
+description: NestJS — modules, controllers, services, guards, pipes, validation. Unused in CostOps (Next.js API routes).
+globs: ["**/*.module.ts", "**/*.controller.ts", "**/apps/api/**"]
 alwaysApply: false
 ---
 
 # NestJS
+
+CostOps is Next.js App Router + Route Handlers. Do not introduce NestJS without an approved TECH_CARD change.
 
 - **Thin controllers** — HTTP mapping + DTO validation only; business logic in **services**.
 - **Modules** per domain; clear boundaries; avoid circular module imports.

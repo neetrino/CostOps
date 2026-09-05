@@ -14,9 +14,13 @@ alwaysApply: false
 
 ## By project size (from `TECH_CARD` / [`project-sizing`](../../.agents/skills/project-onboarding/references/project-sizing.md))
 
+CostOps is **Size B**. Do not collapse to Size A or introduce a Size C monorepo without an approved ADR.
+
 - **A (small):** `src/app`, `components`, `lib`, `types` — simple tree.
-- **B (medium):** `features/*` with `components`, `hooks`, `services`, `types`; `shared/` for UI and utils.
-- **C (large):** `apps/*`, `packages/*` monorepo; shared UI and domain packages.
+- **B (medium, this project):** `src/app`, `src/features/*`, `src/core/*`, `src/providers/<key>/`, `src/notifications/`, `src/shared/`, `src/config`.
+- **C (large):** `apps/*`, `packages/*` monorepo — not selected.
+
+Provider adapters must not import feature UI. Features may call `core` and public provider registry APIs only.
 
 ## Feature modules
 

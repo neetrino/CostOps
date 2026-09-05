@@ -1,13 +1,16 @@
 # Repository guidance
 
-This repository is a template for product documentation, Cursor coding standards, and portable Agent workflows. Keep product and Agent-system concerns separate.
+This repository is **Neetrino CostOps**, an internal multi-provider FinOps platform. Keep product documentation and Agent-system concerns separate.
+
+**Size B** is recorded in `docs/TECH_CARD.md`. Do not rerun project onboarding unless the team explicitly restarts it. Do not modify the reference app `neetrino/neon`.
 
 ## Before substantial work
 
 1. Read the explicit user task and preserve its scope.
-2. Read `docs/TECH_CARD.md` when it exists and is relevant.
-3. Read `docs/01-ARCHITECTURE.md` when it exists and is relevant.
+2. Read `docs/TECH_CARD.md` and `docs/01-ARCHITECTURE.md`.
+3. For domain work, read the matching doc: adapter contract, alert rules, data model, or Neon migration map.
 4. Preserve the existing architecture and approved project decisions.
+5. Do not start Phase 1 implementation until `docs/TECH_CARD.md` is confirmed.
 
 ## Instruction locations
 

@@ -8,8 +8,7 @@ alwaysApply: true
 
 Other `.mdc` files apply by **globs** and task. If a rule seems missing, check the file type matches that rule’s globs.
 
-For greenfield setup, project sizing, and TECH_CARD preparation, use the
-[`project-onboarding`](../../.agents/skills/project-onboarding/SKILL.md) skill. Do not rerun onboarding during ordinary development tasks.
+This repository is **Neetrino CostOps** (Size **B**). Product constraints: [`02-costops.mdc`](02-costops.mdc). Stack and layout: `docs/TECH_CARD.md`. Do **not** rerun [`project-onboarding`](../../.agents/skills/project-onboarding/SKILL.md) unless the team explicitly restarts onboarding.
 
 ## Each task
 
@@ -73,6 +72,7 @@ Full DoD/PR/release checklists: [`docs/reference/Check/Quality/project-quality-c
 | Area | File |
 |------|------|
 | Architecture | `01-architecture.mdc` |
+| CostOps product | `02-costops.mdc` |
 | TypeScript | `03-typescript.mdc` |
 | React / Next | `04-react-nextjs.mdc` |
 | NestJS | `05-backend-nestjs.mdc` |
@@ -92,4 +92,4 @@ Full DoD/PR/release checklists: [`docs/reference/Check/Quality/project-quality-c
 
 Workflows: [`.agents/skills/`](../../.agents/skills/). Platform how-tos and other long-form material live under `docs/reference/`.
 
-**Version:** 3.0 · **Date:** 2026-04-02
+**Version:** 3.1 · **Date:** 2026-09-05

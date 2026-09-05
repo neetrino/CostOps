@@ -1,0 +1,367 @@
+# Data model — Neetrino CostOps
+
+Phase 0 Prisma proposal. Implement in Phase 1 via a migration, not `db push` in production.
+
+Canonical timezone: **UTC**. Reporting currency: **USD**. Budget period v1: **DAILY**.
+
+---
+
+## Entity relationship
+
+```
+Project 1──* ProjectProvider *──1 Provider
+   │                │
+   │                * Resource *──1 ProviderAccount *──1 Provider
+   │                │
+   * CostEntry      * MetricEntry
+   * BudgetRule 1──* AlertEvent
+ProviderAccount 1──* SyncRun
+```
+
+Unmapped `Resource.projectId` is null. Those rows still produce `CostEntry` / `MetricEntry` with null `projectId` so provider and global totals stay complete.
+
+---
+
+## Enums
+
+```prisma
+enum ProviderKey {
+  NEON
+  VERCEL
+  UPSTASH
+  GCP
+  HETZNER
+  RESEND
+  CLOUDFLARE
+}
+
+enum ProviderAccountStatus { ACTIVE DISABLED ERROR }
+enum CostSourceType { API ESTIMATED FIXED MANUAL }
+enum CostSourceStatus { FRESH PARTIAL FINAL STALE ERROR MISSING }
+enum BudgetScope { PROJECT_PROVIDER PROJECT_TOTAL PROVIDER_TOTAL GLOBAL_TOTAL }
+enum BudgetPeriod { DAILY }
+enum AlertChannel { TELEGRAM }
+enum AlertEventStatus { OPEN RESOLVED }
+enum SyncRunStatus { RUNNING SUCCESS ERROR }
+```
+
+---
+
+## Proposed schema
+
+```prisma
+model Project {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+  archived  Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  projectProviders ProjectProvider[]
+  resources        Resource[]
+  costEntries      CostEntry[]
+  metricEntries    MetricEntry[]
+  budgetRules      BudgetRule[]
+
+  @@map("projects")
+}
+
+model Provider {
+  key         ProviderKey @id
+  displayName String      @map("display_name")
+  enabled     Boolean     @default(true)
+
+  accounts         ProviderAccount[]
+  projectProviders ProjectProvider[]
+  resources        Resource[]
+  costEntries      CostEntry[]
+  metricEntries    MetricEntry[]
+  budgetRules      BudgetRule[]
+
+  @@map("providers")
+}
+
+model ProviderAccount {
+  id                             String                @id @default(cuid())
+  providerKey                    ProviderKey           @map("provider_key")
+  name                           String
+  externalAccountId              String                @map("external_account_id")
+  status                         ProviderAccountStatus @default(ACTIVE)
+  syncEnabled                    Boolean               @default(true) @map("sync_enabled")
+  recommendedSyncIntervalMinutes Int?                  @map("recommended_sync_interval_minutes")
+  lastSuccessfulSyncAt           DateTime?             @map("last_successful_sync_at")
+  lastErrorAt                    DateTime?             @map("last_error_at")
+  lastErrorMessage               String?               @map("last_error_message") @db.Text
+  credentialRef                  String                @map("credential_ref")
+  createdAt                      DateTime              @default(now()) @map("created_at")
+  updatedAt                      DateTime              @updatedAt @map("updated_at")
+
+  provider      Provider       @relation(fields: [providerKey], references: [key])
+  resources     Resource[]
+  costEntries   CostEntry[]
+  metricEntries MetricEntry[]
+  syncRuns      SyncRun[]
+
+  @@unique([providerKey, externalAccountId])
+  @@map("provider_accounts")
+}
+
+model ProjectProvider {
+  id          String      @id @default(cuid())
+  projectId   String      @map("project_id")
+  providerKey ProviderKey @map("provider_key")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  project       Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  provider      Provider       @relation(fields: [providerKey], references: [key])
+  resources     Resource[]
+  costEntries   CostEntry[]
+  metricEntries MetricEntry[]
+  budgetRules   BudgetRule[]
+
+  @@unique([projectId, providerKey])
+  @@map("project_providers")
+}
+
+model Resource {
+  id                String       @id @default(cuid())
+  providerKey       ProviderKey  @map("provider_key")
+  providerAccountId String       @map("provider_account_id")
+  projectId         String?      @map("project_id")
+  projectProviderId String?      @map("project_provider_id")
+  externalId        String       @map("external_id")
+  displayName       String       @map("display_name")
+  resourceType      String       @map("resource_type")
+  metadata          Json?
+  discoveredAt      DateTime     @default(now()) @map("discovered_at")
+  archivedAt        DateTime?    @map("archived_at")
+  createdAt         DateTime     @default(now()) @map("created_at")
+  updatedAt         DateTime     @updatedAt @map("updated_at")
+
+  provider        Provider         @relation(fields: [providerKey], references: [key])
+  providerAccount ProviderAccount  @relation(fields: [providerAccountId], references: [id], onDelete: Cascade)
+  project         Project?         @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  projectProvider ProjectProvider? @relation(fields: [projectProviderId], references: [id], onDelete: SetNull)
+  costEntries     CostEntry[]
+  metricEntries   MetricEntry[]
+
+  @@unique([providerAccountId, externalId])
+  @@index([projectId])
+  @@index([providerKey, projectId])
+  @@map("resources")
+}
+
+model CostEntry {
+  id                String           @id @default(cuid())
+  idempotencyKey    String           @unique @map("idempotency_key")
+  projectId         String?          @map("project_id")
+  projectProviderId String?          @map("project_provider_id")
+  providerKey       ProviderKey      @map("provider_key")
+  providerAccountId String           @map("provider_account_id")
+  resourceId        String?          @map("resource_id")
+  bucketDate        DateTime         @map("bucket_date") @db.Date
+  costUsd           Decimal          @map("cost_usd") @db.Decimal(14, 6)
+  originalAmount    Decimal?         @map("original_amount") @db.Decimal(14, 6)
+  originalCurrency  String?          @map("original_currency") @db.VarChar(3)
+  sourceType        CostSourceType   @map("source_type")
+  sourceStatus      CostSourceStatus @map("source_status")
+  isPartial         Boolean          @default(false) @map("is_partial")
+  dimensionKey      String           @default("_") @map("dimension_key")
+  sourceRecordId    String?          @map("source_record_id")
+  metadata          Json?
+  createdAt         DateTime         @default(now()) @map("created_at")
+  updatedAt         DateTime         @updatedAt @map("updated_at")
+
+  project         Project?         @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  projectProvider ProjectProvider? @relation(fields: [projectProviderId], references: [id], onDelete: SetNull)
+  provider        Provider         @relation(fields: [providerKey], references: [key])
+  providerAccount ProviderAccount  @relation(fields: [providerAccountId], references: [id], onDelete: Cascade)
+  resource        Resource?        @relation(fields: [resourceId], references: [id], onDelete: SetNull)
+
+  @@index([projectId, bucketDate])
+  @@index([projectProviderId, bucketDate])
+  @@index([providerKey, bucketDate])
+  @@index([bucketDate])
+  @@map("cost_entries")
+}
+
+model MetricEntry {
+  id                String      @id @default(cuid())
+  idempotencyKey    String      @unique @map("idempotency_key")
+  projectId         String?     @map("project_id")
+  projectProviderId String?     @map("project_provider_id")
+  providerKey       ProviderKey @map("provider_key")
+  providerAccountId String      @map("provider_account_id")
+  resourceId        String?     @map("resource_id")
+  bucketDate        DateTime    @map("bucket_date") @db.Date
+  metricKey         String      @map("metric_key")
+  valueNumeric      Decimal?    @map("value_numeric") @db.Decimal(24, 6)
+  valueBigint       BigInt?     @map("value_bigint")
+  unit              String
+  metadata          Json?
+  createdAt         DateTime    @default(now()) @map("created_at")
+  updatedAt         DateTime    @updatedAt @map("updated_at")
+
+  project         Project?         @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  projectProvider ProjectProvider? @relation(fields: [projectProviderId], references: [id], onDelete: SetNull)
+  provider        Provider         @relation(fields: [providerKey], references: [key])
+  providerAccount ProviderAccount  @relation(fields: [providerAccountId], references: [id])
+  resource        Resource?        @relation(fields: [resourceId], references: [id], onDelete: SetNull)
+
+  @@index([projectProviderId, bucketDate, metricKey])
+  @@index([providerKey, bucketDate])
+  @@map("metric_entries")
+}
+
+model BudgetRule {
+  id                String       @id @default(cuid())
+  scopeKey          String       @unique @map("scope_key")
+  scope             BudgetScope
+  projectId         String?      @map("project_id")
+  projectProviderId String?      @map("project_provider_id")
+  providerKey       ProviderKey? @map("provider_key")
+  period            BudgetPeriod @default(DAILY)
+  limitUsd          Decimal      @map("limit_usd") @db.Decimal(12, 4)
+  escalationPercent Decimal      @map("escalation_percent") @db.Decimal(5, 2)
+  enabled           Boolean      @default(true)
+  createdAt         DateTime     @default(now()) @map("created_at")
+  updatedAt         DateTime     @updatedAt @map("updated_at")
+
+  project         Project?         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectProvider ProjectProvider? @relation(fields: [projectProviderId], references: [id], onDelete: Cascade)
+  provider        Provider?        @relation(fields: [providerKey], references: [key])
+  alertEvents     AlertEvent[]
+
+  @@map("budget_rules")
+}
+
+model AlertEvent {
+  id                  String           @id @default(cuid())
+  budgetRuleId        String           @map("budget_rule_id")
+  budgetDate          DateTime         @map("budget_date") @db.Date
+  firstBreachCostUsd  Decimal          @map("first_breach_cost_usd") @db.Decimal(14, 6)
+  lastNotifiedCostUsd Decimal          @map("last_notified_cost_usd") @db.Decimal(14, 6)
+  lastNotifiedAt      DateTime         @map("last_notified_at")
+  notificationChannel AlertChannel     @default(TELEGRAM) @map("notification_channel")
+  status              AlertEventStatus @default(OPEN)
+  createdAt           DateTime         @default(now()) @map("created_at")
+  updatedAt           DateTime         @updatedAt @map("updated_at")
+
+  budgetRule BudgetRule @relation(fields: [budgetRuleId], references: [id], onDelete: Cascade)
+
+  @@unique([budgetRuleId, budgetDate])
+  @@index([budgetDate])
+  @@map("alert_events")
+}
+
+model SyncRun {
+  id                String        @id @default(cuid())
+  providerAccountId String        @map("provider_account_id")
+  providerKey       ProviderKey   @map("provider_key")
+  startedAt         DateTime      @default(now()) @map("started_at")
+  finishedAt        DateTime?     @map("finished_at")
+  status            SyncRunStatus
+  rangeFrom         DateTime      @map("range_from")
+  rangeTo           DateTime      @map("range_to")
+  granularity       String?
+  rowsRead          Int?          @map("rows_read")
+  rowsWritten       Int?          @map("rows_written")
+  retryCount        Int           @default(0) @map("retry_count")
+  errorMessage      String?       @map("error_message") @db.Text
+  metadata          Json?
+
+  providerAccount ProviderAccount @relation(fields: [providerAccountId], references: [id], onDelete: Cascade)
+
+  @@index([providerAccountId, startedAt])
+  @@index([status, startedAt])
+  @@map("sync_runs")
+}
+```
+
+`credentialRef` is an env prefix (example: `NEON_PRIMARY` → `NEON_PRIMARY_API_KEY`). No raw secrets in the table in v1.
+
+---
+
+## Idempotency keys
+
+Deterministic strings, not random cuids.
+
+**CostEntry**
+
+```text
+cost:{providerKey}:{providerAccountId}:{externalId}:{YYYY-MM-DD}:{dimensionKey}
+```
+
+`dimensionKey` defaults to `_` when the provider has a single cost row per resource/day (Neon estimated total).
+
+**MetricEntry**
+
+```text
+metric:{providerKey}:{providerAccountId}:{externalId}:{YYYY-MM-DD}:{metricKey}
+```
+
+Repeated sync **upserts** on these keys. Do not create a second financial row for the same tuple.
+
+---
+
+## BudgetRule.scopeKey
+
+| Scope | Key |
+|-------|-----|
+| PROJECT_PROVIDER | `PROJECT_PROVIDER:{projectProviderId}` |
+| PROJECT_TOTAL | `PROJECT_TOTAL:{projectId}` |
+| PROVIDER_TOTAL | `PROVIDER_TOTAL:{providerKey}` |
+| GLOBAL_TOTAL | `GLOBAL_TOTAL` |
+
+PROJECT_PROVIDER is mandatory for Neon-migrated projects. Other scopes are optional.
+
+---
+
+## Freshness
+
+| Status | Meaning |
+|--------|---------|
+| `fresh` | Successful sync within the adapter interval |
+| `partial` | Current UTC day, data still accumulating |
+| `final` | Previous day after reconcile job |
+| `stale` | Last success older than 2× recommended interval |
+| `error` | Last sync failed; keep last known cost, do not zero |
+| `missing` | No row for that bucket |
+
+On provider error: write/update `SyncRun` + account error fields. Do **not** upsert cost as 0.
+
+---
+
+## Current day vs finalized
+
+- Intraday (if `supportsIntraday`): upsert today's `CostEntry` / `MetricEntry` with `isPartial=true`, `sourceStatus=PARTIAL`
+- Daily finalize cron: previous UTC day `isPartial=false`, `sourceStatus=FINAL`
+- Rolling reconcile: last N days (Neon: reuse existing reconcile script behavior)
+- Pricing-formula change: recompute Neon `CostEntry` from stored `MetricEntry`, do not require API
+
+---
+
+## Neon metric keys (adapter)
+
+Keep the current seven metrics as `metricKey` values:
+
+```text
+compute_unit_seconds
+root_branch_bytes_month
+child_branch_bytes_month
+instant_restore_bytes_month
+public_network_transfer_bytes
+private_network_transfer_bytes
+extra_branches_month
+```
+
+Store raw amounts in `valueBigint`. Neon estimated USD is a `CostEntry` with `sourceType=ESTIMATED`, `dimensionKey=_`.
+
+---
+
+## Open confirmation
+
+- Prisma 7 vs 6 (TECH_CARD 4.2)
+- Whether `Provider` is a table or a const enum only (table lets us disable a provider without a deploy)

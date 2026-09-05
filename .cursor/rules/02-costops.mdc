@@ -1,0 +1,21 @@
+---
+description: CostOps product constraints — Size B, adapters, budgets, Neon baseline.
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# CostOps
+
+Internal multi-provider FinOps. Spec: `docs/Neetrino_CostOps_CURSOR_SPEC.md`. Stack: `docs/TECH_CARD.md`.
+
+- **Size B.** Feature layout: `src/features`, `src/core`, `src/providers`, `src/shared`. Not a monorepo. Not NestJS.
+- Do **not** modify `neetrino/neon`. It stays live until 7-day parity is proven.
+- Provider I/O lives only in `src/providers/<key>/`. Core cost, budget, sync orchestration, and alerts stay provider-agnostic.
+- Primary budget object is **Project × Provider**. Do not assume identical daily spend across projects.
+- Never treat missing or stale cost as `$0`. Every aggregate exposes freshness (`fresh` / `partial` / `final` / `stale` / `error` / `missing`).
+- Pull model: CostOps owns alerts. Evaluate after a successful current-day sync. Dedupe per `budgetRuleId` + UTC day. Escalate from `lastNotifiedCostUsd`.
+- Do not add Grafana, Apprise, Kafka, RabbitMQ, Kubernetes, or extra notification platforms in v1.
+- Reuse proven Neon dashboard UX: period filters, charts, cards/list, inline limits, retry, Telegram, escalation, SyncRun.
+- Validate provider API responses with Zod at the adapter boundary. No `any` on those boundaries.
+- Schema changes go through `safe-database-migration`. Update `docs/PROGRESS.md` after milestones.
+- Phase 1 starts only after `docs/TECH_CARD.md` is confirmed. Do not retire old Neon until parity tests pass.

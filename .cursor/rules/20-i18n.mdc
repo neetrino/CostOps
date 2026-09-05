@@ -1,10 +1,12 @@
 ---
 description: i18n — externalized strings, locale-aware formatting, RTL when required.
-globs: ["**/locales/**", "**/i18n/**", "**/messages/**", "**/middleware.ts", "**/middleware.tsx"]
+globs: ["**/locales/**", "**/i18n/**", "**/messages/**"]
 alwaysApply: false
 ---
 
 # Internationalization (i18n)
+
+CostOps v1 has **no i18n catalogs**. UI copy is English. Do not add `next-intl` or locale routing unless TECH_CARD changes.
 
 - **No hardcoded UI copy** in components — use message catalogs (`next-intl`, `react-intl`, or project standard).
 - **Routing:** locale prefix (`app/[locale]/...`) or agreed strategy; middleware for detection only as in existing codebase.
