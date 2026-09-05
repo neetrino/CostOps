@@ -86,6 +86,7 @@
 - `OLD_NEON_PROJECT_DATABASE_URL` is unused in this slice.
 - Neon pooled `DATABASE_URL` (PgBouncer) rejects startup `statement_timeout`. Runtime skips those `-c` options on `*-pooler.*` hosts; unpooled/local still apply TECH_CARD 30s/15s/10s.
 - Live forced sync against the configured `NEON_API_KEY` succeeded (378 rows read, 336 written). Telegram may have sent first-breach messages if daily spend already exceeded the $1 default.
+- **Phase 1 safety:** ignored Neon project IDs ported; auto-created PROJECT_PROVIDER rules default to `enabled: false`; one-shot `pnpm exec tsx src/scripts/disable-default-project-provider-rules.ts` disables existing env-default ($1) rules.
 
 ---
 

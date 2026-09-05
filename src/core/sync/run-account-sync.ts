@@ -9,6 +9,7 @@ import { addUtcDays, getStartOfTodayUtc, toUtcDateOnly } from '@/shared/dates';
 import { prisma } from '@/shared/db';
 import { logger } from '@/shared/logger';
 import { safeErrorMessage } from '@/shared/http';
+import { archiveIgnoredNeonResources } from '@/providers/neon/archive-ignored-resources';
 import { getAdapter } from '@/providers/registry';
 import type { DateRange } from '@/providers/types';
 import type { ProviderKey } from '@/generated/prisma/enums';
@@ -56,6 +57,9 @@ async function executeAdapterPull(input: {
     now: input.now,
   };
   const resources = await adapter.syncResources(ctx);
+  if (input.providerKey === 'NEON') {
+    await archiveIgnoredNeonResources(input.accountId);
+  }
   const resourceMap = await upsertDiscoveredResources({
     providerKey: input.providerKey,
     providerAccountId: input.accountId,

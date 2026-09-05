@@ -30,7 +30,7 @@ export async function ensureProjectProviderBudgetRule(input: {
       providerKey: input.providerKey,
       limitUsd: defaults.limitUsd.toFixed(4),
       escalationPercent: defaults.escalationPercent.toFixed(2),
-      enabled: true,
+      enabled: false,
     },
   });
   return {

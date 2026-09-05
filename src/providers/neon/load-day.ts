@@ -22,6 +22,7 @@ import {
   type EstimatedProjectCost,
 } from '@/providers/neon/pricing';
 import { resolveNeonCredentials } from '@/providers/neon/credentials';
+import { filterIgnoredNeonProjects } from '@/providers/neon/ignored-projects';
 import type {
   DateRange,
   NormalizedCost,
@@ -67,9 +68,11 @@ function retryUnlessAuth(error: unknown): boolean {
 
 export async function listNeonResources(ctx: ProviderContext): Promise<ResourceSyncResult> {
   const creds = resolveNeonCredentials(ctx.account.credentialRef);
-  const projects = await withBackoff(
-    () => listAllNeonProjects({ apiKey: creds.apiKey, orgId: creds.orgId }),
-    { label: 'neon.listProjects', shouldRetry: retryUnlessAuth },
+  const projects = filterIgnoredNeonProjects(
+    await withBackoff(() => listAllNeonProjects({ apiKey: creds.apiKey, orgId: creds.orgId }), {
+      label: 'neon.listProjects',
+      shouldRetry: retryUnlessAuth,
+    }),
   );
   return {
     discovered: projects.map((project) => ({
@@ -155,9 +158,11 @@ export async function loadNeonDay(ctx: ProviderContext, range: DateRange): Promi
   const fromIso = bucketDate.toISOString();
   const toIso = hourly ? ctx.now.toISOString() : addUtcDays(bucketDate, 1).toISOString();
 
-  const listed = await withBackoff(
-    () => listAllNeonProjects({ apiKey: creds.apiKey, orgId: creds.orgId }),
-    { label: 'neon.listProjects', shouldRetry: retryUnlessAuth },
+  const listed = filterIgnoredNeonProjects(
+    await withBackoff(() => listAllNeonProjects({ apiKey: creds.apiKey, orgId: creds.orgId }), {
+      label: 'neon.listProjects',
+      shouldRetry: retryUnlessAuth,
+    }),
   );
   const names = new Map(
     listed.map((project) => [
