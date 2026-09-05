@@ -219,5 +219,7 @@ Order: exact commit → build → one `prisma migrate deploy` job → promote ap
 - [PROVIDER_ADAPTER_CONTRACT.md](./PROVIDER_ADAPTER_CONTRACT.md)
 - [ALERT_RULES.md](./ALERT_RULES.md)
 - [DECISIONS.md](./DECISIONS.md)
+- [DESIGN.md](./DESIGN.md)
+- [OLD_NEON_DATABASE.md](./OLD_NEON_DATABASE.md)
 
 **Document version.** 1.0 · **Date.** 2026-09-05

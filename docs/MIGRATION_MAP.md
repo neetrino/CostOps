@@ -69,7 +69,7 @@ If a project has alert history but no resolvable BudgetRule, **skip and log** �
 
 ## History backfill options
 
-1. **DB copy (preferred):** read old `DATABASE_URL` (read-only) and write CostOps. Preserves days Neon API no longer returns.
+1. **DB copy (preferred):** read **`OLD_NEON_PROJECT_DATABASE_URL`** (Postgres of [neetrino/neon](https://github.com/neetrino/neon), read-only) and write CostOps `DATABASE_URL`. Preserves days the Neon API no longer returns. Details: [OLD_NEON_DATABASE.md](./OLD_NEON_DATABASE.md).
 2. **API backfill:** `syncUsageForUtcDay` per day — fills gaps only.
 3. **Reconcile:** after copy, run Neon reconcile for recent N days.
 
@@ -107,4 +107,4 @@ Old Neon live
   → archive old app (do not delete data)
 ```
 
-CostOps must not point its runtime at the old Neon **application** database except the one-off read-only migration job.
+CostOps runtime (`DATABASE_URL`) must never be the old Neon app database. Only `scripts/migrate-from-neon.ts` reads `OLD_NEON_PROJECT_DATABASE_URL`.

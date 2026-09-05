@@ -37,6 +37,8 @@
 - [x] Confirm TECH_CARD
 - [x] Align Neon env names with `neetrino/neon` (`NEON_API_KEY`, `NEON_ORG_ID`)
 - [x] Document credential expiry / 401 alerts for every provider (`docs/CREDENTIAL_ROTATION.md`)
+- [x] Document `OLD_NEON_PROJECT_DATABASE_URL` (`docs/OLD_NEON_DATABASE.md`)
+- [x] Document design/UX bar (`docs/DESIGN.md`) — wait for explicit start command before scaffold
 
 **Blocker.** None for Phase 1 start.
 

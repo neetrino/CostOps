@@ -8,7 +8,7 @@ This repository is **Neetrino CostOps**, an internal multi-provider FinOps platf
 
 1. Read the explicit user task and preserve its scope.
 2. Read `docs/TECH_CARD.md` and `docs/01-ARCHITECTURE.md`.
-3. For domain work, read the matching doc: adapter contract, alert rules, data model, or Neon migration map.
+3. For domain work, read the matching doc: adapter contract, alert rules, data model, Neon migration map, design, or old-Neon DB.
 4. Preserve the existing architecture and approved project decisions.
 5. `docs/TECH_CARD.md` is confirmed. Implement from `docs/IMPLEMENTATION_PLAN.md`.
 

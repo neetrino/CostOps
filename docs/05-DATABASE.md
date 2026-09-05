@@ -26,7 +26,9 @@ Full proposed schema: [DATA_MODEL.md](./DATA_MODEL.md).
 | `app_user` | App + cron DML |
 | `readonly_user` | Optional analytics |
 
-Local `.env` points at a **dev** branch only.
+Local `.env` CostOps `DATABASE_URL` points at a **dev** branch only.
+
+**`OLD_NEON_PROJECT_DATABASE_URL`** is a separate, read-only connection to the existing [neetrino/neon](https://github.com/neetrino/neon) analytics database. It is not a role on the CostOps DB. Never migrate it. See [OLD_NEON_DATABASE.md](./OLD_NEON_DATABASE.md).
 
 ---
 

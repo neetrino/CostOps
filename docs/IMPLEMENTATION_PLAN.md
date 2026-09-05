@@ -28,9 +28,9 @@ Goal: CostOps can replace the Neon dashboard for Neon-only use.
 6. Credential health: expiry warnings (30d / 7d / expired), 401/403 alerts, Settings Integrations UI + Telegram with create-token URL ([CREDENTIAL_ROTATION.md](./CREDENTIAL_ROTATION.md))
 7. Neon adapter (port client, metrics, pricing, day + intraday sync) + Neon `credentials` meta (org API keys page; no auto-expiry)
 8. Scheduler routes + SyncRun
-9. UI: Overview shell, Projects, Project detail (Neon only), Neon provider board
-10. Port filters, charts, cards/list, inline limits
-11. `scripts/migrate-from-neon.ts` + backfill/reconcile
+9. UI: Overview shell, Projects, Project detail (Neon only), Neon provider board — [DESIGN.md](./DESIGN.md)
+10. Port filters, charts, cards/list, inline limits; browser-verify empty/error/freshness
+11. `scripts/migrate-from-neon.ts` (reads `OLD_NEON_PROJECT_DATABASE_URL`) + backfill/reconcile
 12. Unit tests (aggregates, alerts, formula, credential rotation) + Neon fixture parity tests
 13. Deploy to a CostOps preview; run parallel with old Neon
 
@@ -87,6 +87,21 @@ scaffold + CI
 
 Keep each slice deployable.
 
+UI work follows [DESIGN.md](./DESIGN.md): design every state; verify in the browser. Do not ship leftover template chrome.
+
+---
+
+## Autonomous run (when the operator says start)
+
+Work through Phase 1 without waiting on cosmetic questions. Stop and ask only for:
+
+- missing secrets that cannot be invented
+- schema or architecture changes that contradict the confirmed TECH_CARD
+- production deploy / production migrate
+- retiring `neetrino/neon`
+
+Study the Neon repo, run tests, and use the browser yourself. Update `PROGRESS.md` as you go.
+
 ---
 
 ## Credentials needed at Phase 1 start (do not invent)
@@ -95,5 +110,5 @@ Keep each slice deployable.
 - `NEON_API_KEY`, `NEON_ORG_ID`
 - `CRON_SECRET`, `JWT_SECRET`, `DASHBOARD_PASSWORD`
 - `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` (or a staging bot)
-- Read-only URL to old Neon DB for migration (when ready)
+- `OLD_NEON_PROJECT_DATABASE_URL` — read-only Postgres of https://github.com/neetrino/neon; use only for `migrate-from-neon` ([OLD_NEON_DATABASE.md](./OLD_NEON_DATABASE.md)). Not the CostOps runtime DB.
 - Vercel project for CostOps (new, not the old Neon project)

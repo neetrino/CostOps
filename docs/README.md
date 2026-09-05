@@ -18,6 +18,8 @@ Technical docs are **English**. The source spec may be Russian.
 | [CREDENTIAL_ROTATION.md](./CREDENTIAL_ROTATION.md) | Token expiry / 401 alerts + rotate links |
 | [EXISTING_NEON_AUDIT.md](./EXISTING_NEON_AUDIT.md) | What to reuse from Neon |
 | [MIGRATION_MAP.md](./MIGRATION_MAP.md) | Old → new entities/files |
+| [OLD_NEON_DATABASE.md](./OLD_NEON_DATABASE.md) | `OLD_NEON_PROJECT_DATABASE_URL` — read-only neetrino/neon DB |
+| [DESIGN.md](./DESIGN.md) | Visual/UX bar; design every detail |
 | [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) | Phases |
 | [PROGRESS.md](./PROGRESS.md) | Status |
 | [DECISIONS.md](./DECISIONS.md) | ADR index |

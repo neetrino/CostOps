@@ -30,7 +30,7 @@
 |---|-----------|----------|--------|-------|
 | 2.1 | Framework | Next.js 16.x (App Router) | ✅ | Port Neon 15 UI |
 | 2.2 | Styles | Tailwind CSS 4.x | ✅ | |
-| 2.3 | UI kit | Custom (Neon dashboard) | ✅ | |
+| 2.3 | UI kit | Custom (Neon dashboard) | ✅ | Every screen designed per `docs/DESIGN.md` |
 | 2.4 | State | URL + local prefs + React state | ✅ | |
 | 2.5 | Forms | Server Actions + Zod | ✅ | |
 | 2.6 | Data fetching | Server Components + Route Handlers | ✅ | |
@@ -71,6 +71,7 @@
 | 4.9 | Cache (Redis) | not needed | ➖ | |
 | 4.10 | Queues | not needed | ➖ | |
 | 4.11 | Production migrations | GitHub Actions or Vercel deploy job | ✅ | |
+| 4.12 | Old Neon history DB | `OLD_NEON_PROJECT_DATABASE_URL` | ✅ | Read-only [neetrino/neon](https://github.com/neetrino/neon) Postgres. Not CostOps runtime. `docs/OLD_NEON_DATABASE.md` |
 
 ---
 

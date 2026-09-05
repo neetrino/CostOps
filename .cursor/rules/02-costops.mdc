@@ -16,6 +16,8 @@ Internal multi-provider FinOps. Spec: `docs/Neetrino_CostOps_CURSOR_SPEC.md`. St
 - Pull model: CostOps owns alerts. Evaluate after a successful current-day sync. Dedupe per `budgetRuleId` + UTC day. Escalate from `lastNotifiedCostUsd`.
 - Do not add Grafana, Apprise, Kafka, RabbitMQ, Kubernetes, or extra notification platforms in v1.
 - Reuse proven Neon dashboard UX: period filters, charts, cards/list, inline limits, retry, Telegram, escalation, SyncRun.
+- UI must be designed in detail ([`docs/DESIGN.md`](../../docs/DESIGN.md)). No leftover template or unconsidered empty/error states. Verify in the browser.
+- `OLD_NEON_PROJECT_DATABASE_URL` is read-only history from `neetrino/neon`. Never use it as CostOps `DATABASE_URL`. See `docs/OLD_NEON_DATABASE.md`.
 - Validate provider API responses with Zod at the adapter boundary. No `any` on those boundaries.
 - Schema changes go through `safe-database-migration`. Update `docs/PROGRESS.md` after milestones.
 - `docs/TECH_CARD.md` is confirmed. Follow `docs/IMPLEMENTATION_PLAN.md`. Do not retire old Neon until parity tests pass.
