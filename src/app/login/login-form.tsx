@@ -37,8 +37,8 @@ export function LoginForm() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-4">
-      <div className="w-full max-w-sm rounded-[var(--radius)] border border-[var(--line)] bg-[var(--paper)] p-8 shadow-[var(--shadow)]">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--canvas)] px-4">
+      <div className="w-full max-w-sm rounded-[var(--radius)] border border-[var(--line)] bg-[var(--paper)] p-8 shadow-[var(--shadow-card)]">
         <p className="text-xs font-medium tracking-[0.18em] text-[var(--muted)] uppercase">
           Neetrino
         </p>

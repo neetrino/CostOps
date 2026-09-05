@@ -1,7 +1,7 @@
 # Progress — Neetrino CostOps
 
-**Phase.** 1 — read APIs done; dashboard UI next  
-**Overall.** 62% (foundation + sync/alerts + dashboard reads)  
+**Phase.** 1 — dashboard UI shipped (Overview + Projects)  
+**Overall.** 72% (foundation + sync/alerts + dashboard reads + first UI)  
 **Updated.** 2026-09-05
 
 ---
@@ -11,7 +11,7 @@
 | Phase | Status | Progress |
 |-------|--------|----------|
 | 0. Architecture + docs | ✅ TECH_CARD confirmed | 100% |
-| 1. Core + Neon parity | 🔄 Read APIs done; UI next | 62% |
+| 1. Core + Neon parity | 🔄 Dashboard UI shipped; detail routes next | 72% |
 | 2. Vercel | ⏳ | 0% |
 | 3. Project totals | ⏳ | 0% |
 | 4. Next providers | ⏳ | 0% |
@@ -50,21 +50,23 @@
 - [x] Shared UTC date presets + Zod range (`current_month` / `previous_month` / 1 / 7 / 30 / 60 / custom, 400-day cap)
 - [x] CostView on every cost (`costUsd` null when missing/error — never a bare 0)
 - [x] Inline writes: project-provider budget, project rename/archive, resource mapping, credential expiry/rotate
+- [x] Visual dashboard: app shell, Overview `/`, Projects `/projects` (URL filters, KPI strip, Recharts, cards/list, inline budget, freshness, sync chip)
+- [x] Design tokens extended in `globals.css` (warning/stale/chart solids; no gradients)
 
 ---
 
 ## In progress
 
-- [ ] Dashboard boards (Overview / Projects / Neon)
+- [ ] Project detail `/projects/[slug]`, provider board, Unmapped, Integrations
 - [ ] `scripts/migrate-from-neon.ts`
 
-**Blocker.** None for the dashboard UI slice — read APIs and inline budget PATCH are in place.
+**Blocker.** None for the next UI slice — detail/provider boards are scope, not infrastructure.
 
 ---
 
 ## Next
 
-1. Dashboard port per `docs/DESIGN.md` (filters, charts, cards/list, inline limits, freshness)
+1. Project detail + Neon provider board per `docs/DESIGN.md`
 2. History copy from `OLD_NEON_PROJECT_DATABASE_URL`
 3. Preview deploy + 7-day Neon parity
 
@@ -89,12 +91,21 @@
 - Neon pooled `DATABASE_URL` (PgBouncer) rejects startup `statement_timeout`. Runtime skips those `-c` options on `*-pooler.*` hosts; unpooled/local still apply TECH_CARD 30s/15s/10s.
 - Live forced sync against the configured `NEON_API_KEY` succeeded (378 rows read, 336 written). Telegram may have sent first-breach messages if daily spend already exceeded the $1 default.
 
+### 2026-09-05 — visual dashboard (Overview + Projects)
+
+- App shell: nav (Overview, Projects), brand, sync status chip, Sync now (disabled while pending), Sign out. Login uses same canvas/paper tokens.
+- Overview `/`: hero today + period totals as `CostView`, provider/project mix, near-limit, sync/credential/unmapped health.
+- Projects `/projects`: filter rail (presets, UTC from/to, groupBy, refresh), URL-backed query string, KPI strip from `/api/usage/totals`, project comparison bars + usage-over-time lines (Recharts, flat solids), cards/list toggle, search, inline daily limit + escalation → `PATCH /api/project-providers/[id]/budget`.
+- Freshness badge on every cost; missing/error never renders bare `$0`.
+- **Leftover (honest):** `/projects/[slug]`, `/providers/neon`, Unmapped, Integrations — not stubbed.
+- Added `recharts` dependency.
+
 ### 2026-09-05 — dashboard read APIs
 
 - Session-gated JSON reads for Overview / Projects / Providers / usage series+totals / alerts / integrations / unmapped. `GET /api/sync/status` reused as-is.
 - Inline writes: `PATCH /api/project-providers/[id]/budget` (limit + escalation; setting a limit enables the rule), project rename/archive, resource mapping, credential expiry / mark rotated.
 - Missing/error costs return `costUsd: null` plus `sourceStatus` — never a bare `$0`.
-- Neon-shaped aliases (`/api/usage/projects`, spend-alert) and the visual dashboard are still outstanding.
+- Neon-shaped aliases (`/api/usage/projects`, spend-alert) still outstanding.
 - **Phase 1 safety:** ignored Neon project IDs ported; auto-created PROJECT_PROVIDER rules default to `enabled: false`; one-shot `pnpm exec tsx src/scripts/disable-default-project-provider-rules.ts` disables existing env-default ($1) rules.
 
 ---
