@@ -1,2 +1,2 @@
-/** Metric store helpers. Implemented in a later Phase 1 slice. */
-export {};
+export { metricIdempotencyKey } from './idempotency';
+export { upsertMetricEntries } from './upsert';

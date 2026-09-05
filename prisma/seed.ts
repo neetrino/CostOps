@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../src/generated/prisma/client';
-import { NEON_CREDENTIAL_REF } from '../src/config/constants';
+import { DEFAULT_SYNC_INTERVAL_MINUTES, NEON_CREDENTIAL_REF } from '../src/config/constants';
 
 function neonOrgId(): string | undefined {
   const value = process.env.NEON_ORG_ID?.trim();
@@ -41,6 +41,7 @@ async function seed(): Promise<void> {
         name: 'Neon organization',
         externalAccountId: orgId,
         credentialRef: NEON_CREDENTIAL_REF,
+        recommendedSyncIntervalMinutes: DEFAULT_SYNC_INTERVAL_MINUTES,
       },
       update: {
         name: 'Neon organization',

@@ -1,9 +1,12 @@
 import { APP_NAME } from '@/config/constants';
+import { HomeSyncStatus } from '@/features/overview/home-sync-status';
+import { loadHomeStatus } from '@/features/overview/load-home-status';
 import { getPublicEnv } from '@/shared/env';
 import { SignOutButton } from '@/shared/ui/sign-out-button';
 
-export default function HomePage() {
+export default async function HomePage() {
   const { hasDashboardAuth } = getPublicEnv();
+  const status = await loadHomeStatus();
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center px-6">
@@ -16,9 +19,7 @@ export default function HomePage() {
           Internal FinOps. Spend by project and period, Telegram when a Project × Provider daily
           limit breaks, history we own.
         </p>
-        <p className="mt-8 border-t border-[var(--line)] pt-6 text-sm text-[var(--ink)]">
-          Foundation is up. Schema, session, and health are ready. Dashboard boards come next.
-        </p>
+        <HomeSyncStatus status={status} />
         {hasDashboardAuth ? (
           <div className="mt-6">
             <SignOutButton />

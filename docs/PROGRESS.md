@@ -1,7 +1,7 @@
 # Progress — Neetrino CostOps
 
-**Phase.** 1 — foundation in progress  
-**Overall.** 28% (runnable app + schema + auth)  
+**Phase.** 1 — Neon adapter + sync slice done  
+**Overall.** 48% (foundation + pull/sync/alerts; dashboard still next)  
 **Updated.** 2026-09-05
 
 ---
@@ -11,7 +11,7 @@
 | Phase | Status | Progress |
 |-------|--------|----------|
 | 0. Architecture + docs | ✅ TECH_CARD confirmed | 100% |
-| 1. Core + Neon parity | 🔄 Foundation slice done | 20% |
+| 1. Core + Neon parity | 🔄 Adapter/sync/alerts done | 45% |
 | 2. Vercel | ⏳ | 0% |
 | 3. Project totals | ⏳ | 0% |
 | 4. Next providers | ⏳ | 0% |
@@ -37,26 +37,34 @@
 - [x] Routes: `/`, `/login`, `/api/health`, `/api/auth/login`, `/api/auth/logout`
 - [x] ESLint, Prettier, Vitest, Husky, commitlint, CI (Node 24)
 - [x] Seed: Provider `NEON` + ProviderAccount from `NEON_ORG_ID` when set
+- [x] Neon `CostProviderAdapter` (client, Zod, consumption v2, list projects, map-metrics, launch/scale pricing, credential meta)
+- [x] Provider registry + contract check (`credentialCreateUrl` required)
+- [x] Generic sync orchestration with SyncRun on **intraday** and daily reconcile
+- [x] CostEntry / MetricEntry upsert by idempotency key; current day PARTIAL / ESTIMATED; yesterday FINAL
+- [x] Spend alerts: first breach, escalation, P2002, Telegram-then-write
+- [x] Credential AUTH_FAILED once per incident + 30d / 7d / expired
+- [x] Cron: `GET /api/cron/sync`, `GET /api/cron/reconcile-yesterday`; `vercel.json` `0 * * * *` and `0 2 * * *`
+- [x] `POST /api/sync/now` (session + rate limit), `GET /api/sync/status`
+- [x] Vitest: aggregation, alerts, freshness, Neon formula, credential 401, adapter contract
 
 ---
 
 ## In progress
 
-- [ ] Neon adapter + sync
-- [ ] Cost / alert core + Telegram spend engine
 - [ ] Dashboard boards (Overview / Projects / Neon)
+- [ ] Read APIs beyond sync status
 - [ ] `scripts/migrate-from-neon.ts`
 
-**Blocker.** None for the next Phase 1 slice (adapter + sync).
+**Blocker.** None for the dashboard / read-API slice.
 
 ---
 
 ## Next
 
-1. Port Neon adapter (client, metrics, pricing, day + intraday sync)
-2. Core upsert / aggregates / freshness / budget eval
-3. Telegram spend alerts + credential rotation warnings
-4. Read APIs + dashboard port per `docs/DESIGN.md`
+1. Read APIs (`/api/overview`, projects, series) + dashboard port per `docs/DESIGN.md`
+2. Inline budget PATCH + mapping UI
+3. History copy from `OLD_NEON_PROJECT_DATABASE_URL`
+4. Preview deploy + 7-day Neon parity
 
 ---
 
@@ -68,6 +76,16 @@
 - Auth uses Next.js 16 `proxy.ts` (successor to `middleware.ts`) with the Neon password + JWT cookie model.
 - Prisma CLI uses `DIRECT_URL` when set; runtime uses pooled `DATABASE_URL`. Never points at `OLD_NEON_PROJECT_DATABASE_URL`.
 - Local `.env` has a typo key `OLD_NEON_PROJECTDATABASE_URL` (missing underscore). Runtime ignores it; rename to `OLD_NEON_PROJECT_DATABASE_URL` before the history-copy script.
+
+### 2026-09-05 — adapter + sync
+
+- Ported Neon Console API + pricing formula; public transfer allowance is still org-wide (100 GB), same as `neetrino/neon`.
+- Intraday writes `SyncRun` (old Neon skipped this).
+- Unmapped Neon projects auto-create a CostOps Project + `PROJECT_PROVIDER` budget (env $1 / 30%) so alerts work before `migrate-from-neon`.
+- Missing/error cost never becomes `$0`. Failed syncs do not invent spend rows.
+- `OLD_NEON_PROJECT_DATABASE_URL` is unused in this slice.
+- Neon pooled `DATABASE_URL` (PgBouncer) rejects startup `statement_timeout`. Runtime skips those `-c` options on `*-pooler.*` hosts; unpooled/local still apply TECH_CARD 30s/15s/10s.
+- Live forced sync against the configured `NEON_API_KEY` succeeded (378 rows read, 336 written). Telegram may have sent first-breach messages if daily spend already exceeded the $1 default.
 
 ---
 

@@ -38,15 +38,23 @@ function createPool(): Pool {
     DATABASE_STATEMENT_TIMEOUT_MS_DEFAULT,
   );
 
+  const pooled =
+    connectionString.includes('-pooler.') || connectionString.includes('pgbouncer=true');
+
   return new Pool({
     connectionString,
     max,
     connectionTimeoutMillis: poolTimeoutSeconds * 1000,
-    options: [
-      `-c statement_timeout=${statementTimeoutMs}`,
-      `-c idle_in_transaction_session_timeout=${DATABASE_IDLE_IN_TX_TIMEOUT_MS}`,
-      `-c lock_timeout=${DATABASE_LOCK_TIMEOUT_MS}`,
-    ].join(' '),
+    // Neon PgBouncer rejects startup `-c statement_timeout`. Unpooled/local still get TECH_CARD timeouts.
+    ...(pooled
+      ? {}
+      : {
+          options: [
+            `-c statement_timeout=${statementTimeoutMs}`,
+            `-c idle_in_transaction_session_timeout=${DATABASE_IDLE_IN_TX_TIMEOUT_MS}`,
+            `-c lock_timeout=${DATABASE_LOCK_TIMEOUT_MS}`,
+          ].join(' '),
+        }),
   });
 }
 
