@@ -1,0 +1,41 @@
+@import 'tailwindcss';
+
+:root {
+  --canvas: #f3efe6;
+  --paper: #fffcf7;
+  --ink: #1c1917;
+  --muted: #6f6a63;
+  --line: rgba(28, 25, 23, 0.1);
+  --line-strong: rgba(28, 25, 23, 0.16);
+  --accent: #1f4d3a;
+  --accent-ink: #f8f4ec;
+  --danger: #9f2a2a;
+  --shadow: 0 1px 2px rgba(28, 25, 23, 0.06);
+  --radius: 0.75rem;
+  --font-sans: var(--font-ibm-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-source-serif), ui-serif, Georgia, serif;
+}
+
+@theme inline {
+  --font-sans: var(--font-ibm-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-source-serif), ui-serif, Georgia, serif;
+  --color-canvas: var(--canvas);
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-danger: var(--danger);
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--canvas);
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}

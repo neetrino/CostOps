@@ -8,18 +8,19 @@ Internal multi-provider FinOps platform. Pulls usage and cost from infrastructur
 
 ## Status
 
-Phase 0 is complete. `docs/TECH_CARD.md` is **confirmed**. Next: Phase 1 scaffold (`docs/IMPLEMENTATION_PLAN.md`).
+Phase 1 foundation is in place: runnable Next.js 16 app, Prisma 7 schema, dashboard password auth. Next: Neon adapter + sync (`docs/IMPLEMENTATION_PLAN.md`).
 
 Docs index: [docs/README.md](./docs/README.md).
 
 ---
 
-## When Phase 1 starts
+## Local run
 
 1. Copy `.env.example` → `.env` (dev database only — never production URLs).
 2. Install: `pnpm install`
-3. Migrate the **dev** database: `pnpm exec prisma migrate dev`
-4. `pnpm dev`
+3. Migrate the **dev** database: `pnpm db:migrate` (or `pnpm db:migrate:deploy` for committed history)
+4. Seed: `pnpm db:seed`
+5. `pnpm dev` — open `/login`, then `/`. Health: `GET /api/health`
 5. Cron locally: `curl -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/sync`
 
 Production migrations run from the deploy job (`prisma migrate deploy`), not from a laptop.

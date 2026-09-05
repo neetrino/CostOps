@@ -1,0 +1,1 @@
+export { neonAdapterStub } from './adapter';

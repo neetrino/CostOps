@@ -1,7 +1,7 @@
 # Progress — Neetrino CostOps
 
-**Phase.** 1 — authorized (not started)  
-**Overall.** 18% (docs confirmed; no application code)  
+**Phase.** 1 — foundation in progress  
+**Overall.** 28% (runnable app + schema + auth)  
 **Updated.** 2026-09-05
 
 ---
@@ -11,7 +11,7 @@
 | Phase | Status | Progress |
 |-------|--------|----------|
 | 0. Architecture + docs | ✅ TECH_CARD confirmed | 100% |
-| 1. Core + Neon parity | ⏳ Authorized, not started | 0% |
+| 1. Core + Neon parity | 🔄 Foundation slice done | 20% |
 | 2. Vercel | ⏳ | 0% |
 | 3. Project totals | ⏳ | 0% |
 | 4. Next providers | ⏳ | 0% |
@@ -29,38 +29,45 @@
 - [x] ADRs + DECISIONS
 - [x] Cursor rules: Size B, CostOps constraints, NestJS/i18n globs fixed
 - [x] README, `.env.example`, quality plan
+- [x] Next.js 16 App Router + React 19 + Tailwind 4 + pnpm
+- [x] Size B folders (`src/app`, `features`, `core`, `providers`, `notifications`, `shared`, `config`)
+- [x] Prisma 7 schema from `DATA_MODEL.md` (including `CredentialAlert`) + initial migration
+- [x] Zod env, Pino logger, Prisma client
+- [x] Password + httpOnly JWT auth (Next.js 16 `src/proxy.ts` request gate)
+- [x] Routes: `/`, `/login`, `/api/health`, `/api/auth/login`, `/api/auth/logout`
+- [x] ESLint, Prettier, Vitest, Husky, commitlint, CI (Node 24)
+- [x] Seed: Provider `NEON` + ProviderAccount from `NEON_ORG_ID` when set
 
 ---
 
 ## In progress
 
-- [x] Confirm TECH_CARD
-- [x] Align Neon env names with `neetrino/neon` (`NEON_API_KEY`, `NEON_ORG_ID`)
-- [x] Document credential expiry / 401 alerts for every provider (`docs/CREDENTIAL_ROTATION.md`)
-- [x] Document `OLD_NEON_PROJECT_DATABASE_URL` (`docs/OLD_NEON_DATABASE.md`)
-- [x] Document design/UX bar (`docs/DESIGN.md`) — wait for explicit start command before scaffold
+- [ ] Neon adapter + sync
+- [ ] Cost / alert core + Telegram spend engine
+- [ ] Dashboard boards (Overview / Projects / Neon)
+- [ ] `scripts/migrate-from-neon.ts`
 
-**Blocker.** None for Phase 1 start.
+**Blocker.** None for the next Phase 1 slice (adapter + sync).
 
 ---
 
 ## Next
 
-1. Scaffold Next.js 16 + Prisma 7 + Vitest + CI
-2. Apply first migration
-3. Port Neon adapter and dashboard
+1. Port Neon adapter (client, metrics, pricing, day + intraday sync)
+2. Core upsert / aggregates / freshness / budget eval
+3. Telegram spend alerts + credential rotation warnings
+4. Read APIs + dashboard port per `docs/DESIGN.md`
 
 ---
 
 ## Notes
 
-### 2026-09-05
+### 2026-09-05 — foundation
 
-- Size B: feature modules + provider plugins; not Size A (too much domain) and not Size C (spec forbids microservice/K8s theater).
-- Neon remains the visual and operational baseline. Intraday hourly cron does not write `SyncRun` today — CostOps will record account-scoped runs for both cadences.
-- Adaptive DB limits confirmed: pool 5, statement 30s, idle-in-tx 15s, lock 10s.
-- Neon env: only `NEON_API_KEY` + `NEON_ORG_ID` (+ `NEON_PRICING_PLAN`). Removed `NEON_PRIMARY_*` duplicates.
-- Credential rotation: warn 30d / 7d / expired and on 401; Telegram + Settings; each adapter ships a create-token URL. Neon keys do not auto-expire; Vercel 1-year expiry is stored as `credentialExpiresAt` (API does not return it).
+- Scaffolded the runnable app. No Neon API sync, no Telegram spend engine, no charts.
+- Auth uses Next.js 16 `proxy.ts` (successor to `middleware.ts`) with the Neon password + JWT cookie model.
+- Prisma CLI uses `DIRECT_URL` when set; runtime uses pooled `DATABASE_URL`. Never points at `OLD_NEON_PROJECT_DATABASE_URL`.
+- Local `.env` has a typo key `OLD_NEON_PROJECTDATABASE_URL` (missing underscore). Runtime ignores it; rename to `OLD_NEON_PROJECT_DATABASE_URL` before the history-copy script.
 
 ---
 
