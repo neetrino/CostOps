@@ -39,11 +39,13 @@ export async function assignResourceToProject(input: {
   try {
     const projectProvider = await findOrCreateProjectProvider(project.id, resource.providerKey);
     const mapped = await applyMapping(resource.id, project.id, projectProvider.id);
-    await ensureProjectProviderBudgetRule({
-      projectId: project.id,
-      projectProviderId: projectProvider.id,
-      providerKey: resource.providerKey,
-    });
+    if (resource.providerKey !== 'HETZNER') {
+      await ensureProjectProviderBudgetRule({
+        projectId: project.id,
+        projectProviderId: projectProvider.id,
+        providerKey: resource.providerKey,
+      });
+    }
     return mapped;
   } catch (error) {
     if (isPrismaUniqueViolation(error)) {

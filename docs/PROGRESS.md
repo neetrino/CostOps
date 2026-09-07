@@ -173,7 +173,7 @@ Discrepancies vs docs:
 - Inline writes: `PATCH /api/project-providers/[id]/budget` (limit + escalation; setting a limit enables the rule), project rename/archive, resource mapping, credential expiry / mark rotated.
 - Missing/error costs return `costUsd: null` plus `sourceStatus` — never a bare `$0`.
 - Neon-shaped aliases (`/api/usage/projects`, spend-alert) still outstanding.
-- **Phase 1 safety:** ignored Neon project IDs ported; auto-created PROJECT_PROVIDER rules default to `enabled: false`; one-shot `pnpm exec tsx src/scripts/disable-default-project-provider-rules.ts` disables existing env-default ($1) rules.
+- **Phase 1 safety (reversed 2026-09-07):** ignored Neon project IDs ported; auto-created PROJECT_PROVIDER rules started `enabled: false` so the first live sync would not Telegram-spam every leftover project over $1.
 
 ### 2026-09-05 — Neon history hose
 
@@ -227,6 +227,12 @@ The `404 costs_not_found` was observed on a short UTC `from=today 00:00Z&to=now`
 - After a non-empty provider discover, resources missing from the live list are archived (history kept). Picker hides projects with no live resource. Extra ToonExpo rows were leftover Neon IDs, not extra DBs in the console.
 - Inbox **Save as project** (`POST /api/resources/[id]/project`) creates a CostOps project from one resource. Vercel/Upstash-only is valid. Team leftover (`_unallocated`) cannot become a project — Archive only.
 - `POST /api/sync/backfill` + `scripts/backfill.ts` fill missing UTC days (Sync now is today only). Vercel totals and Telegram use **EffectiveCost** (who spent, including plan credit).
+
+### 2026-09-07 — daily $1 alerts on by default
+
+- Operator decision: every Neon / Vercel / Upstash Project × Provider rule is `$1` **and enabled**. No Set / Sync now to arm Telegram. VPS stays analytics-only.
+- `ensureProjectProviderBudgetRule` creates `enabled: true`. One-shot `pnpm exec tsx src/scripts/enable-project-provider-rules.ts` turns on existing disabled live-provider rules. `pnpm exec tsx src/scripts/run-stored-alert-pass.ts` evaluates stored today without a provider pull.
+- Near daily limit only lists **enabled** rules (same gate as Telegram). Disabled leftover rules no longer appear as if they were watching.
 
 ### 2026-09-07 — home = projects board
 

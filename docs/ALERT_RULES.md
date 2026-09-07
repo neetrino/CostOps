@@ -32,7 +32,9 @@ Provider **credential** failures and token expiry are a separate engine: [CREDEN
 | `GLOBAL_TOTAL` | optional | All CostEntry that day |
 | `RESOURCE` | future | — |
 
-Defaults when a PROJECT_PROVIDER rule is missing after Neon migration: env `TELEGRAM_SPEND_ALERT_DEFAULT_USD` (Neon default `$1`) and `SPEND_ALERT_ESCALATION_PERCENT_OF_THRESHOLD` (30).
+Defaults when a PROJECT_PROVIDER rule is missing: env `TELEGRAM_SPEND_ALERT_DEFAULT_USD` (`$1`) and `SPEND_ALERT_ESCALATION_PERCENT_OF_THRESHOLD` (30), **enabled**. Every mapped Neon / Vercel / Upstash link is watched as soon as spend exists — no Set to arm Telegram. HETZNER / VPS stays out of daily Telegram.
+
+Phase 1 created these rules disabled so the first live sync would not flood Telegram from leftover Neon projects. That safety slice is reversed.
 
 ---
 
