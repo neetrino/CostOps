@@ -76,7 +76,7 @@ Forbidden:
 | `/providers` | providers |
 | `/providers/[key]` | providers |
 | `/settings` | settings / mapping / accounts |
-| `/api/cron/sync` | generic scheduler |
+| `/api/cron/sync/[provider]` | one provider per cron invocation |
 | `/api/usage/*` | read models (ported from Neon, then generalized) |
 | `/api/auth/*` | login/logout |
 

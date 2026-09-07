@@ -21,7 +21,8 @@ Docs index: [docs/README.md](./docs/README.md).
 3. Migrate the **dev** database: `pnpm db:migrate` (or `pnpm db:migrate:deploy` for committed history)
 4. Seed: `pnpm db:seed`
 5. `pnpm dev` — open `/login`, then `/`. Health: `GET /api/health`
-5. Cron locally: `curl -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/sync`
+5. Cron locally (one provider per call, same as production):
+   `curl -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/sync/neon`
 
 Production migrations run from the deploy job (`prisma migrate deploy`), not from a laptop.
 

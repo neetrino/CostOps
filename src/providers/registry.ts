@@ -4,8 +4,10 @@ import { upstashAdapter } from '@/providers/upstash/adapter';
 import { vercelAdapter } from '@/providers/vercel/adapter';
 import type { CostProviderAdapter } from '@/providers/types';
 
-export const REGISTERED_PROVIDER_KEYS = ['NEON', 'VERCEL', 'UPSTASH'] as const;
-export type RegisteredProviderKey = (typeof REGISTERED_PROVIDER_KEYS)[number];
+export {
+  REGISTERED_PROVIDER_KEYS,
+  type RegisteredProviderKey,
+} from '@/shared/registered-providers';
 
 const adapters = new Map<string, CostProviderAdapter>();
 
