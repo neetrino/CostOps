@@ -55,6 +55,7 @@ export type ProviderCredentialMeta = {
   credentialCreateUrl: string;
   credentialDocsUrl: string;
   credentialCreatePath: string;
+  /** Always false. CostOps does not store vendor token expiry dates. */
   supportsExpiryDate: boolean;
   isAuthFailure(error: unknown): boolean;
 };

@@ -4,7 +4,6 @@ import {
   evaluateExpiryAlerts,
   sendAuthFailureAlert,
 } from '@/core/alerts/evaluate-credentials';
-import { expiryKindsDue, expiryWindowKey } from '@/core/alerts/credential-kinds';
 import type { CredentialAlertRecord, CredentialAlertStore } from '@/core/alerts/credential-types';
 import { neonCredentialMeta } from '@/providers/neon/credentials';
 
@@ -120,15 +119,13 @@ describe('credential alerts', () => {
     expect(store.rows.some((row) => row.kind === 'AUTH_FAILED')).toBe(false);
   });
 
-  it('sends the 30-day warning once, then the 7-day warning later', async () => {
-    const expiresAt = new Date('2026-10-05T00:00:00.000Z');
+  it('does not send calendar expiry alerts even if a leftover date is stored', async () => {
     const store = memoryCredentialStore();
     const sent: string[] = [];
-    const acc = { ...account, credentialExpiresAt: expiresAt };
-    const first = await evaluateExpiryAlerts({
-      account: acc,
+    const kinds = await evaluateExpiryAlerts({
+      account: { ...account, credentialExpiresAt: new Date('2026-09-08T00:00:00.000Z') },
       meta: neonCredentialMeta,
-      now: new Date('2026-09-06T00:00:00.000Z'),
+      now: new Date('2026-09-07T00:00:00.000Z'),
       store,
       notifier: {
         sendHtml: async (html) => {
@@ -136,67 +133,8 @@ describe('credential alerts', () => {
         },
       },
     });
-    const againHourly = await evaluateExpiryAlerts({
-      account: acc,
-      meta: neonCredentialMeta,
-      now: new Date('2026-09-06T01:00:00.000Z'),
-      store,
-      notifier: {
-        sendHtml: async (html) => {
-          sent.push(html);
-        },
-      },
-    });
-    const week = await evaluateExpiryAlerts({
-      account: acc,
-      meta: neonCredentialMeta,
-      now: new Date('2026-09-29T00:00:00.000Z'),
-      store,
-      notifier: {
-        sendHtml: async (html) => {
-          sent.push(html);
-        },
-      },
-    });
-    expect(first).toEqual(['EXPIRING_30D']);
-    expect(againHourly).toEqual([]);
-    expect(week).toEqual(['EXPIRING_7D']);
-    expect(sent).toHaveLength(2);
-  });
-
-  it('sends an expiry-day warning', async () => {
-    const expiresAt = new Date('2026-09-05T12:00:00.000Z');
-    expect(expiryKindsDue(expiresAt, new Date('2026-09-05T12:00:00.000Z'))).toEqual(['EXPIRED']);
-    const store = memoryCredentialStore();
-    const sent = await evaluateExpiryAlerts({
-      account: { ...account, credentialExpiresAt: expiresAt },
-      meta: neonCredentialMeta,
-      now: new Date('2026-09-05T13:00:00.000Z'),
-      store,
-      notifier: { sendHtml: async () => undefined },
-    });
-    expect(sent).toEqual(['EXPIRED']);
-  });
-
-  it('starts a new expiry cycle when expiresAt changes', async () => {
-    const store = memoryCredentialStore();
-    const firstExpiry = new Date('2026-10-05T00:00:00.000Z');
-    await evaluateExpiryAlerts({
-      account: { ...account, credentialExpiresAt: firstExpiry },
-      meta: neonCredentialMeta,
-      now: new Date('2026-09-06T00:00:00.000Z'),
-      store,
-      notifier: { sendHtml: async () => undefined },
-    });
-    const rotated = new Date('2027-09-05T00:00:00.000Z');
-    expect(expiryWindowKey(rotated)).not.toBe(expiryWindowKey(firstExpiry));
-    const sent = await evaluateExpiryAlerts({
-      account: { ...account, credentialExpiresAt: rotated },
-      meta: neonCredentialMeta,
-      now: new Date('2027-08-10T00:00:00.000Z'),
-      store,
-      notifier: { sendHtml: async () => undefined },
-    });
-    expect(sent).toEqual(['EXPIRING_30D']);
+    expect(kinds).toEqual([]);
+    expect(sent).toEqual([]);
+    expect(store.inserts).toBe(0);
   });
 });

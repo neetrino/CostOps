@@ -88,7 +88,8 @@ function IntegrationsContent() {
       <header>
         <h1 className="wordmark text-3xl text-[var(--ink)]">Integrations</h1>
         <p className="mt-1 text-sm text-[var(--muted)]">
-          Credential health, sync status, and rotation links — no secrets on screen.
+          Status comes from the last provider API request. Token expiry dates are not stored. No
+          secrets on screen.
         </p>
       </header>
       <ul className="grid gap-5 lg:grid-cols-2">
@@ -111,28 +112,8 @@ function IntegrationAccountCard({
   account: IntegrationAccount;
   onUpdated: () => void;
 }) {
-  const [expiryDraft, setExpiryDraft] = useState(account.credentialExpiresAt?.slice(0, 10) ?? '');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const saveExpiry = async () => {
-    setSaving(true);
-    setError(null);
-    try {
-      await fetchJson(`/api/provider-accounts/${account.id}/credential`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          credentialExpiresAt: expiryDraft.trim() ? expiryDraft.trim() : null,
-        }),
-      });
-      onUpdated();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Save failed');
-    } finally {
-      setSaving(false);
-    }
-  };
 
   const markRotated = async () => {
     if (!window.confirm('Mark credential as rotated? Clears auth-failure incident.')) {
@@ -187,27 +168,6 @@ function IntegrationAccountCard({
             {account.lastAuthFailureCode ? ` · ${account.lastAuthFailureCode}` : ''}
           </p>
         ) : null}
-        {account.daysUntilExpiry !== null ? (
-          <p className="text-xs text-[var(--muted)]">
-            Expires in {account.daysUntilExpiry} day{account.daysUntilExpiry === 1 ? '' : 's'}
-          </p>
-        ) : null}
-        {account.supportsExpiryDate ? (
-          <label className="text-xs font-medium text-[var(--muted)]">
-            Credential expiry (UTC date)
-            <div className="mt-1 flex flex-wrap gap-2">
-              <input
-                type="date"
-                value={expiryDraft}
-                onChange={(event) => setExpiryDraft(event.target.value)}
-                className="rounded-[var(--radius-sm)] border border-[var(--line-strong)] bg-[var(--canvas)] px-3 py-2 text-sm"
-              />
-              <Button variant="secondary" disabled={saving} onClick={() => void saveExpiry()}>
-                Save expiry
-              </Button>
-            </div>
-          </label>
-        ) : null}
         <div className="mt-auto flex flex-wrap gap-2 border-t border-[var(--line)] pt-4">
           {rotateUrl ? (
             <a
@@ -238,21 +198,19 @@ function CredentialHealthBadge({ health }: { health: IntegrationAccount['credent
   const tone =
     health === 'ok'
       ? 'fresh'
-      : health === 'expiring'
-        ? 'partial'
-        : health === 'unknown'
-          ? 'missing'
+      : health === 'unknown'
+        ? 'missing'
+        : health === 'error'
+          ? 'stale'
           : 'error';
   const label =
     health === 'ok'
       ? 'Healthy'
-      : health === 'expiring'
-        ? 'Expiring'
-        : health === 'expired'
-          ? 'Expired'
-          : health === 'auth_failed'
-            ? 'Auth failed'
-            : 'Unknown';
+      : health === 'auth_failed'
+        ? 'Auth failed'
+        : health === 'error'
+          ? 'Request failed'
+          : 'Unknown';
   return (
     <span title={`Credential: ${label}`}>
       <FreshnessBadge status={tone} />

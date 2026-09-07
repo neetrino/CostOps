@@ -1,40 +1,22 @@
-import { CREDENTIAL_WARN_DAYS_LONG, MS_PER_DAY } from '@/config/constants';
-
-export type CredentialHealth = 'ok' | 'expiring' | 'expired' | 'auth_failed' | 'unknown';
-
-export function daysUntilExpiry(expiresAt: Date, now: Date): number {
-  return Math.floor((expiresAt.getTime() - now.getTime()) / MS_PER_DAY);
-}
+export type CredentialHealth = 'ok' | 'auth_failed' | 'error' | 'unknown';
 
 /**
- * Admin credential health. Auth failure wins over expiry.
+ * Admin credential health from the last live provider request.
+ * Calendar expiry dates are not used — vendors do not return them, and we do not store them.
  */
 export function credentialHealth(input: {
   lastAuthFailureAt: Date | null;
-  credentialExpiresAt: Date | null;
+  lastErrorAt?: Date | null;
   lastSuccessfulSyncAt: Date | null;
-  now: Date;
-}): { health: CredentialHealth; daysUntilExpiry: number | null } {
+}): { health: CredentialHealth } {
   if (input.lastAuthFailureAt) {
-    return {
-      health: 'auth_failed',
-      daysUntilExpiry: input.credentialExpiresAt
-        ? daysUntilExpiry(input.credentialExpiresAt, input.now)
-        : null,
-    };
+    return { health: 'auth_failed' };
   }
-  if (input.credentialExpiresAt) {
-    const days = daysUntilExpiry(input.credentialExpiresAt, input.now);
-    if (days < 0) {
-      return { health: 'expired', daysUntilExpiry: days };
-    }
-    if (days <= CREDENTIAL_WARN_DAYS_LONG) {
-      return { health: 'expiring', daysUntilExpiry: days };
-    }
-    return { health: 'ok', daysUntilExpiry: days };
+  if (input.lastErrorAt) {
+    return { health: 'error' };
   }
   if (input.lastSuccessfulSyncAt) {
-    return { health: 'ok', daysUntilExpiry: null };
+    return { health: 'ok' };
   }
-  return { health: 'unknown', daysUntilExpiry: null };
+  return { health: 'unknown' };
 }

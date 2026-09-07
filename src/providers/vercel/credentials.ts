@@ -14,7 +14,7 @@ export const vercelCredentialMeta: ProviderCredentialMeta = {
   credentialCreateUrl: VERCEL_CREATE_TOKEN_URL,
   credentialDocsUrl: VERCEL_CREDENTIAL_DOCS_URL,
   credentialCreatePath: VERCEL_CREDENTIAL_CREATE_PATH,
-  supportsExpiryDate: true,
+  supportsExpiryDate: false,
   isAuthFailure: isVercelAuthFailure,
 };
 

@@ -110,7 +110,7 @@
 | 7.11 | Telegram | Bot API | ✅ | |
 | 7.12 | Neon API | Console API v2 | ✅ | Env names: `NEON_API_KEY`, `NEON_ORG_ID` (same as `neetrino/neon`) |
 | 7.13 | Vercel API | Billing/usage — verify live | ✅ | Env names: `VERCEL_API_TOKEN`, `VERCEL_TEAM_ID` |
-| 7.14 | Credential rotation | Admin + Telegram | ✅ | 30d / 7d / expired + 401; per-provider create-token URL. `docs/CREDENTIAL_ROTATION.md` |
+| 7.14 | Credential rotation | Admin + Telegram | ✅ | Live 401/403 only; no stored expiry date. Per-provider create-token URL. `docs/CREDENTIAL_ROTATION.md` |
 
 ---
 

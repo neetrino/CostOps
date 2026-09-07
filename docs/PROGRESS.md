@@ -42,7 +42,7 @@
 - [x] Generic sync orchestration with SyncRun on **intraday** and daily reconcile
 - [x] CostEntry / MetricEntry upsert by idempotency key; current day PARTIAL / ESTIMATED; yesterday FINAL
 - [x] Spend alerts: first breach, escalation, P2002, Telegram-then-write
-- [x] Credential AUTH_FAILED once per incident + 30d / 7d / expired
+- [x] Credential AUTH_FAILED once per incident (calendar 30d / 7d / expired disabled; no stored expiry date)
 - [x] Cron: `GET /api/cron/sync`, `GET /api/cron/reconcile-yesterday`; `vercel.json` `0 * * * *` and `0 2 * * *`
 - [x] `POST /api/sync/now` (session + rate limit), `GET /api/sync/status`
 - [x] Vitest: aggregation, alerts, freshness, Neon formula, credential 401, adapter contract
@@ -53,7 +53,7 @@
 - [x] Visual dashboard: app shell, Overview `/`, Projects `/projects` (URL filters, KPI strip, Recharts, cards/list, inline budget, freshness, sync chip)
 - [x] Phase 1 detail routes: `/projects/[slug]`, `/providers/[key]`, `/unmapped`, `/integrations` (filter rail, charts, inline budget, mapping, credential health)
 - [x] Nav: Overview, Projects, Neon, Vercel, Unmapped, Integrations; project cards link to detail
-- [x] Vercel `CostProviderAdapter` (`src/providers/vercel/`): GET `/v10/projects`, FOCUS GET `/v1/billing/charges`, Zod, credential meta (`supportsExpiryDate: true`)
+- [x] Vercel `CostProviderAdapter` (`src/providers/vercel/`): GET `/v10/projects`, FOCUS GET `/v1/billing/charges`, Zod, credential meta (`supportsExpiryDate: false`)
 - [x] Seed + cron ensure Provider `VERCEL` + ProviderAccount from `VERCEL_TEAM_ID`
 - [x] `/providers/vercel` board + unmapped inbox for `vercel_project` / `vercel_unallocated`
 - [x] Design tokens extended in `globals.css` (warning/stale/chart solids; no gradients)

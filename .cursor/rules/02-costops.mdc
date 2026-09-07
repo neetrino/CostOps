@@ -22,4 +22,4 @@ Internal multi-provider FinOps. Spec: `docs/Neetrino_CostOps_CURSOR_SPEC.md`. St
 - Schema changes go through `safe-database-migration`. Update `docs/PROGRESS.md` after milestones.
 - `docs/TECH_CARD.md` is confirmed. Follow `docs/IMPLEMENTATION_PLAN.md`. Do not retire old Neon until parity tests pass.
 - Neon env names match the baseline app: `NEON_API_KEY`, `NEON_ORG_ID`. Do not add `NEON_PRIMARY_*` aliases.
-- Every provider adapter must expose a create-token URL and auth-failure detection. Warn 30d / 7d / expired and on 401. See `docs/CREDENTIAL_ROTATION.md`.
+- Every provider adapter must expose a create-token URL and auth-failure detection. Token health comes from the live provider request (401/403 / expired key) — do not store or ask for expiry dates. See `docs/CREDENTIAL_ROTATION.md`.

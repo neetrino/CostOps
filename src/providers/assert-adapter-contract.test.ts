@@ -13,14 +13,14 @@ describe('adapter contract', () => {
     expect(() => assertAdapterContract(adapter)).not.toThrow();
   });
 
-  it('registers Vercel with expiry-aware rotate metadata', () => {
+  it('registers Vercel with rotate metadata and no stored expiry date', () => {
     const adapter = getAdapter('VERCEL');
     expect(adapter.providerKey).toBe('VERCEL');
     expect(adapter.supportsIntraday).toBe(false);
     expect(adapter.supportsBackfill).toBe(true);
     expect(adapter.credentials.credentialCreateUrl).toBe('https://vercel.com/account/tokens');
     expect(adapter.credentials.envVarNames).toEqual(['VERCEL_API_TOKEN', 'VERCEL_TEAM_ID']);
-    expect(adapter.credentials.supportsExpiryDate).toBe(true);
+    expect(adapter.credentials.supportsExpiryDate).toBe(false);
     expect(() => assertAdapterContract(adapter)).not.toThrow();
   });
 

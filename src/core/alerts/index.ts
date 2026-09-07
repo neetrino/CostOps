@@ -7,7 +7,7 @@ export {
 } from './evaluate-credentials';
 export { evaluateCredentialExpiryForAccounts } from './run-credential-expiry';
 export { expiryKindsDue, expiryWindowKey } from './credential-kinds';
-export { credentialHealth, daysUntilExpiry } from './credential-health';
+export { credentialHealth } from './credential-health';
 export type { CredentialHealth } from './credential-health';
 export type { SpendAlertStore, SpendAlertTarget, SpendNotifier } from './spend-types';
 export type { CredentialAlertStore, CredentialNotifier } from './credential-types';

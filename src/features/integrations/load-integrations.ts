@@ -2,7 +2,7 @@ import { credentialHealth } from '@/core/alerts/credential-health';
 import { tryGetAdapter } from '@/providers/registry';
 import { prisma } from '@/shared/db';
 
-export async function loadIntegrations(now: Date = new Date()) {
+export async function loadIntegrations() {
   const accounts = await prisma.providerAccount.findMany({
     orderBy: [{ providerKey: 'asc' }, { name: 'asc' }],
     include: { provider: { select: { displayName: true, enabled: true } } },
@@ -13,9 +13,8 @@ export async function loadIntegrations(now: Date = new Date()) {
       const adapter = tryGetAdapter(account.providerKey);
       const health = credentialHealth({
         lastAuthFailureAt: account.lastAuthFailureAt,
-        credentialExpiresAt: account.credentialExpiresAt,
+        lastErrorAt: account.lastErrorAt,
         lastSuccessfulSyncAt: account.lastSuccessfulSyncAt,
-        now,
       });
       return {
         id: account.id,
@@ -30,14 +29,11 @@ export async function loadIntegrations(now: Date = new Date()) {
         lastErrorMessage: account.lastErrorMessage,
         lastAuthFailureAt: account.lastAuthFailureAt?.toISOString() ?? null,
         lastAuthFailureCode: account.lastAuthFailureCode,
-        credentialExpiresAt: account.credentialExpiresAt?.toISOString() ?? null,
         credentialRotatedAt: account.credentialRotatedAt?.toISOString() ?? null,
         credentialHealth: health.health,
-        daysUntilExpiry: health.daysUntilExpiry,
         credentialCreateUrl: adapter?.credentials.credentialCreateUrl ?? null,
         credentialCreatePath: adapter?.credentials.credentialCreatePath ?? null,
         credentialDocsUrl: adapter?.credentials.credentialDocsUrl ?? null,
-        supportsExpiryDate: adapter?.credentials.supportsExpiryDate ?? false,
       };
     }),
   };

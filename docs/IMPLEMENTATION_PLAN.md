@@ -25,7 +25,7 @@ Goal: CostOps can replace the Neon dashboard for Neon-only use.
 3. Apply schema from `DATA_MODEL.md` via migration
 4. Seed Provider `NEON` + ProviderAccount from env
 5. Core: upsert, aggregates, freshness, budget eval, Telegram
-6. Credential health: expiry warnings (30d / 7d / expired), 401/403 alerts, Settings Integrations UI + Telegram with create-token URL ([CREDENTIAL_ROTATION.md](./CREDENTIAL_ROTATION.md))
+6. Credential health: live 401/403 alerts (no stored expiry dates), Settings Integrations UI + Telegram with create-token URL ([CREDENTIAL_ROTATION.md](./CREDENTIAL_ROTATION.md))
 7. Neon adapter (port client, metrics, pricing, day + intraday sync) + Neon `credentials` meta (org API keys page; no auto-expiry)
 8. Scheduler routes + SyncRun
 9. UI: Overview shell, Projects, Project detail (Neon only), Neon provider board — [DESIGN.md](./DESIGN.md)

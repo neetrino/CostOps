@@ -67,9 +67,8 @@ export async function loadOverview(
           name: account.name,
           health: credentialHealth({
             lastAuthFailureAt: account.lastAuthFailureAt,
-            credentialExpiresAt: account.credentialExpiresAt,
+            lastErrorAt: account.lastErrorAt,
             lastSuccessfulSyncAt: account.lastSuccessfulSyncAt,
-            now,
           }).health,
         }))
         .filter((row) => row.health !== 'ok'),
@@ -101,7 +100,7 @@ async function loadOverviewCatalog() {
         providerKey: true,
         name: true,
         lastAuthFailureAt: true,
-        credentialExpiresAt: true,
+        lastErrorAt: true,
         lastSuccessfulSyncAt: true,
       },
     }),

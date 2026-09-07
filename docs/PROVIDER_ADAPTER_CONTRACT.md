@@ -60,7 +60,7 @@ export type ProviderCredentialMeta = {
   credentialCreateUrl: string;
   credentialDocsUrl: string;
   credentialCreatePath: string;
-  supportsExpiryDate: boolean;
+  supportsExpiryDate: boolean; // always false; CostOps does not store token expiry dates
   isAuthFailure(error: unknown): boolean;
 };
 

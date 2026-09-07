@@ -154,3 +154,4 @@ Paid models: not used. Fable 5: orchestrator only.
 | QStash `period=30d` unused | Live API returns 400; default stats already include a calendar-month `daily_billings`. |
 | Vector/Search daily cost `missing` | No daily USD series in the Management API stats (only `monthly_cost`). Discover later when indexes exist. |
 | Tokens never stored | List payloads include Redis rest tokens and QStash tokens. Zod keeps identity fields only. |
+| No stored token expiry dates | Operator does not type Vercel/Neon/Upstash expiry in admin. Status + Telegram only from live 401/403. |
