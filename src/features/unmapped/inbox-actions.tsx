@@ -12,6 +12,7 @@ export function InboxActions({
   confirmArchive,
   onProjectId,
   onMap,
+  onSaveAsProject,
   onAskArchive,
   onCancelArchive,
   onConfirmArchive,
@@ -23,10 +24,28 @@ export function InboxActions({
   confirmArchive: boolean;
   onProjectId: (value: string) => void;
   onMap: () => void;
+  onSaveAsProject: (() => void) | null;
   onAskArchive: () => void;
   onCancelArchive: () => void;
   onConfirmArchive: () => void;
 }) {
+  const archive = (
+    <ArchiveButtons
+      saving={saving}
+      confirmArchive={confirmArchive}
+      leftover={!onSaveAsProject}
+      onAskArchive={onAskArchive}
+      onCancelArchive={onCancelArchive}
+      onConfirmArchive={onConfirmArchive}
+    />
+  );
+  if (!onSaveAsProject) {
+    return (
+      <div className="mt-4 flex flex-wrap items-end gap-2 border-t border-[var(--line)] pt-4">
+        {archive}
+      </div>
+    );
+  }
   return (
     <div className="mt-4 flex flex-wrap items-end gap-2 border-t border-[var(--line)] pt-4">
       <ProjectPicker
@@ -38,20 +57,44 @@ export function InboxActions({
       <Button variant="secondary" disabled={saving || !projectId} onClick={onMap}>
         {saving ? 'Saving…' : 'Map'}
       </Button>
-      {confirmArchive ? (
-        <>
-          <Button variant="ghost" disabled={saving} onClick={onCancelArchive}>
-            Cancel
-          </Button>
-          <Button variant="secondary" disabled={saving} onClick={onConfirmArchive}>
-            Confirm archive
-          </Button>
-        </>
-      ) : (
-        <Button variant="ghost" disabled={saving} onClick={onAskArchive}>
-          Archive
-        </Button>
-      )}
+      <Button variant="secondary" disabled={saving} onClick={onSaveAsProject}>
+        {saving ? 'Saving…' : 'Save as project'}
+      </Button>
+      {archive}
     </div>
+  );
+}
+
+function ArchiveButtons({
+  saving,
+  confirmArchive,
+  leftover,
+  onAskArchive,
+  onCancelArchive,
+  onConfirmArchive,
+}: {
+  saving: boolean;
+  confirmArchive: boolean;
+  leftover: boolean;
+  onAskArchive: () => void;
+  onCancelArchive: () => void;
+  onConfirmArchive: () => void;
+}) {
+  if (confirmArchive) {
+    return (
+      <>
+        <Button variant="ghost" disabled={saving} onClick={onCancelArchive}>
+          Cancel
+        </Button>
+        <Button variant="secondary" disabled={saving} onClick={onConfirmArchive}>
+          Confirm archive
+        </Button>
+      </>
+    );
+  }
+  return (
+    <Button variant={leftover ? 'secondary' : 'ghost'} disabled={saving} onClick={onAskArchive}>
+      {leftover ? 'Archive leftover' : 'Archive'}
+    </Button>
   );
 }

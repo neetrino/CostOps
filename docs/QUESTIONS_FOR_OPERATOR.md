@@ -8,7 +8,7 @@ If this list is empty at the end of Phase 1, nothing is blocked on you.
 
 ## Open
 
-1. **Vercel + Upstash → проекты** — в `/unmapped` searchable picker (slug + Neon/Vercel/Upstash chips). Одинаковые имена не сливаю — это разные записи. Связь не обязательна. Archive для мусора.
+1. **Vercel + Upstash → проекты** — в `/unmapped`: Map на существующий, **Save as project** для одиночки (только Vercel/Upstash — нормально), Archive для leftover (`Team (unallocated)`) и мусора. Одинаковые имена не сливаю.
 2. **GCP** — отложили. Проект `neetrino` создан, биллинг не привязан (лимит 5 billed-проектов). `GOOGLE_APPLICATION_CREDENTIALS` пустой. Вернёмся позже.
 
 ---

@@ -158,3 +158,4 @@ Paid models: not used. Fable 5: orchestrator only.
 | Suggest inbox maps, never auto-PATCH | Best-name match is prefilled. Operator confirms or changes. Ambiguous / `_unallocated` / QStash stay unmatched. |
 | Archive ≠ delete | `Resource.archivedAt` hides trash from `/unmapped`. Restore returns it. Cost rows stay. |
 | Archive resources gone from the provider list | After a non-empty discover, leftover IDs are archived. Empty discover does not wipe. History stays. |
+| Standalone inbox → Save as project | Vercel/Upstash-only apps get an operator-clicked CostOps project. `_unallocated` cannot. No auto-create. |

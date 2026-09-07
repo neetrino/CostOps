@@ -57,6 +57,15 @@ export function UnmappedRow({
             });
           });
         }}
+        onSaveAsProject={
+          isUnallocatedResource(resource)
+            ? null
+            : () => {
+                void run(async () => {
+                  await fetchJson(`/api/resources/${resource.id}/project`, { method: 'POST' });
+                });
+              }
+        }
         onAskArchive={() => setConfirmArchive(true)}
         onCancelArchive={() => setConfirmArchive(false)}
         onConfirmArchive={() => {
@@ -91,13 +100,14 @@ function SuggestionHint({ resource }: { resource: InboxResourceRow }) {
   if (isUnallocatedResource(resource)) {
     return (
       <p className="mt-3 text-xs text-[var(--muted)]">
-        Team leftover spend. Usually archive, not a business project.
+        Vercel team leftovers (seats, Pro, untagged charges) — not an app. Archive, do not save as
+        a project.
       </p>
     );
   }
   return (
     <p className="mt-3 text-xs text-[var(--muted)]">
-      No confident match. Search a project, keep unmapped, or archive.
+      No Neon/Upstash needed. Save as project creates a CostOps project with only this resource.
     </p>
   );
 }
