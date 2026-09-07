@@ -11,7 +11,7 @@ type KpiStripProps = {
 
 function periodCostLabel(sourceType: CostView['sourceType']): string {
   if (sourceType === 'API') {
-    return 'Billed cost';
+    return 'Usage cost';
   }
   if (sourceType === 'FIXED') {
     return 'Fixed cost';
@@ -22,9 +22,12 @@ function periodCostLabel(sourceType: CostView['sourceType']): string {
   return 'Estimated cost';
 }
 
-function periodCostHint(sourceType: CostView['sourceType']): string {
+function periodCostHint(sourceType: CostView['sourceType'], providerKey?: string): string {
+  if (providerKey === 'VERCEL') {
+    return 'Current billing cycle · credit counted';
+  }
   if (sourceType === 'API') {
-    return 'API billed · period total';
+    return 'API usage · period total';
   }
   return 'Approximate · period total';
 }
@@ -32,7 +35,7 @@ function periodCostHint(sourceType: CostView['sourceType']): string {
 export function KpiStrip({ total, byProvider, loading }: KpiStripProps) {
   if (loading) {
     return (
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, index) => (
           <div
             key={index}
@@ -43,16 +46,17 @@ export function KpiStrip({ total, byProvider, loading }: KpiStripProps) {
     );
   }
 
-  const tiles = [
+  const tiles: Array<{ label: string; cost: CostView; providerKey?: string }> = [
     { label: periodCostLabel(total.sourceType), cost: total },
     ...byProvider.slice(0, 3).map((row) => ({
       label: row.displayName,
       cost: row.cost,
+      providerKey: row.providerKey,
     })),
   ];
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
       {tiles.map((tile) => (
         <div
           key={tile.label}
@@ -65,7 +69,7 @@ export function KpiStrip({ total, byProvider, loading }: KpiStripProps) {
             <CostViewDisplay cost={tile.cost} size="md" />
           </div>
           <p className="mt-2 text-[10px] text-[var(--muted)]">
-            {periodCostHint(tile.cost.sourceType)}
+            {periodCostHint(tile.cost.sourceType, tile.providerKey)}
           </p>
         </div>
       ))}

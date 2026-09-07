@@ -3,7 +3,7 @@ import { costViewForRows, latestSyncForAccounts } from '@/core/cost/cost-view';
 import {
   rowsForProjectProvider,
   rowsForResource,
-  rowsInRange,
+  rowsInDashboardPeriod,
   rowsOnUtcDay,
 } from '@/core/cost/filter-entries';
 import { loadDashboardCostContext } from '@/core/cost/load-dashboard-costs';
@@ -43,7 +43,7 @@ export async function loadProjectDetail(
       },
     }),
   ]);
-  const periodRows = rowsInRange(cost.entries, query.from, query.to);
+  const periodRows = rowsInDashboardPeriod(cost.entries, query.from, query.to, query.preset);
   const todayRows = rowsOnUtcDay(cost.entries, cost.today);
   const providers = project.projectProviders
     .filter((link) => !query.providerKey || link.providerKey === query.providerKey)

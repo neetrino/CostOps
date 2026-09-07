@@ -9,20 +9,21 @@ import { fetchJson, UnauthorizedError } from '@/features/dashboard/api-client';
 import { useDashboardUrl } from '@/features/dashboard/use-dashboard-url';
 import { useUnauthorizedRedirect } from '@/features/dashboard/use-unauthorized-redirect';
 import { buildCompareBarData } from '@/features/projects/chart-data';
+import { DashboardBoard } from '@/features/projects/dashboard-board';
 import { FilterRail } from '@/features/projects/filter-rail';
 import { KpiStrip } from '@/features/projects/kpi-strip';
 import { ProjectCompareChart } from '@/features/projects/project-compare-chart';
 import { UsageSeriesChart } from '@/features/projects/usage-series-chart';
+import { sortByPeriodCostDesc } from '@/features/projects/sort-projects-by-cost';
+import { ViewToggle, type BoardViewMode } from '@/features/projects/view-toggle';
 import type { ProviderDetailResponse } from '@/features/providers/load-provider-detail';
+import { BackfillPeriodButton } from '@/features/providers/backfill-period-button';
 import { ProviderProjectCards } from '@/features/providers/provider-project-cards';
 import { ProviderProjectList } from '@/features/providers/provider-project-list';
-import { Button } from '@/shared/ui/button';
 import { CostViewDisplay } from '@/shared/ui/cost-view-display';
 import { CardSkeleton, EmptyPanel, ErrorPanel } from '@/shared/ui/state-panels';
 
 type UsageSeriesResponse = { points: CostSeriesPoint[] };
-
-type ViewMode = 'cards' | 'list';
 
 function ProviderDetailContent() {
   const params = useParams<{ key: string }>();
@@ -33,7 +34,7 @@ function ProviderDetailContent() {
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [viewMode, setViewMode] = useState<ViewMode>('cards');
+  const [viewMode, setViewMode] = useState<BoardViewMode>('cards');
   useUnauthorizedRedirect(error);
 
   const scopedQuery = useMemo(() => {
@@ -98,10 +99,10 @@ function ProviderDetailContent() {
   const filteredProjects = useMemo(() => {
     const list = detail?.projects ?? [];
     const term = search.trim().toLowerCase();
-    if (!term) {
-      return list;
-    }
-    return list.filter((project) => project.name.toLowerCase().includes(term));
+    const matched = term
+      ? list.filter((project) => project.name.toLowerCase().includes(term))
+      : list;
+    return sortByPeriodCostDesc(matched);
   }, [detail?.projects, search]);
 
   const projectNames = useMemo(() => {
@@ -126,98 +127,104 @@ function ProviderDetailContent() {
 
   const kpiTotal = detail?.period ?? emptyCost();
 
+  const visibleIds = useMemo(
+    () => new Set(filteredProjects.map((project) => project.projectId)),
+    [filteredProjects],
+  );
+
   return (
-    <div className="flex flex-col lg:flex-row lg:gap-0">
-      <FilterRail
-        state={state}
-        onChange={replaceState}
-        onRefresh={() => void load()}
-        loading={loading}
-      />
-      <div className="min-w-0 flex-1 space-y-6 p-4 lg:p-6">
-        {error && !detail ? (
-          <ErrorPanel
-            message={error instanceof UnauthorizedError ? 'Session expired' : error.message}
-            onRetry={() => void load()}
-          />
-        ) : loading && !detail ? (
-          <CardSkeleton />
-        ) : !detail ? (
-          <EmptyPanel title="Provider not found" detail="Unknown provider key." />
-        ) : (
-          <>
-            <header className="flex flex-wrap items-end justify-between gap-4">
-              <div>
-                <h1 className="wordmark text-3xl text-[var(--ink)]">
-                  {detail.provider.displayName}
-                </h1>
-                <p className="mt-1 text-sm text-[var(--muted)]">
-                  Provider board · {detail.range.from} → {detail.range.to}
-                </p>
-              </div>
-              <label className="min-w-[12rem] flex-1 text-xs font-medium text-[var(--muted)] sm:max-w-xs">
-                Search
-                <input
-                  type="search"
-                  value={search}
-                  onChange={(event) => setSearch(event.target.value)}
-                  placeholder="Filter projects…"
-                  className="mt-1 w-full rounded-[var(--radius-sm)] border border-[var(--line-strong)] bg-[var(--paper)] px-3 py-2 text-sm text-[var(--ink)]"
-                />
-              </label>
-            </header>
-
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <HeroMetric label="Today" cost={detail.today} accent />
-              <HeroMetric label="Selected period" cost={detail.period} />
-              <UnmappedTile unmapped={detail.unmapped} />
-            </div>
-
-            <KpiStrip
-              total={kpiTotal}
-              byProvider={[
-                {
-                  providerKey: detail.provider.key,
-                  displayName: detail.provider.displayName,
-                  cost: kpiTotal,
-                },
-              ]}
-              loading={false}
-            />
-
-            <div className="grid gap-6 xl:grid-cols-2">
-              <ProjectCompareChart data={compareData} />
-              <UsageSeriesChart points={seriesData?.points ?? []} projectNames={projectNames} />
-            </div>
-
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="text-sm text-[var(--muted)]">
-                {filteredProjects.length} project{filteredProjects.length === 1 ? '' : 's'}
+    <DashboardBoard
+      rail={
+        <FilterRail
+          state={state}
+          onChange={replaceState}
+          onRefresh={() => void load()}
+          loading={loading}
+        />
+      }
+    >
+      {error && !detail ? (
+        <ErrorPanel
+          message={error instanceof UnauthorizedError ? 'Session expired' : error.message}
+          onRetry={() => void load()}
+        />
+      ) : loading && !detail ? (
+        <CardSkeleton />
+      ) : !detail ? (
+        <EmptyPanel title="Provider not found" detail="Unknown provider key." />
+      ) : (
+        <>
+          <header className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <h1 className="wordmark text-3xl text-[var(--ink)]">{detail.provider.displayName}</h1>
+              <p className="mt-1 text-sm text-[var(--muted)]">
+                Provider board · {detail.range.from} → {detail.range.to}. Sync now only refreshes
+                today.
               </p>
-              <div className="flex gap-1 rounded-[var(--radius-sm)] border border-[var(--line)] p-1">
-                <ViewToggle active={viewMode === 'cards'} onClick={() => setViewMode('cards')}>
-                  Cards
-                </ViewToggle>
-                <ViewToggle active={viewMode === 'list'} onClick={() => setViewMode('list')}>
-                  List
-                </ViewToggle>
-              </div>
             </div>
-
-            {filteredProjects.length === 0 ? (
-              <EmptyPanel
-                title="No projects in range"
-                detail={search ? 'Try clearing search.' : 'Run sync or widen the date range.'}
+            <BackfillPeriodButton
+              providerKey={detail.provider.key}
+              from={detail.range.from}
+              to={detail.range.to}
+              onComplete={() => void load()}
+            />
+            <label className="min-w-[12rem] flex-1 text-xs font-medium text-[var(--muted)] sm:max-w-xs">
+              Search
+              <input
+                type="search"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Filter projects…"
+                className="mt-1 w-full rounded-[var(--radius-sm)] border border-[var(--line-strong)] bg-[var(--paper)] px-3 py-2 text-sm text-[var(--ink)]"
               />
-            ) : viewMode === 'cards' ? (
-              <ProviderProjectCards projects={filteredProjects} onBudgetSaved={() => void load()} />
-            ) : (
-              <ProviderProjectList projects={filteredProjects} onBudgetSaved={() => void load()} />
-            )}
-          </>
-        )}
-      </div>
-    </div>
+            </label>
+          </header>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <HeroMetric label="Today" cost={detail.today} accent />
+            <HeroMetric label="Selected period" cost={detail.period} />
+            <UnmappedTile unmapped={detail.unmapped} />
+          </div>
+
+          <KpiStrip
+            total={kpiTotal}
+            byProvider={[
+              {
+                providerKey: detail.provider.key,
+                displayName: detail.provider.displayName,
+                cost: kpiTotal,
+              },
+            ]}
+            loading={false}
+          />
+
+          <ProjectCompareChart data={compareData} />
+          <UsageSeriesChart
+            points={seriesData?.points ?? []}
+            projectNames={projectNames}
+            visibleIds={visibleIds}
+          />
+
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-[var(--muted)]">
+              {filteredProjects.length} project{filteredProjects.length === 1 ? '' : 's'}
+            </p>
+            <ViewToggle mode={viewMode} onChange={setViewMode} />
+          </div>
+
+          {filteredProjects.length === 0 ? (
+            <EmptyPanel
+              title="No projects in range"
+              detail={search ? 'Try clearing search.' : 'Run sync or widen the date range.'}
+            />
+          ) : viewMode === 'cards' ? (
+            <ProviderProjectCards projects={filteredProjects} onBudgetSaved={() => void load()} />
+          ) : (
+            <ProviderProjectList projects={filteredProjects} onBudgetSaved={() => void load()} />
+          )}
+        </>
+      )}
+    </DashboardBoard>
   );
 }
 
@@ -268,26 +275,6 @@ function UnmappedTile({ unmapped }: { unmapped: ProviderDetailResponse['unmapped
         </Link>
       ) : null}
     </div>
-  );
-}
-
-function ViewToggle({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <Button
-      variant={active ? 'primary' : 'ghost'}
-      className="px-3 py-1.5 text-xs"
-      onClick={onClick}
-    >
-      {children}
-    </Button>
   );
 }
 

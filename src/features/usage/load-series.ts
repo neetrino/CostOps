@@ -1,6 +1,7 @@
 import { COST_SERIES_METRIC } from '@/config/constants';
 import { buildCostSeries } from '@/core/cost/build-series';
 import { latestSyncForAccounts } from '@/core/cost/cost-view';
+import { rowsInDashboardPeriod } from '@/core/cost/filter-entries';
 import {
   accountSyncMap,
   loadAccountSyncRows,
@@ -33,7 +34,7 @@ export async function loadUsageSeries(query: ResolvedDashboardQuery) {
         from: query.from,
         to: query.to,
         groupBy: query.groupBy,
-        rows,
+        rows: rowsInDashboardPeriod(rows, query.from, query.to, query.preset),
         syncAtByAccountId: accountSyncMap(accounts),
         fallbackSyncAt: fallback,
       }),

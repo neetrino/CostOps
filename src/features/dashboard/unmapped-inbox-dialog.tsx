@@ -66,8 +66,8 @@ export function UnmappedInboxDialog({
           </button>
         </div>
         <p className="mt-3 text-sm text-[var(--muted)]">
-          {count} {count === 1 ? 'resource needs' : 'resources need'} a project. Suggestions are
-          prefilled — confirm or change. Archive trash instead of deleting.
+          {count} {count === 1 ? 'item needs' : 'items need'} a decision. Map to an existing
+          project, Save as project for a single-provider app, or Archive leftovers.
         </p>
         <ul className="mt-4 max-h-[40vh] space-y-2 overflow-auto">
           {preview.map((row) => (

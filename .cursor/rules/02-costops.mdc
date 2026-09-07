@@ -13,6 +13,7 @@ Internal multi-provider FinOps. Spec: `docs/Neetrino_CostOps_CURSOR_SPEC.md`. St
 - Provider I/O lives only in `src/providers/<key>/`. Core cost, budget, sync orchestration, and alerts stay provider-agnostic.
 - Primary budget object is **Project × Provider**. Do not assume identical daily spend across projects.
 - Never treat missing or stale cost as `$0`. Every aggregate exposes freshness (`fresh` / `partial` / `final` / `stale` / `error` / `missing`).
+- **Count usage, not invoices.** Totals and Telegram spend alerts are “who spent how much today / this month?”. Included plan credit and on-demand extra are both spend. Do not drop a day because the invoice line is `$0`. Vercel `costUsd` is FOCUS `EffectiveCost` (`BilledCost` stays in metadata only).
 - Pull model: CostOps owns alerts. Evaluate after a successful current-day sync. Dedupe per `budgetRuleId` + UTC day. Escalate from `lastNotifiedCostUsd`.
 - Do not add Grafana, Apprise, Kafka, RabbitMQ, Kubernetes, or extra notification platforms in v1.
 - Reuse proven Neon dashboard UX: period filters, charts, cards/list, inline limits, retry, Telegram, escalation, SyncRun.

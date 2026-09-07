@@ -21,6 +21,17 @@ export function addUtcDays(date: Date, days: number): Date {
   return toUtcDateOnly(next);
 }
 
+/** Inclusive UTC calendar days from `from` through `to`. Empty when from > to. */
+export function eachUtcDay(from: Date, to: Date): Date[] {
+  const start = toUtcDateOnly(from);
+  const end = toUtcDateOnly(to);
+  const days: Date[] = [];
+  for (let cursor = start; cursor.getTime() <= end.getTime(); cursor = addUtcDays(cursor, 1)) {
+    days.push(cursor);
+  }
+  return days;
+}
+
 export function parseIsoDateOnly(iso: string): Date {
   const day = iso.slice(0, 10);
   const [year, month, date] = day.split('-').map(Number);

@@ -14,6 +14,7 @@ export type CostEntryRow = CostRow & {
   bucketDate: Date;
   resourceId: string | null;
   providerAccountId: string;
+  providerBillingCycleStart?: string | null;
 };
 
 /**

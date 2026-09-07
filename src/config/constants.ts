@@ -64,6 +64,8 @@ export const UPSTASH_QSTASH_RESOURCE_TYPE = 'upstash_qstash';
 
 export const SYNC_NOW_RATE_LIMIT_PER_MINUTE = 5;
 export const SYNC_NOW_RATE_WINDOW_MS = 60_000;
+export const MAX_BACKFILL_DAYS = 31;
+export const BACKFILL_MAX_DURATION_SECONDS = 120;
 
 export const MAX_DASHBOARD_RANGE_DAYS = 400;
 export const NEAR_LIMIT_USAGE_PERCENT = 70;

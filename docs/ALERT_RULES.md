@@ -2,6 +2,8 @@
 
 CostOps owns alerting. Providers only supply data. v1 channel: Telegram Bot API.
 
+Spend in a rule is **usage** (`CostEntry.costUsd`), including plan-included consumption. Do not alert on invoice remainder. Included vs on-demand does not change the threshold math.
+
 Preserve Neon first-breach + escalation + dedupe. Generalize the target from “Neon project” to a `BudgetRule` scope.
 
 ---
@@ -82,24 +84,25 @@ unique(budgetRuleId, budgetDate)
 
 ## Telegram content
 
-Reuse Neon HTML escaping. Expand fields:
+Reuse Neon HTML escaping and the compact emoji layout.
 
 **Project × Provider (first)**
 
+Same compact HTML as Neon (emoji rows, only the project name is `<b>`):
+
 ```text
-COST ALERT
+Vercel
 
-Project: Degusto
-Provider: Vercel
-Today: $1.08
-Daily limit: $1.00
-Usage: 108%
+📦 Degusto
 
-Last sync: 14:05 UTC
-Status: partial current day
+📅 Day 05
+
+💵 Estimated $1.08
+
+🎯 Limit $1.00
 ```
 
-**Escalation** — include previous notified spend and step.
+**Escalation** — append `↑ $0.66 since last alert` (delta from last notified spend).
 
 **Project / provider totals** — include breakdown (top providers or top projects).
 

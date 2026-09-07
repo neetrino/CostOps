@@ -8,7 +8,7 @@ If this list is empty at the end of Phase 1, nothing is blocked on you.
 
 ## Open
 
-1. **Vercel + Upstash → проекты** — в `/unmapped` searchable picker (slug + Neon/Vercel/Upstash chips). Одинаковые имена не сливаю — это разные записи. Связь не обязательна. Archive для мусора.
+1. **Vercel + Upstash → проекты** — в `/unmapped`: Map на существующий, **Save as project** для одиночки (только Vercel/Upstash — нормально), Archive для leftover (`Team (unallocated)`) и мусора. Одинаковые имена не сливаю.
 2. **GCP** — отложили. Проект `neetrino` создан, биллинг не привязан (лимит 5 billed-проектов). `GOOGLE_APPLICATION_CREDENTIALS` пустой. Вернёмся позже.
 
 ---
@@ -19,3 +19,4 @@ If this list is empty at the end of Phase 1, nothing is blocked on you.
 2. **История старого Neon** — `--apply` 2026-09-07 успешен: 65 ресурсов, 42938 метрик, 6134 cost, 21 алерт. В CostOps 6 включённых PROJECT_PROVIDER (5 из старого Neon + UI Set).
 3. **Upstash ключи** — `UPSTASH_EMAIL` / `UPSTASH_API_KEY` есть; адаптер читает Management API (Basic auth).
 4. **Даты токенов** — не ставим в админке. Статус и Telegram только с живого запроса (401/403 / истёкший ключ). Один подход для Neon, Vercel, Upstash.
+5. **Vercel included vs invoice** — считаем usage (`EffectiveCost`): кто потратил included $20 и сколько сверху. Инвойс не цель. Telegram с того же числа.

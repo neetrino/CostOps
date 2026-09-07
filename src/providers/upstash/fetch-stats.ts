@@ -49,7 +49,14 @@ async function fetchRedisStats(
   credentials: UpstashApiCredentials,
   id: string,
 ): Promise<UpstashResourceStats> {
-  const raw = await upstashGetJson({ credentials, path: `/redis/stats/${id}` });
+  // The default live response only contains about five daily points. `7d` is
+  // the widest period accepted by the Redis endpoint and covers the complete
+  // current month during its first week instead of silently undercounting it.
+  const raw = await upstashGetJson({
+    credentials,
+    path: `/redis/stats/${id}`,
+    searchParams: new URLSearchParams({ period: '7d' }),
+  });
   const stats = parseUpstashObject(upstashRedisStatsSchema, raw, 'redis stats');
   return {
     externalId: id,

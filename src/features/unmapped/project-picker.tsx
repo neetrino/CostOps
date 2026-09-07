@@ -125,7 +125,7 @@ function PickerSummary({ selected }: { selected: InboxProjectOption | null }) {
       <span>
         <span className="font-medium text-[var(--ink)]">Keep unmapped</span>
         <span className="mt-0.5 block text-[11px] text-[var(--muted)]">
-          Valid. Not every resource needs a project.
+          Stay in inbox. Save as project if this app stands alone.
         </span>
       </span>
     );

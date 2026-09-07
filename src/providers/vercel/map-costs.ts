@@ -3,6 +3,7 @@ import { vercelMetricKey } from '@/providers/vercel/metrics';
 import { utcDayKey } from '@/shared/dates';
 import type { NormalizedCost, NormalizedMetric } from '@/providers/types';
 import type { VercelFocusCharge } from '@/providers/vercel/schemas';
+import type { VercelBillingCycle } from '@/providers/vercel/fetch-billing-cycle';
 
 export type VercelProjectRef = {
   externalId: string;
@@ -21,6 +22,12 @@ type MetricAccumulator = {
   serviceName: string;
 };
 
+const VERCEL_NON_USAGE_SERVICES = new Set(['Pro', 'Additional Team Seats']);
+
+export function isVercelUsageCharge(charge: VercelFocusCharge): boolean {
+  return !VERCEL_NON_USAGE_SERVICES.has(charge.ServiceName);
+}
+
 export function chargeProjectExternalId(charge: VercelFocusCharge): string {
   const projectId = charge.Tags.ProjectId?.trim();
   return projectId && projectId.length > 0 ? projectId : VERCEL_UNALLOCATED_EXTERNAL_ID;
@@ -36,9 +43,16 @@ export function vercelChargesToCosts(input: {
   projects: VercelProjectRef[];
   bucketDate: Date;
   isPartial: boolean;
+  billingCycle?: VercelBillingCycle | null;
 }): NormalizedCost[] {
   const totals = new Map<string, CostAccumulator>();
   for (const charge of input.charges) {
+    // EffectiveCost already represents credit consumption plus overage. Adding
+    // the Pro/seat subscription accrual would count the same included credit a
+    // second time and would not match Vercel's Usage total.
+    if (!isVercelUsageCharge(charge)) {
+      continue;
+    }
     const externalId = chargeProjectExternalId(charge);
     const current = totals.get(externalId) ?? { billedUsd: 0, effectiveUsd: 0, chargeCount: 0 };
     current.billedUsd += charge.BilledCost;
@@ -53,11 +67,12 @@ export function vercelChargesToCosts(input: {
       totals.get(project.externalId),
       input.bucketDate,
       input.isPartial,
+      input.billingCycle,
     ),
   );
   for (const [externalId, acc] of totals) {
     if (!knownIds.has(externalId)) {
-      rows.push(toCostRow(externalId, acc, input.bucketDate, input.isPartial));
+      rows.push(toCostRow(externalId, acc, input.bucketDate, input.isPartial, input.billingCycle));
     }
   }
   return rows;
@@ -122,13 +137,16 @@ function toCostRow(
   acc: CostAccumulator | undefined,
   bucketDate: Date,
   isPartial: boolean,
+  billingCycle?: VercelBillingCycle | null,
 ): NormalizedCost {
   const billedUsd = acc?.billedUsd ?? 0;
+  const effectiveUsd = acc?.effectiveUsd ?? 0;
+  // Usage (who spent), including plan credit. Invoice remainder stays in metadata.billedUsd.
   return {
     externalId,
     bucketDate,
-    costUsd: billedUsd,
-    originalAmount: billedUsd,
+    costUsd: effectiveUsd,
+    originalAmount: effectiveUsd,
     originalCurrency: 'USD',
     sourceType: 'API',
     sourceStatus: isPartial ? 'partial' : 'fresh',
@@ -136,8 +154,10 @@ function toCostRow(
     dimensionKey: '_',
     metadata: {
       billedUsd,
-      effectiveUsd: acc?.effectiveUsd ?? 0,
+      effectiveUsd,
       chargeCount: acc?.chargeCount ?? 0,
+      billingCycleStart: billingCycle?.start ?? null,
+      billingCycleEnd: billingCycle?.end ?? null,
     },
   };
 }

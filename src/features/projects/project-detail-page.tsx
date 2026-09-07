@@ -8,6 +8,7 @@ import { fetchJson, UnauthorizedError } from '@/features/dashboard/api-client';
 import { useDashboardUrl } from '@/features/dashboard/use-dashboard-url';
 import { useUnauthorizedRedirect } from '@/features/dashboard/use-unauthorized-redirect';
 import { buildCompareBarData } from '@/features/projects/chart-data';
+import { DashboardBoard } from '@/features/projects/dashboard-board';
 import { FilterRail } from '@/features/projects/filter-rail';
 import { ProjectCompareChart } from '@/features/projects/project-compare-chart';
 import { ProjectProviderSection } from '@/features/projects/project-provider-section';
@@ -152,60 +153,59 @@ function ProjectDetailContent() {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row lg:gap-0">
-      <FilterRail
-        state={state}
-        onChange={replaceState}
-        onRefresh={() => void load()}
-        loading={loading}
-      />
-      <div className="min-w-0 flex-1 space-y-6 p-4 lg:p-6">
-        {error && !detail ? (
-          <ErrorPanel
-            message={error instanceof UnauthorizedError ? 'Session expired' : error.message}
-            onRetry={() => void load()}
+    <DashboardBoard
+      rail={
+        <FilterRail
+          state={state}
+          onChange={replaceState}
+          onRefresh={() => void load()}
+          loading={loading}
+        />
+      }
+    >
+      {error && !detail ? (
+        <ErrorPanel
+          message={error instanceof UnauthorizedError ? 'Session expired' : error.message}
+          onRetry={() => void load()}
+        />
+      ) : loading && !detail ? (
+        <CardSkeleton />
+      ) : !detail ? (
+        <EmptyPanel title="Project not found" detail="Check the slug or return to Projects." />
+      ) : (
+        <>
+          <ProjectDetailHeader
+            detail={detail}
+            editingName={editingName}
+            nameDraft={nameDraft}
+            savingName={savingName}
+            onNameDraft={setNameDraft}
+            onStartEdit={() => setEditingName(true)}
+            onCancelEdit={() => setEditingName(false)}
+            onSaveName={() => void saveName()}
+            onArchive={() => void archiveProject()}
           />
-        ) : loading && !detail ? (
-          <CardSkeleton />
-        ) : !detail ? (
-          <EmptyPanel title="Project not found" detail="Check the slug or return to Projects." />
-        ) : (
-          <>
-            <ProjectDetailHeader
-              detail={detail}
-              editingName={editingName}
-              nameDraft={nameDraft}
-              savingName={savingName}
-              onNameDraft={setNameDraft}
-              onStartEdit={() => setEditingName(true)}
-              onCancelEdit={() => setEditingName(false)}
-              onSaveName={() => void saveName()}
-              onArchive={() => void archiveProject()}
-            />
-            <ProjectTotalHero slug={slug} detail={detail} onBudgetSaved={() => void load()} />
-            <div className="grid gap-6 xl:grid-cols-2">
-              <ProjectCompareChart
-                data={compareData}
-                title="Provider mix"
-                subtitle="Period cost by mapped provider (USD)"
-                emptyTitle="No comparable providers"
-              />
-              <ProviderStackChart points={seriesData?.points ?? []} providerKeys={providerKeys} />
-            </div>
-            <section className="space-y-4">
-              <h2 className="text-sm font-semibold text-[var(--ink)]">Resources</h2>
-              {detail.providers.length === 0 ? (
-                <EmptyPanel title="No provider links" detail="Map resources or run sync." />
-              ) : (
-                detail.providers.map((provider) => (
-                  <ProjectProviderSection key={provider.projectProviderId} provider={provider} />
-                ))
-              )}
-            </section>
-          </>
-        )}
-      </div>
-    </div>
+          <ProjectTotalHero slug={slug} detail={detail} onBudgetSaved={() => void load()} />
+          <ProjectCompareChart
+            data={compareData}
+            title="Provider mix"
+            subtitle="Period cost by mapped provider (USD)"
+            emptyTitle="No comparable providers"
+          />
+          <ProviderStackChart points={seriesData?.points ?? []} providerKeys={providerKeys} />
+          <section className="space-y-4">
+            <h2 className="text-sm font-semibold text-[var(--ink)]">Resources</h2>
+            {detail.providers.length === 0 ? (
+              <EmptyPanel title="No provider links" detail="Map resources or run sync." />
+            ) : (
+              detail.providers.map((provider) => (
+                <ProjectProviderSection key={provider.projectProviderId} provider={provider} />
+              ))
+            )}
+          </section>
+        </>
+      )}
+    </DashboardBoard>
   );
 }
 
@@ -234,7 +234,7 @@ function ProjectDetailHeader({
     <header className="flex flex-wrap items-start justify-between gap-4">
       <div className="min-w-0 flex-1">
         <p className="text-xs text-[var(--muted)]">
-          <Link href="/projects" className="hover:text-[var(--accent)]">
+          <Link href="/" className="hover:text-[var(--accent)]">
             Projects
           </Link>
           {' · '}

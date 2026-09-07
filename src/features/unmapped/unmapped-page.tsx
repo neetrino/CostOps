@@ -11,6 +11,7 @@ import type {
   InboxResourcesResponse,
   ProjectOptionsResponse,
 } from '@/features/unmapped/types';
+import { DashboardBoard } from '@/features/projects/dashboard-board';
 import { FilterRail } from '@/features/projects/filter-rail';
 import { CardSkeleton, EmptyPanel, ErrorPanel } from '@/shared/ui/state-panels';
 
@@ -101,59 +102,60 @@ function UnmappedContent() {
   }, [data?.resources, search]);
 
   return (
-    <div className="flex flex-col lg:flex-row lg:gap-0">
-      <FilterRail
-        state={state}
-        onChange={replaceState}
-        onRefresh={() => void load()}
-        loading={loading}
-      />
-      <div className="min-w-0 flex-1 space-y-6 p-4 lg:p-6">
-        <InboxHeader
-          tab={tab}
-          openCount={data?.openCount ?? 0}
-          archivedCount={data?.archivedCount ?? 0}
-          rangeLabel={`${data?.range.from ?? '…'} → ${data?.range.to ?? '…'}`}
-          search={search}
-          onTab={setTab}
-          onSearch={setSearch}
+    <DashboardBoard
+      rail={
+        <FilterRail
+          state={state}
+          onChange={replaceState}
+          onRefresh={() => void load()}
+          loading={loading}
         />
-        {error && !data ? (
-          <ErrorPanel
-            message={error instanceof UnauthorizedError ? 'Session expired' : error.message}
-            onRetry={() => void load()}
-          />
-        ) : loading && (!data || data.inbox !== tab) ? (
-          <CardSkeleton />
-        ) : filtered.length === 0 ? (
-          <EmptyPanel
-            title={search ? 'No matches' : tab === 'archived' ? 'Archive empty' : 'Inbox clear'}
-            detail={
-              search
-                ? 'Try clearing search.'
-                : tab === 'archived'
-                  ? 'Nothing hidden. Archived rows can be restored.'
-                  : 'All discovered resources are mapped or archived.'
-            }
-          />
-        ) : (
-          <ul className="space-y-3">
-            {filtered.map((resource) =>
-              data?.inbox === 'archived' ? (
-                <ArchivedRow key={resource.id} resource={resource} onChanged={() => void load()} />
-              ) : (
-                <UnmappedRow
-                  key={resource.id}
-                  resource={resource}
-                  projects={projects}
-                  onChanged={() => void load()}
-                />
-              ),
-            )}
-          </ul>
-        )}
-      </div>
-    </div>
+      }
+    >
+      <InboxHeader
+        tab={tab}
+        openCount={data?.openCount ?? 0}
+        archivedCount={data?.archivedCount ?? 0}
+        rangeLabel={`${data?.range.from ?? '…'} → ${data?.range.to ?? '…'}`}
+        search={search}
+        onTab={setTab}
+        onSearch={setSearch}
+      />
+      {error && !data ? (
+        <ErrorPanel
+          message={error instanceof UnauthorizedError ? 'Session expired' : error.message}
+          onRetry={() => void load()}
+        />
+      ) : loading && (!data || data.inbox !== tab) ? (
+        <CardSkeleton />
+      ) : filtered.length === 0 ? (
+        <EmptyPanel
+          title={search ? 'No matches' : tab === 'archived' ? 'Archive empty' : 'Inbox clear'}
+          detail={
+            search
+              ? 'Try clearing search.'
+              : tab === 'archived'
+                ? 'Nothing hidden. Archived rows can be restored.'
+                : 'All discovered resources are mapped or archived.'
+          }
+        />
+      ) : (
+        <ul className="space-y-3">
+          {filtered.map((resource) =>
+            data?.inbox === 'archived' ? (
+              <ArchivedRow key={resource.id} resource={resource} onChanged={() => void load()} />
+            ) : (
+              <UnmappedRow
+                key={resource.id}
+                resource={resource}
+                projects={projects}
+                onChanged={() => void load()}
+              />
+            ),
+          )}
+        </ul>
+      )}
+    </DashboardBoard>
   );
 }
 

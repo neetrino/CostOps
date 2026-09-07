@@ -79,9 +79,9 @@ describe('spend alerts', () => {
     });
     expect(result).toBe('sent_first');
     expect(sent).toHaveLength(1);
-    expect(sent[0]).toContain('COST ALERT');
-    expect(sent[0]).toContain('Degusto');
+    expect(sent[0]).toContain('📦 <b>Degusto</b>');
     expect(sent[0]).toContain('Neon');
+    expect(sent[0]).toContain('🎯 Limit $1.00');
     expect(store.creates).toBe(1);
   });
 
@@ -118,7 +118,7 @@ describe('spend alerts', () => {
       now,
     });
     expect(result).toBe('sent_escalation');
-    expect(sent[0]).toContain('Previous notified');
+    expect(sent[0]).toContain('↑ $0.61 since last alert');
     expect(store.events.get('rule-1:2026-09-05')?.lastNotifiedCostUsd).toBe(2.62);
   });
 
@@ -274,6 +274,6 @@ describe('spend alerts', () => {
       now,
     });
     expect(result).toBe('sent_first');
-    expect(sent[0]).toContain('COST ALERT');
+    expect(sent[0]).toContain('📦 <b>Degusto</b>');
   });
 });

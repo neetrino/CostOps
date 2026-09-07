@@ -8,6 +8,10 @@ import { withBackoff } from '@/shared/retry';
 import { resolveVercelCredentials } from '@/providers/vercel/credentials';
 import { isVercelAuthFailure } from '@/providers/vercel/errors';
 import { fetchVercelCharges } from '@/providers/vercel/fetch-charges';
+import {
+  fetchVercelBillingCycle,
+  type VercelBillingCycle,
+} from '@/providers/vercel/fetch-billing-cycle';
 import { listAllVercelProjects } from '@/providers/vercel/list-projects';
 import {
   chargesForUtcDay,
@@ -37,6 +41,7 @@ const UNALLOCATED_PROJECT: VercelProjectRef = {
 };
 
 let cachedLoad: { key: string; value: VercelDayLoad } | null = null;
+let cachedBillingCycle: { key: string; value: VercelBillingCycle | null } | null = null;
 
 function cacheKey(accountId: string, range: DateRange, now: Date): string {
   return `${accountId}:${utcDayKey(range.from)}:${utcDayKey(range.to)}:${now.toISOString()}`;
@@ -89,10 +94,13 @@ export async function loadVercelDay(
     return cachedLoad.value;
   }
   const creds = resolveVercelCredentials(ctx.account.credentialRef);
-  const listed = await withBackoff(
-    () => listAllVercelProjects({ token: creds.token, teamId: creds.teamId }),
-    { label: 'vercel.listProjects', shouldRetry: retryUnlessAuth },
-  );
+  const [listed, billingCycle] = await Promise.all([
+    withBackoff(() => listAllVercelProjects({ token: creds.token, teamId: creds.teamId }), {
+      label: 'vercel.listProjects',
+      shouldRetry: retryUnlessAuth,
+    }),
+    loadBillingCycle(ctx, creds),
+  ]);
   const projects: VercelProjectRef[] = [
     ...listed.map((project) => ({ externalId: project.id, displayName: project.name })),
     UNALLOCATED_PROJECT,
@@ -101,7 +109,13 @@ export async function loadVercelDay(
     () => fetchVercelCharges({ token: creds.token, teamId: creds.teamId, utcDay: bucketDate }),
     { label: 'vercel.billingCharges', shouldRetry: retryUnlessAuth },
   );
-  const value = toDayLoad(projects, charges, bucketDate, isSameUtcDay(bucketDate, ctx.now));
+  const value = toDayLoad(
+    projects,
+    charges,
+    bucketDate,
+    isSameUtcDay(bucketDate, ctx.now),
+    billingCycle,
+  );
   cachedLoad = { key, value };
   return value;
 }
@@ -111,13 +125,20 @@ function toDayLoad(
   charges: Awaited<ReturnType<typeof fetchVercelCharges>>,
   bucketDate: Date,
   isPartial: boolean,
+  billingCycle: VercelBillingCycle | null,
 ): VercelDayLoad {
   if (charges.kind === 'ok') {
     const dayCharges = chargesForUtcDay(charges.charges, bucketDate);
     return {
       bucketDate,
       isPartial,
-      costs: vercelChargesToCosts({ charges: dayCharges, projects, bucketDate, isPartial }),
+      costs: vercelChargesToCosts({
+        charges: dayCharges,
+        projects,
+        bucketDate,
+        isPartial,
+        billingCycle,
+      }),
       metrics: vercelChargesToMetrics({ charges: dayCharges, bucketDate }),
     };
   }
@@ -137,4 +158,20 @@ function toDayLoad(
     }),
     metrics: [],
   };
+}
+
+async function loadBillingCycle(
+  ctx: ProviderContext,
+  creds: ReturnType<typeof resolveVercelCredentials>,
+): Promise<VercelBillingCycle | null> {
+  const key = `${ctx.account.id}:${ctx.now.toISOString()}`;
+  if (cachedBillingCycle?.key === key) {
+    return cachedBillingCycle.value;
+  }
+  const value = await withBackoff(
+    () => fetchVercelBillingCycle({ token: creds.token, teamId: creds.teamId, now: ctx.now }),
+    { label: 'vercel.billingCycle', shouldRetry: retryUnlessAuth },
+  );
+  cachedBillingCycle = { key, value };
+  return value;
 }

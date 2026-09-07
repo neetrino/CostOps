@@ -5,6 +5,7 @@ import { upsertCostEntries } from '@/core/cost/upsert';
 import { upsertMetricEntries } from '@/core/metrics/upsert';
 import { recordAuthFailure } from '@/core/sync/handle-auth-failure';
 import { loadAccountResources, upsertDiscoveredResources } from '@/core/sync/upsert-resources';
+import { shouldEvaluateSpendAlerts } from '@/core/sync/should-evaluate-spend-alerts';
 import { addUtcDays, getStartOfTodayUtc, toUtcDateOnly } from '@/shared/dates';
 import { prisma } from '@/shared/db';
 import { logger } from '@/shared/logger';
@@ -149,14 +150,16 @@ export async function runAccountSync(input: {
     });
     await clearAuthFailureIncident(createPrismaCredentialStore(), account.id);
 
-    try {
-      await evaluateSpendAlertsForDay({
-        budgetDate: range.from,
-        lastSyncAt: finishedAt,
-        now,
-      });
-    } catch (error) {
-      logger.error({ err: error }, 'Spend alert evaluation failed after sync');
+    if (shouldEvaluateSpendAlerts(range.from, now)) {
+      try {
+        await evaluateSpendAlertsForDay({
+          budgetDate: range.from,
+          lastSyncAt: finishedAt,
+          now,
+        });
+      } catch (error) {
+        logger.error({ err: error }, 'Spend alert evaluation failed after sync');
+      }
     }
 
     return {

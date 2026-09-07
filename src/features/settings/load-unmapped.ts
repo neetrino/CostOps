@@ -1,7 +1,7 @@
 import { UNMAPPED_RESOURCE_QUERY_LIMIT } from '@/config/constants';
 import { costViewForRows, latestSyncForAccounts } from '@/core/cost/cost-view';
 import type { CostView } from '@/core/cost/types';
-import { rowsForResource, rowsInRange, rowsOnUtcDay } from '@/core/cost/filter-entries';
+import { rowsForResource, rowsInDashboardPeriod, rowsOnUtcDay } from '@/core/cost/filter-entries';
 import { loadDashboardCostContext } from '@/core/cost/load-dashboard-costs';
 import { suggestProjectForResource } from '@/core/mapping/suggest-project';
 import type { ProjectSuggestion } from '@/core/mapping/suggest-project';
@@ -71,7 +71,7 @@ async function loadInboxResources(
     prisma.resource.count({ where: openWhere }),
     prisma.resource.count({ where: archivedWhere }),
   ]);
-  const periodRows = rowsInRange(cost.entries, query.from, query.to);
+  const periodRows = rowsInDashboardPeriod(cost.entries, query.from, query.to, query.preset);
   const todayRows = rowsOnUtcDay(cost.entries, cost.today);
   const fallback = latestSyncForAccounts(cost.accounts, query.providerKey);
 

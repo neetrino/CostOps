@@ -10,4 +10,8 @@
 
 TECH_CARD confirmed 2026-09-05 (Node 24, Next 16, Prisma 7, pool 5, timeouts 30/15/10, coverage 80/70). Neon env names match `neetrino/neon`.
 
+Product (2026-09-07): count **usage** (who spent, including plan credit), not invoice remainder. Vercel `costUsd` = FOCUS `EffectiveCost`. Telegram uses the same number. See `docs/BRIEF.md` and `.cursor/rules/02-costops.mdc`.
+
+Dashboard (2026-09-07): for the `current_month` board, Vercel period totals use the active Vercel billing cycle reported by the current Pro invoice. Rows before the cycle start remain stored and are still available through explicit custom historical ranges.
+
 When a Phase 4 provider forces a core schema change, add an ADR before migrating.

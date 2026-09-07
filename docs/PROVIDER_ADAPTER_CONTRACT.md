@@ -91,7 +91,7 @@ Exact type names may live in `src/core` once Phase 1 starts. The split of respon
 1. Validate every provider HTTP payload with Zod. Fail the SyncRun on malformed data. Do not coerce to zero.
 2. Respect provider rate limits. The process scheduler may tick often; the adapter decides whether a fetch is due.
 3. `supportsIntraday` is false unless the API can return a useful current-day number.
-4. Cost sources: API (invoiced/billing), ESTIMATED (formula from usage), FIXED (Hetzner-like), MANUAL (import).
+4. Cost sources: API (provider usage/billing feed), ESTIMATED (formula from usage), FIXED (Hetzner-like), MANUAL (import). Prefer usage (who spent) over invoice remainder. Vercel: `EffectiveCost` → `costUsd`.
 5. Estimated cost must stay labeled estimated in UI and Telegram.
 6. Adapters never send Telegram, never evaluate BudgetRules, never write generic columns for one-off metrics.
 7. Credentials are read via `credentialRef` → env. No secrets in adapter source.

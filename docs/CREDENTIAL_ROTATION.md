@@ -30,7 +30,7 @@ For each `ProviderAccount` show:
 - short path text (where to click if the deep link is generic)
 - after rotation: operator updates env / secret, then **Mark rotated** or the next successful sync clears `auth_failed`
 
-Overview must also surface stale/error accounts (already in the spec). Credential expiry counts as provider health.
+Integrations must surface stale/error accounts (already in the spec). Credential expiry counts as provider health. The header sync chip is the board-level health signal.
 
 ### Telegram
 

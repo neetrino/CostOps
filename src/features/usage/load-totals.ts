@@ -2,7 +2,7 @@ import { costViewForRows, latestSyncForAccounts } from '@/core/cost/cost-view';
 import {
   rowsForProject,
   rowsForProvider,
-  rowsInRange,
+  rowsInDashboardPeriod,
   unmappedRows,
 } from '@/core/cost/filter-entries';
 import { loadDashboardCostContext } from '@/core/cost/load-dashboard-costs';
@@ -23,7 +23,7 @@ export async function loadUsageTotals(query: ResolvedDashboardQuery) {
     }),
     prisma.provider.findMany({ orderBy: { displayName: 'asc' } }),
   ]);
-  const periodRows = rowsInRange(cost.entries, query.from, query.to);
+  const periodRows = rowsInDashboardPeriod(cost.entries, query.from, query.to, query.preset);
   const fallback = latestSyncForAccounts(cost.accounts, query.providerKey);
   const visibleProviders = query.providerKey
     ? providers.filter((provider) => provider.key === query.providerKey)

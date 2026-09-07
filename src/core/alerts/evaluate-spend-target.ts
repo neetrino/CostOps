@@ -30,12 +30,10 @@ export async function evaluateSpendForTarget(input: {
       formatSpendAlertTelegramHtml({
         projectName: target.projectName,
         providerName: target.providerName,
+        budgetDate,
         spendUsd,
         limitUsd: target.limitUsd,
         kind: 'first',
-        freshness: target.spend.sourceStatus,
-        lastSyncAt: target.lastSyncAt,
-        sourceType: target.spend.sourceType ?? undefined,
       }),
     );
     try {
@@ -63,14 +61,11 @@ export async function evaluateSpendForTarget(input: {
     formatSpendAlertTelegramHtml({
       projectName: target.projectName,
       providerName: target.providerName,
+      budgetDate,
       spendUsd,
       limitUsd: target.limitUsd,
       kind: 'escalation',
-      freshness: target.spend.sourceStatus,
-      lastSyncAt: target.lastSyncAt,
-      sourceType: target.spend.sourceType ?? undefined,
       previousNotifiedSpendUsd: existing.lastNotifiedCostUsd,
-      escalationStepUsd: step,
     }),
   );
   await store.updateEscalation({

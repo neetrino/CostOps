@@ -4,6 +4,7 @@ import { costViewForRows, latestSyncForAccounts } from '@/core/cost/cost-view';
 import {
   rowsForProjectProvider,
   rowsForProvider,
+  rowsInDashboardPeriod,
   rowsInRange,
   rowsOnUtcDay,
 } from '@/core/cost/filter-entries';
@@ -33,7 +34,7 @@ export async function loadOverview(
     loadOverviewCatalog(),
     loadSyncStatus(now),
   ]);
-  const periodRows = rowsInRange(cost.entries, query.from, query.to);
+  const periodRows = rowsInDashboardPeriod(cost.entries, query.from, query.to, query.preset);
   const todayRows = rowsOnUtcDay(cost.entries, cost.today);
   const globalFallback = latestSyncForAccounts(cost.accounts, query.providerKey);
   const today = costViewForRows(todayRows, cost.syncAtByAccountId, globalFallback);

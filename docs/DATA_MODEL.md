@@ -4,6 +4,8 @@ Phase 0 Prisma proposal. Implement in Phase 1 via a migration, not `db push` in 
 
 Canonical timezone: **UTC**. Reporting currency: **USD**. Budget period v1: **DAILY**.
 
+`CostEntry.costUsd` is **usage** for that UTC day (who spent), not the provider invoice remainder. Included plan credit counts. Vercel writes FOCUS `EffectiveCost` here; `BilledCost` is metadata only.
+
 ---
 
 ## Entity relationship
