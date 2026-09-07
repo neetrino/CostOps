@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { APP_NAME } from '@/config/constants';
 import { SyncNowButton, SyncStatusChip } from '@/features/dashboard/sync-controls';
+import { UnmappedInboxController } from '@/features/dashboard/unmapped-inbox-controller';
 import { SignOutButton } from '@/shared/ui/sign-out-button';
 
 const NAV = [
@@ -62,6 +63,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
         </div>
       </header>
       <main className="mx-auto max-w-[1600px] px-4 py-6 lg:px-6">{children}</main>
+      <UnmappedInboxController />
     </div>
   );
 }

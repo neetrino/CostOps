@@ -1,1 +1,2 @@
-export { loadUnmappedResources } from './load-unmapped';
+export { loadUnmappedResources, loadArchivedResources } from './load-unmapped';
+export { loadInboxStatus } from './load-inbox-status';

@@ -1,61 +1,57 @@
 'use client';
 
-import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
-import type { CostView } from '@/core/cost/types';
-import type { RangePayload } from '@/shared/dashboard-query';
+import { Suspense, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { fetchJson, UnauthorizedError } from '@/features/dashboard/api-client';
 import { useDashboardUrl } from '@/features/dashboard/use-dashboard-url';
 import { useUnauthorizedRedirect } from '@/features/dashboard/use-unauthorized-redirect';
+import { ArchivedRow } from '@/features/unmapped/archived-row';
+import { UnmappedRow } from '@/features/unmapped/unmapped-row';
+import type {
+  InboxProjectOption,
+  InboxResourcesResponse,
+  ProjectOptionsResponse,
+} from '@/features/unmapped/types';
 import { FilterRail } from '@/features/projects/filter-rail';
-import type { ProjectListResponse } from '@/features/projects/types';
-import { Button } from '@/shared/ui/button';
-import { CostViewDisplay } from '@/shared/ui/cost-view-display';
 import { CardSkeleton, EmptyPanel, ErrorPanel } from '@/shared/ui/state-panels';
 
-type UnmappedResourceRow = {
-  id: string;
-  providerKey: string;
-  providerAccountId: string;
-  externalId: string;
-  displayName: string;
-  resourceType: string;
-  discoveredAt: string;
-  today: CostView;
-  period: CostView;
-};
-
-type UnmappedResponse = {
-  range: RangePayload;
-  resources: UnmappedResourceRow[];
-};
+type InboxTab = InboxResourcesResponse['inbox'];
 
 function UnmappedContent() {
   const { state, queryString, replaceState } = useDashboardUrl();
-  const [data, setData] = useState<UnmappedResponse | null>(null);
-  const [projects, setProjects] = useState<ProjectListResponse['projects']>([]);
+  const [tab, setTab] = useState<InboxTab>('open');
+  const [data, setData] = useState<InboxResourcesResponse | null>(null);
+  const [projects, setProjects] = useState<InboxProjectOption[]>([]);
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   useUnauthorizedRedirect(error);
 
+  const applyInbox = useCallback(
+    (inbox: InboxResourcesResponse, options: ProjectOptionsResponse) => {
+      setData(inbox);
+      setProjects(options.projects);
+    },
+    [],
+  );
+
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const [unmapped, projectList] = await Promise.all([
-        fetchJson<UnmappedResponse>(`/api/resources/unmapped${queryString}`),
-        fetchJson<ProjectListResponse>(`/api/projects${queryString}`),
+      const path = tab === 'archived' ? '/api/resources/archived' : '/api/resources/unmapped';
+      const [inbox, options] = await Promise.all([
+        fetchJson<InboxResourcesResponse>(`${path}${queryString}`),
+        fetchJson<ProjectOptionsResponse>('/api/projects/options'),
       ]);
-      setData(unmapped);
-      setProjects(projectList.projects);
+      applyInbox(inbox, options);
     } catch (err) {
       setData(null);
       setProjects([]);
-      setError(err instanceof Error ? err : new Error('Failed to load unmapped resources'));
+      setError(err instanceof Error ? err : new Error('Failed to load inbox'));
     } finally {
       setLoading(false);
     }
-  }, [queryString]);
+  }, [applyInbox, queryString, tab]);
 
   useEffect(() => {
     let cancelled = false;
@@ -63,22 +59,22 @@ function UnmappedContent() {
       setLoading(true);
       setError(null);
       try {
-        const [unmapped, projectList] = await Promise.all([
-          fetchJson<UnmappedResponse>(`/api/resources/unmapped${queryString}`),
-          fetchJson<ProjectListResponse>(`/api/projects${queryString}`),
+        const path = tab === 'archived' ? '/api/resources/archived' : '/api/resources/unmapped';
+        const [inbox, options] = await Promise.all([
+          fetchJson<InboxResourcesResponse>(`${path}${queryString}`),
+          fetchJson<ProjectOptionsResponse>('/api/projects/options'),
         ]);
         if (cancelled) {
           return;
         }
-        setData(unmapped);
-        setProjects(projectList.projects);
+        applyInbox(inbox, options);
       } catch (err) {
         if (cancelled) {
           return;
         }
         setData(null);
         setProjects([]);
-        setError(err instanceof Error ? err : new Error('Failed to load unmapped resources'));
+        setError(err instanceof Error ? err : new Error('Failed to load inbox'));
       } finally {
         if (!cancelled) {
           setLoading(false);
@@ -88,7 +84,7 @@ function UnmappedContent() {
     return () => {
       cancelled = true;
     };
-  }, [queryString]);
+  }, [applyInbox, queryString, tab]);
 
   const filtered = useMemo(() => {
     const list = data?.resources ?? [];
@@ -113,49 +109,47 @@ function UnmappedContent() {
         loading={loading}
       />
       <div className="min-w-0 flex-1 space-y-6 p-4 lg:p-6">
-        <header className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h1 className="wordmark text-3xl text-[var(--ink)]">Unmapped</h1>
-            <p className="mt-1 text-sm text-[var(--muted)]">
-              Resources without a project · {data?.range.from ?? '…'} → {data?.range.to ?? '…'}
-            </p>
-          </div>
-          <label className="min-w-[12rem] flex-1 text-xs font-medium text-[var(--muted)] sm:max-w-xs">
-            Search
-            <input
-              type="search"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Name, id, provider…"
-              className="mt-1 w-full rounded-[var(--radius-sm)] border border-[var(--line-strong)] bg-[var(--paper)] px-3 py-2 text-sm text-[var(--ink)]"
-            />
-          </label>
-        </header>
-
+        <InboxHeader
+          tab={tab}
+          openCount={data?.openCount ?? 0}
+          archivedCount={data?.archivedCount ?? 0}
+          rangeLabel={`${data?.range.from ?? '…'} → ${data?.range.to ?? '…'}`}
+          search={search}
+          onTab={setTab}
+          onSearch={setSearch}
+        />
         {error && !data ? (
           <ErrorPanel
             message={error instanceof UnauthorizedError ? 'Session expired' : error.message}
             onRetry={() => void load()}
           />
-        ) : loading && !data ? (
+        ) : loading && (!data || data.inbox !== tab) ? (
           <CardSkeleton />
         ) : filtered.length === 0 ? (
           <EmptyPanel
-            title={search ? 'No matches' : 'Inbox clear'}
+            title={search ? 'No matches' : tab === 'archived' ? 'Archive empty' : 'Inbox clear'}
             detail={
-              search ? 'Try clearing search.' : 'All discovered resources are mapped to projects.'
+              search
+                ? 'Try clearing search.'
+                : tab === 'archived'
+                  ? 'Nothing hidden. Archived rows can be restored.'
+                  : 'All discovered resources are mapped or archived.'
             }
           />
         ) : (
           <ul className="space-y-3">
-            {filtered.map((resource) => (
-              <UnmappedRow
-                key={resource.id}
-                resource={resource}
-                projects={projects}
-                onMapped={() => void load()}
-              />
-            ))}
+            {filtered.map((resource) =>
+              data?.inbox === 'archived' ? (
+                <ArchivedRow key={resource.id} resource={resource} onChanged={() => void load()} />
+              ) : (
+                <UnmappedRow
+                  key={resource.id}
+                  resource={resource}
+                  projects={projects}
+                  onChanged={() => void load()}
+                />
+              ),
+            )}
           </ul>
         )}
       </div>
@@ -163,89 +157,75 @@ function UnmappedContent() {
   );
 }
 
-function UnmappedRow({
-  resource,
-  projects,
-  onMapped,
+function InboxHeader({
+  tab,
+  openCount,
+  archivedCount,
+  rangeLabel,
+  search,
+  onTab,
+  onSearch,
 }: {
-  resource: UnmappedResourceRow;
-  projects: ProjectListResponse['projects'];
-  onMapped: () => void;
+  tab: InboxTab;
+  openCount: number;
+  archivedCount: number;
+  rangeLabel: string;
+  search: string;
+  onTab: (tab: InboxTab) => void;
+  onSearch: (value: string) => void;
 }) {
-  const [projectId, setProjectId] = useState('');
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const mapResource = async () => {
-    if (!projectId) {
-      setError('Select a project first.');
-      return;
-    }
-    setSaving(true);
-    setError(null);
-    try {
-      await fetchJson(`/api/resources/${resource.id}/mapping`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectId }),
-      });
-      onMapped();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Mapping failed');
-    } finally {
-      setSaving(false);
-    }
-  };
-
   return (
-    <li className="rounded-[var(--radius)] border border-[var(--line)] bg-[var(--paper)] p-4 shadow-[var(--shadow-card)]">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="min-w-0 flex-1">
-          <p className="font-semibold text-[var(--ink)]">{resource.displayName}</p>
-          <p className="mt-1 font-[family-name:var(--font-mono)] text-xs text-[var(--muted)]">
-            {resource.providerKey} · {resource.resourceType} · {resource.externalId}
-          </p>
-          <p className="mt-1 text-[11px] text-[var(--muted)]">
-            Discovered {resource.discoveredAt.slice(0, 10)}
-          </p>
-        </div>
-        <div className="flex shrink-0 gap-6 text-right">
-          <div>
-            <p className="text-[10px] font-semibold tracking-wide text-[var(--muted)] uppercase">
-              Period
-            </p>
-            <CostViewDisplay cost={resource.period} size="sm" />
-          </div>
-          <div>
-            <p className="text-[10px] font-semibold tracking-wide text-[var(--muted)] uppercase">
-              Today
-            </p>
-            <CostViewDisplay cost={resource.today} size="sm" />
-          </div>
+    <header className="flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <h1 className="wordmark text-3xl text-[var(--ink)]">Unmapped</h1>
+        <p className="mt-1 text-sm text-[var(--muted)]">
+          Resources without a project · {rangeLabel}. Mapping is optional. A project can have only
+          Neon, only Vercel, or only Upstash.
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <TabButton active={tab === 'open'} onClick={() => onTab('open')}>
+            Inbox {openCount}
+          </TabButton>
+          <TabButton active={tab === 'archived'} onClick={() => onTab('archived')}>
+            Archived {archivedCount}
+          </TabButton>
         </div>
       </div>
-      <div className="mt-4 flex flex-wrap items-end gap-2 border-t border-[var(--line)] pt-4">
-        <label className="min-w-[12rem] flex-1 text-xs font-medium text-[var(--muted)]">
-          Map to project
-          <select
-            value={projectId}
-            onChange={(event) => setProjectId(event.target.value)}
-            className="mt-1 w-full rounded-[var(--radius-sm)] border border-[var(--line-strong)] bg-[var(--canvas)] px-3 py-2 text-sm text-[var(--ink)]"
-          >
-            <option value="">Select…</option>
-            {projects.map((project) => (
-              <option key={project.id} value={project.id}>
-                {project.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <Button variant="secondary" disabled={saving} onClick={() => void mapResource()}>
-          {saving ? 'Saving…' : 'Map'}
-        </Button>
-      </div>
-      {error ? <p className="mt-2 text-xs text-[var(--danger)]">{error}</p> : null}
-    </li>
+      <label className="min-w-[12rem] flex-1 text-xs font-medium text-[var(--muted)] sm:max-w-xs">
+        Search
+        <input
+          type="search"
+          value={search}
+          onChange={(event) => onSearch(event.target.value)}
+          placeholder="Name, id, provider…"
+          className="mt-1 w-full rounded-[var(--radius-sm)] border border-[var(--line-strong)] bg-[var(--paper)] px-3 py-2 text-sm text-[var(--ink)]"
+        />
+      </label>
+    </header>
+  );
+}
+
+function TabButton({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`rounded-[var(--radius-sm)] px-3 py-1.5 text-sm font-medium ${
+        active
+          ? 'bg-[var(--accent)] text-[var(--accent-ink)]'
+          : 'bg-[var(--paper)] text-[var(--muted)] border border-[var(--line)] hover:text-[var(--ink)]'
+      }`}
+    >
+      {children}
+    </button>
   );
 }
 

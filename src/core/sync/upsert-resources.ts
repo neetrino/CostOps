@@ -46,9 +46,7 @@ export async function upsertDiscoveredResources(input: {
       projectId: row.projectId,
     });
     const fresh = await prisma.resource.findUniqueOrThrow({ where: { id: row.id } });
-    if (fresh.archivedAt) {
-      continue;
-    }
+    // Archived rows stay linked so spend does not detach from the resource.
     byExternalId.set(fresh.externalId, {
       id: fresh.id,
       projectId: fresh.projectId,
@@ -63,7 +61,7 @@ export async function loadAccountResources(
   providerAccountId: string,
 ): Promise<Map<string, ResourceLink>> {
   const rows = await prisma.resource.findMany({
-    where: { providerAccountId, archivedAt: null },
+    where: { providerAccountId },
   });
   return new Map(
     rows.map((row) => [

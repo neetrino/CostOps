@@ -125,7 +125,7 @@ Before marking a UI task done, walk this list:
 | Projects | Cards/list with today, period, mini provider split, warning state |
 | Project detail | Story of one business: total → providers → resources; charts first |
 | Provider board | Neon board quality for every provider: compare, series, budgets |
-| Unmapped | Obvious inbox; money still in provider totals |
+| Unmapped | Searchable project picker with slug + provider chips; mapping optional; archive/restore |
 | Settings / Integrations | Credential expiry, rotate links, last error — calm ops, not a form graveyard |
 | Login | Same brand, no leftover template |
 
