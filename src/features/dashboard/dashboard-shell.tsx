@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { APP_NAME } from '@/config/constants';
 import { SyncNowButton, SyncStatusChip } from '@/features/dashboard/sync-controls';
 import { UnmappedInboxController } from '@/features/dashboard/unmapped-inbox-controller';
+import { CostOpsMark } from '@/shared/ui/costops-mark';
 import { SignOutButton } from '@/shared/ui/sign-out-button';
 
 const NAV = [
@@ -45,11 +46,14 @@ export function DashboardShell({ children }: DashboardShellProps) {
     <div className="min-h-screen bg-[var(--canvas)]">
       <header className="sticky top-0 z-20 border-b border-[var(--line)] bg-[var(--sidebar)]/95 backdrop-blur-sm">
         <div className="flex flex-wrap items-center gap-3 px-4 py-3 lg:px-6">
-          <Link href="/" className="mr-2 shrink-0">
-            <p className="text-[10px] font-semibold tracking-[0.2em] text-[var(--muted)] uppercase">
-              Neetrino
-            </p>
-            <p className="wordmark text-xl text-[var(--ink)]">{APP_NAME}</p>
+          <Link href="/" className="mr-2 flex shrink-0 items-center gap-2.5">
+            <CostOpsMark size={32} />
+            <span>
+              <p className="text-[10px] font-semibold tracking-[0.2em] text-[var(--muted)] uppercase">
+                Neetrino
+              </p>
+              <p className="wordmark text-xl text-[var(--ink)]">{APP_NAME}</p>
+            </span>
           </Link>
           <nav className="flex flex-1 flex-wrap items-center gap-1">
             {NAV.map((item) => {

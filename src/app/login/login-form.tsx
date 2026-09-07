@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { APP_NAME } from '@/config/constants';
+import { CostOpsMark } from '@/shared/ui/costops-mark';
 
 export function LoginForm() {
   const router = useRouter();
@@ -39,6 +40,7 @@ export function LoginForm() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--canvas)] px-4">
       <div className="w-full max-w-sm rounded-[var(--radius)] border border-[var(--line)] bg-[var(--paper)] p-8 shadow-[var(--shadow-card)]">
+        <CostOpsMark size={44} className="mb-4" />
         <p className="text-xs font-medium tracking-[0.18em] text-[var(--muted)] uppercase">
           Neetrino
         </p>
