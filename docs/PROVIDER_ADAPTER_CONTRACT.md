@@ -123,7 +123,7 @@ load enabled accounts due for sync
 |-----|----------|----------|-------------|-------|
 | NEON | yes (hourly slots summed) | yes | ESTIMATED from usage + plan rates | Port `lib/neon/*`, `lib/sync/*`, `lib/usage/*` |
 | VERCEL | no (current Pacific day often `404 costs_not_found`) | yes (FOCUS daily) | API `GET /v1/billing/charges` (JSONL) | Observed API in `docs/PROGRESS.md`. GET only. |
-| UPSTASH | provider-specific | if API allows | API or documented ESTIMATED | |
+| UPSTASH | yes (current UTC day in Redis `dailybilling` / QStash `daily_billings`) | yes (QStash month; Redis ~5 recent UTC days) | API `GET /v2/redis/stats/{id}` + `GET /v2/qstash/stats/{id}` | Observed API in `docs/PROGRESS.md`. Basic auth. GET only. Days outside the series window are `missing`, not `$0`. |
 | GCP | provider-specific | yes if export/API | API | |
 | HETZNER | no | n/a | FIXED recurring | |
 

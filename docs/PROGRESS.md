@@ -1,7 +1,7 @@
 # Progress — Neetrino CostOps
 
-**Phase.** 3 — Cross-provider project totals  
-**Overall.** 92% (Neon + Vercel + project totals; preview/parity and operator mapping still open)  
+**Phase.** 4 — Upstash (GCP postponed)  
+**Overall.** 94% (Neon + Vercel + project totals + Upstash adapter; operator mapping and preview/parity still open)  
 **Updated.** 2026-09-07
 
 ---
@@ -13,8 +13,8 @@
 | 0. Architecture + docs | ✅ TECH_CARD confirmed | 100% |
 | 1. Core + Neon parity | 🔄 UI + history script; preview/parity next | 86% |
 | 2. Vercel | 🔄 Adapter + board + tests; operator mapping next | 80% |
-| 3. Project totals | 🔄 UI + PROJECT_TOTAL patch; live DB apply still running | 85% |
-| 4. Next providers | ⏳ | 0% |
+| 3. Project totals | ✅ UI + PROJECT_TOTAL + history apply | 90% |
+| 4. Next providers | 🔄 Upstash adapter; GCP postponed; Hetzner blocked | 40% |
 | 5. Advanced FinOps | ⏳ Out of v1 cutover | 0% |
 
 ---
@@ -62,25 +62,53 @@
 - [x] Project detail story: hero Total → Neon/Vercel lines + PROJECT_TOTAL inline limit → resources
 - [x] Stacked provider series on `/projects/[slug]`; Overview “By project” uses the same mapped-provider rollup
 - [x] `PATCH /api/projects/[slug]/budget-total` (ensure PROJECT_TOTAL, `enabled: true` only when a limit is set)
+- [x] Upstash `CostProviderAdapter` (`src/providers/upstash/`): Management API Redis + QStash, Zod, credential meta (`supportsExpiryDate: false`)
+- [x] Seed + cron ensure Provider `UPSTASH` + ProviderAccount from `UPSTASH_EMAIL`
+- [x] `/providers/upstash` nav + generic provider board + unmapped `upstash_redis` / `upstash_qstash`
 
 ---
 
 ## In progress
 
 - [x] Live Neon history `--apply` (2026-09-07, ~60 min): 65 resources, 42938 metrics, 6134 costs, 21 alerts
-- [ ] Map Vercel resources onto CostOps projects and enable Project × Vercel limits
+- [ ] Map Vercel / Upstash resources onto CostOps projects and enable Project × Provider limits
 
 ---
 
 ## Next
 
-1. Map Vercel inbox rows in `/unmapped` to existing projects
-2. Fresh old-Neon Connect URL, then `pnpm migrate:from-neon` → `--apply`
-3. Operator deploys CostOps when ready (no preview wait)
+1. Map Vercel and Upstash inbox rows in `/unmapped` to existing projects
+2. Operator deploys CostOps when ready (no preview wait)
+3. GCP later (billing quota / SA JSON)
 
 ---
 
 ## Notes
+
+### 2026-09-07 — Phase 4 Upstash adapter (live API)
+
+Management API Basic auth (`UPSTASH_EMAIL` + `UPSTASH_API_KEY`). GET only. Response bodies are not logged (list payloads include rest/QStash tokens). Zod list schemas keep identity fields only.
+
+| Endpoint | Status | Notes |
+|----------|--------|-------|
+| `GET /v2/redis/databases` | 200 | Array. 22 DBs observed (`database_id` / `database_name`). `type` is `paid`; `database_type` is `Pay as You Go`. `state` includes `archived`. Extra `read_only_rest_token` stripped. |
+| `GET /v2/redis/stats/{id}` | 200 | `dailybilling` / `dailyrequests` (~5 recent UTC days). `total_monthly_billing` is month-to-date and is **not** allocated onto missing days. |
+| `GET /v2/qstash/users` | 200 | Two regional users (eu-central-1, us-east-1). `token` / `read_only_token` stripped. |
+| `GET /v2/qstash/stats/{id}` | 200 | Default (no `period`) returns calendar-month `daily_billings`. `?period=30d` is **400** — unused. |
+| `GET /v2/vector/index` | 200 | Empty list. Adapter still lists when indexes appear. |
+| `GET /v2/search` | 200 | Empty list. |
+| `GET /v2/teams` | 200 | Empty — personal account. `externalAccountId` = `UPSTASH_EMAIL`. |
+
+Discrepancies vs docs:
+
+- OpenAPI Redis `type` enum (`free`/`payg`/…) vs live `type: paid` + `database_type: Pay as You Go`.
+- OpenAPI QStash `period=30d` vs live 400.
+- Vector/Search stats expose `monthly_cost` only — daily CostOps rows stay `missing` until a daily USD series exists.
+- Redis `dailybilling` window is shorter than the month; days not in the series are `missing`, not `$0`.
+
+`supportsIntraday: true`. `supportsBackfill: true` (QStash month; Redis only the observed window).
+
+---
 
 ### 2026-09-07 — Phase 3 project totals
 

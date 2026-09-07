@@ -4,6 +4,7 @@ import { PrismaClient } from '../src/generated/prisma/client';
 import {
   DEFAULT_SYNC_INTERVAL_MINUTES,
   NEON_CREDENTIAL_REF,
+  UPSTASH_CREDENTIAL_REF,
   VERCEL_CREDENTIAL_REF,
 } from '../src/config/constants';
 
@@ -32,9 +33,15 @@ async function seed(): Promise<void> {
       create: { key: 'VERCEL', displayName: 'Vercel', enabled: true },
       update: { displayName: 'Vercel', enabled: true },
     });
+    await prisma.provider.upsert({
+      where: { key: 'UPSTASH' },
+      create: { key: 'UPSTASH', displayName: 'Upstash', enabled: true },
+      update: { displayName: 'Upstash', enabled: true },
+    });
 
     await seedNeonAccount(prisma);
     await seedVercelAccount(prisma);
+    await seedUpstashAccount(prisma);
   } finally {
     await prisma.$disconnect();
   }
@@ -82,6 +89,29 @@ async function seedVercelAccount(prisma: PrismaClient): Promise<void> {
     update: {
       name: 'Vercel team',
       credentialRef: VERCEL_CREDENTIAL_REF,
+    },
+  });
+}
+
+async function seedUpstashAccount(prisma: PrismaClient): Promise<void> {
+  const email = envValue('UPSTASH_EMAIL');
+  if (!email) {
+    return;
+  }
+  await prisma.providerAccount.upsert({
+    where: {
+      providerKey_externalAccountId: { providerKey: 'UPSTASH', externalAccountId: email },
+    },
+    create: {
+      providerKey: 'UPSTASH',
+      name: 'Upstash account',
+      externalAccountId: email,
+      credentialRef: UPSTASH_CREDENTIAL_REF,
+      recommendedSyncIntervalMinutes: DEFAULT_SYNC_INTERVAL_MINUTES,
+    },
+    update: {
+      name: 'Upstash account',
+      credentialRef: UPSTASH_CREDENTIAL_REF,
     },
   });
 }

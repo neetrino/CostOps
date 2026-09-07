@@ -29,5 +29,5 @@ describe.skipIf(!live)('Vercel live probe (optional)', () => {
     if (charges.kind === 'ok') {
       expect(Array.isArray(charges.charges)).toBe(true);
     }
-  });
+  }, 20_000);
 });

@@ -50,6 +50,18 @@ export const VERCEL_BILLING_TIME_ZONE = 'America/Los_Angeles';
 export const VERCEL_PROJECT_PAGE_SIZE = 100;
 export const VERCEL_PROJECT_PAGE_LIMIT = 50;
 
+export const UPSTASH_CREDENTIAL_REF = 'UPSTASH';
+export const UPSTASH_API_BASE = 'https://api.upstash.com/v2';
+export const UPSTASH_CREATE_TOKEN_URL = 'https://console.upstash.com/account/api';
+export const UPSTASH_CREDENTIAL_DOCS_URL =
+  'https://upstash.com/docs/devops/developer-api/authentication';
+export const UPSTASH_CREDENTIAL_CREATE_PATH = 'Account → Management API';
+export const UPSTASH_CREDENTIAL_ENV_VARS = ['UPSTASH_EMAIL', 'UPSTASH_API_KEY'] as const;
+export const UPSTASH_REDIS_RESOURCE_TYPE = 'upstash_redis';
+export const UPSTASH_VECTOR_RESOURCE_TYPE = 'upstash_vector';
+export const UPSTASH_SEARCH_RESOURCE_TYPE = 'upstash_search';
+export const UPSTASH_QSTASH_RESOURCE_TYPE = 'upstash_qstash';
+
 export const SYNC_NOW_RATE_LIMIT_PER_MINUTE = 5;
 export const SYNC_NOW_RATE_WINDOW_MS = 60_000;
 

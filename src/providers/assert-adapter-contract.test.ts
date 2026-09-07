@@ -24,6 +24,17 @@ describe('adapter contract', () => {
     expect(() => assertAdapterContract(adapter)).not.toThrow();
   });
 
+  it('registers Upstash with Management API rotate metadata', () => {
+    const adapter = getAdapter('UPSTASH');
+    expect(adapter.providerKey).toBe('UPSTASH');
+    expect(adapter.supportsIntraday).toBe(true);
+    expect(adapter.supportsBackfill).toBe(true);
+    expect(adapter.credentials.credentialCreateUrl).toBe('https://console.upstash.com/account/api');
+    expect(adapter.credentials.envVarNames).toEqual(['UPSTASH_EMAIL', 'UPSTASH_API_KEY']);
+    expect(adapter.credentials.supportsExpiryDate).toBe(false);
+    expect(() => assertAdapterContract(adapter)).not.toThrow();
+  });
+
   it('fails when credentialCreateUrl is missing', () => {
     const broken: CostProviderAdapter = {
       ...neonAdapter,

@@ -12,6 +12,7 @@ const NAV = [
   { href: '/projects', label: 'Projects' },
   { href: '/providers/neon', label: 'Neon' },
   { href: '/providers/vercel', label: 'Vercel' },
+  { href: '/providers/upstash', label: 'Upstash' },
   { href: '/unmapped', label: 'Unmapped' },
   { href: '/integrations', label: 'Integrations' },
 ] as const;

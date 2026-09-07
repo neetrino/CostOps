@@ -28,7 +28,7 @@ export function HomeSyncStatus({ status }: HomeSyncStatusProps) {
         </p>
       ) : (
         <p className="mt-2 text-[var(--muted)]">
-          No provider accounts yet. Seed NEON_ORG_ID / VERCEL_TEAM_ID or run cron.
+          No provider accounts yet. Seed NEON_ORG_ID / VERCEL_TEAM_ID / UPSTASH_EMAIL or run cron.
         </p>
       )}
       {latest ? (

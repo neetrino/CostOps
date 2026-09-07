@@ -140,3 +140,17 @@ Paid models: not used. Fable 5: orchestrator only.
 | Phase 3 accepted | Mapped-provider Total + `PATCH .../budget-total`; unmapped stays off project total |
 | No Phase 4 yet (Upstash/GCP/…) | No next-provider tokens; DoD is one provider at a time |
 | Next after `--apply` finishes | Browser-check project detail totals; then operator unmapped + token expiry |
+
+---
+
+## 2026-09-07 — Phase 4 Upstash (GCP postponed)
+
+| Decision | Why |
+|----------|-----|
+| GCP paused | Operator asked to drop Google for now. Project `neetrino` exists; billing quota still blocks SA/API. |
+| Upstash next | Management API keys already in env. Plan order is Upstash → GCP → Hetzner. |
+| No fuzzy map Redis → CostOps projects | Same as Vercel: inbox only. Names like `Ommm.am` are not unique enough to merge. |
+| Redis days outside `dailybilling` = `missing` | Observed window is ~5 UTC days. Do not invent `$0` for Sep 1 when the series starts Sep 3. |
+| QStash `period=30d` unused | Live API returns 400; default stats already include a calendar-month `daily_billings`. |
+| Vector/Search daily cost `missing` | No daily USD series in the Management API stats (only `monthly_cost`). Discover later when indexes exist. |
+| Tokens never stored | List payloads include Redis rest tokens and QStash tokens. Zod keeps identity fields only. |
