@@ -6,9 +6,7 @@ type ProjectsIndexRedirectProps = {
   searchParams: Promise<SearchParams>;
 };
 
-export default async function ProjectsIndexRedirect({
-  searchParams,
-}: ProjectsIndexRedirectProps) {
+export default async function ProjectsIndexRedirect({ searchParams }: ProjectsIndexRedirectProps) {
   const raw = await searchParams;
   const query = new URLSearchParams();
   for (const [key, value] of Object.entries(raw)) {

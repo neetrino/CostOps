@@ -14,9 +14,17 @@ describe('formatSpendAlertTelegramHtml', () => {
       kind: 'first',
     });
     expect(html).toBe(
-      ['Neon', '', '📦 <b>NBOS</b>', '', '📅 Day 07', '', '💵 Estimated $1.09', '', '🎯 Limit $1.00'].join(
-        '\n',
-      ),
+      [
+        'Neon',
+        '',
+        '📦 <b>NBOS</b>',
+        '',
+        '📅 Day 07',
+        '',
+        '💵 Estimated $1.09',
+        '',
+        '🎯 Limit $1.00',
+      ].join('\n'),
     );
   });
 

@@ -142,10 +142,7 @@ function ProjectsContent() {
     [totalsData?.byProject, visibleIds],
   );
 
-  const nearLimit = useMemo(
-    () => buildBoardNearLimitItems(filteredProjects),
-    [filteredProjects],
-  );
+  const nearLimit = useMemo(() => buildBoardNearLimitItems(filteredProjects), [filteredProjects]);
 
   return (
     <DashboardBoard

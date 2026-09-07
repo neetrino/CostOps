@@ -100,8 +100,8 @@ function SuggestionHint({ resource }: { resource: InboxResourceRow }) {
   if (isUnallocatedResource(resource)) {
     return (
       <p className="mt-3 text-xs text-[var(--muted)]">
-        Vercel team leftovers (seats, Pro, untagged charges) — not an app. Archive, do not save as
-        a project.
+        Vercel team leftovers (seats, Pro, untagged charges) — not an app. Archive, do not save as a
+        project.
       </p>
     );
   }

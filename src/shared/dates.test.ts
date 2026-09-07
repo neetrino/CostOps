@@ -11,8 +11,8 @@ describe('eachUtcDay', () => {
   });
 
   it('returns empty when from is after to', () => {
-    expect(eachUtcDay(new Date('2026-09-03T00:00:00.000Z'), new Date('2026-09-01T00:00:00.000Z'))).toEqual(
-      [],
-    );
+    expect(
+      eachUtcDay(new Date('2026-09-03T00:00:00.000Z'), new Date('2026-09-01T00:00:00.000Z')),
+    ).toEqual([]);
   });
 });

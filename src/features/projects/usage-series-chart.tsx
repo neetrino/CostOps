@@ -48,7 +48,11 @@ export function UsageSeriesChart({ points, projectNames, visibleIds }: UsageSeri
       subtitle="USD by project · missing days are gaps, not $0"
       action={
         selectedId ? (
-          <Button variant="ghost" className="px-2.5 py-1 text-xs" onClick={() => setSelectedId(null)}>
+          <Button
+            variant="ghost"
+            className="px-2.5 py-1 text-xs"
+            onClick={() => setSelectedId(null)}
+          >
             Clear highlight
           </Button>
         ) : null
@@ -96,7 +100,9 @@ export function UsageSeriesChart({ points, projectNames, visibleIds }: UsageSeri
                     onMouseEnter={() => setHoveredId(item.projectId)}
                     onMouseLeave={() => setHoveredId(null)}
                     onClick={() =>
-                      setSelectedId((current) => (current === item.projectId ? null : item.projectId))
+                      setSelectedId((current) =>
+                        current === item.projectId ? null : item.projectId,
+                      )
                     }
                   />
                 );

@@ -91,7 +91,12 @@ export function ProjectCompareChart({
                   );
                 }}
               />
-              <Bar dataKey="costUsd" radius={[6, 6, 0, 0]} maxBarSize={BAR_SLOT_PX - 18} isAnimationActive={false}>
+              <Bar
+                dataKey="costUsd"
+                radius={[6, 6, 0, 0]}
+                maxBarSize={BAR_SLOT_PX - 18}
+                isAnimationActive={false}
+              >
                 {data.map((row, index) => (
                   <Cell key={row.projectId} fill={chartColor(index)} />
                 ))}

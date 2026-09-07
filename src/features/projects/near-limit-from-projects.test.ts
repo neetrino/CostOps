@@ -12,7 +12,9 @@ function cost(usd: number | null) {
   };
 }
 
-function project(overrides: Partial<ProjectListRow> & Pick<ProjectListRow, 'id' | 'name'>): ProjectListRow {
+function project(
+  overrides: Partial<ProjectListRow> & Pick<ProjectListRow, 'id' | 'name'>,
+): ProjectListRow {
   return {
     slug: overrides.slug ?? overrides.id,
     archived: false,

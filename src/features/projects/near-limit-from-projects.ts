@@ -35,5 +35,7 @@ export function buildBoardNearLimitItems(projects: ProjectListRow[]): BoardNearL
       });
     }
   }
-  return rows.sort((left, right) => right.usagePercent - left.usagePercent).slice(0, NEAR_LIMIT_MAX_ROWS);
+  return rows
+    .sort((left, right) => right.usagePercent - left.usagePercent)
+    .slice(0, NEAR_LIMIT_MAX_ROWS);
 }
