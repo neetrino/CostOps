@@ -5,4 +5,15 @@ build
 coverage
 pnpm-lock.yaml
 prisma/migrations
+src/generated
 .git
+docs
+.agents
+.cursor
+list.md
+AGENTS.md
+README.md
+scripts
+.github/dependabot.yml
+.github/ISSUE_TEMPLATE
+.github/PULL_REQUEST_TEMPLATE.md

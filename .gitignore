@@ -15,6 +15,10 @@ node_modules/
 dist/
 build/
 coverage/
+src/generated/
+*.tsbuildinfo
+.vercel
+next-env.d.ts
 
 # Logs and temp
 *.log
