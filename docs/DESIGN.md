@@ -43,7 +43,7 @@ Inspected in the browser at `https://neon-neetrino.vercel.app/` (signed in). Cos
 - “Other metrics · Show” expand — do not drop
 - ~60 projects in the All-projects filter; search is first-class
 
-CostOps adds Overview / multi-provider / freshness / credential health **on top of** this language. Do not replace the rail + KPI + two charts + cards stack with a single table.
+CostOps adds multi-provider / freshness / credential health **on top of** this language. The home screen **is** the projects board. Do not replace the rail + KPI + stacked full-width charts + cards stack with a single table.
 
 When implementing UI, follow [`.agents/skills/figma-to-production`](../.agents/skills/figma-to-production/SKILL.md) (design analysis + browser verification), even without Figma.
 
@@ -109,7 +109,7 @@ Before marking a UI task done, walk this list:
 | Presentation | Cards **and** list, switch preserved |
 | Search | Instant filter on project/provider names |
 | Limits | Inline edit, one save, same speed as Neon spend-alert field |
-| Health | Sync / credential status on Overview and Integrations |
+| Health | Sync chip on every board; credential status on Integrations |
 | Compare | Project and provider comparison charts where the spec asks |
 | Overflow | Long names truncate with title; money never wrap into unreadability |
 | Focus | Visible focus, labels on inputs, tooltips on KPI jargon |
@@ -121,9 +121,8 @@ Before marking a UI task done, walk this list:
 
 | Screen | Design focus |
 |--------|----------------|
-| Overview | Hero totals, provider/project mix, near-limit, health. Not a dump of every table |
-| Projects | Cards/list with today, period, mini provider split, warning state |
-| Project detail | Story of one business: total → providers → resources; charts first |
+| Home (`/`) | Projects board: rail, KPI, near-limit, full-width compare + series, cards/list |
+| Project detail | Story of one business: total → providers → resources; charts stacked full width |
 | Provider board | Neon board quality for every provider: compare, series, budgets |
 | Unmapped | Searchable project picker with slug + provider chips; mapping optional; archive/restore |
 | Settings / Integrations | Credential expiry, rotate links, last error — calm ops, not a form graveyard |

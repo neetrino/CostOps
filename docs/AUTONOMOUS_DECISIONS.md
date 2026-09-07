@@ -159,3 +159,15 @@ Paid models: not used. Fable 5: orchestrator only.
 | Archive ≠ delete | `Resource.archivedAt` hides trash from `/unmapped`. Restore returns it. Cost rows stay. |
 | Archive resources gone from the provider list | After a non-empty discover, leftover IDs are archived. Empty discover does not wipe. History stays. |
 | Standalone inbox → Save as project | Vercel/Upstash-only apps get an operator-clicked CostOps project. `_unallocated` cannot. No auto-create. |
+| Vercel card = BilledCost | Vercel Usage $20 included credit is not billed. CostOps does not add it. Backfill missing days; do not invent credit as spend. |
+
+---
+
+## 2026-09-07 — home is the projects board
+
+| Decision | Why |
+|----------|-----|
+| `/` = projects board; `/projects` redirects to `/` | Operator asked to drop the sparse Overview home. Spend is already project-scoped. `/projects/[slug]` stays. |
+| Charts stacked full width, not two columns | Side-by-side plots were narrower and harder than Neon. Compare + series each use the remaining viewport after the rail. |
+| Ranked series legend + highlight | Neon’s usable pattern; CostOps keeps flat solids, omits missing days instead of drawing $0. |
+| Near-limit strip from project list | Keeps the only Overview signal that is not already in the header / inbox. `/api/overview` remains. |

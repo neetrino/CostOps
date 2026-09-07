@@ -24,7 +24,7 @@ function periodCostLabel(sourceType: CostView['sourceType']): string {
 
 function periodCostHint(sourceType: CostView['sourceType']): string {
   if (sourceType === 'API') {
-    return 'API billed · period total';
+    return 'Invoice billed · plan credit not counted';
   }
   return 'Approximate · period total';
 }
@@ -32,7 +32,7 @@ function periodCostHint(sourceType: CostView['sourceType']): string {
 export function KpiStrip({ total, byProvider, loading }: KpiStripProps) {
   if (loading) {
     return (
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, index) => (
           <div
             key={index}
@@ -52,7 +52,7 @@ export function KpiStrip({ total, byProvider, loading }: KpiStripProps) {
   ];
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
       {tiles.map((tile) => (
         <div
           key={tile.label}

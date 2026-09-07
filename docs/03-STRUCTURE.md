@@ -69,9 +69,9 @@ Forbidden:
 
 | Route | Feature |
 |-------|---------|
-| `/` | overview |
+| `/` | projects board (home) |
 | `/login` | auth (shared) |
-| `/projects` | projects |
+| `/projects` | redirect → `/` (query preserved) |
 | `/projects/[slug]` | projects |
 | `/providers` | providers |
 | `/providers/[key]` | providers |

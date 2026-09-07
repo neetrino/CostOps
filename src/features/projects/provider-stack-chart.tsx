@@ -17,10 +17,12 @@ import {
   formatChartUsd,
   toProviderChartRows,
 } from '@/features/projects/chart-data';
+import { formatChartAxisUsd } from '@/features/projects/chart-format';
+import { ChartPanel } from '@/features/projects/chart-panel';
 import { chartColor } from '@/shared/ui/chart-colors';
 import { EmptyPanel } from '@/shared/ui/state-panels';
 
-const CHART_HEIGHT = 360;
+const CHART_HEIGHT_PX = 380;
 
 type ProviderStackChartProps = {
   points: CostSeriesPoint[];
@@ -46,14 +48,13 @@ export function ProviderStackChart({ points, providerKeys }: ProviderStackChartP
   }
 
   return (
-    <div className="rounded-[var(--radius)] border border-[var(--line)] bg-[var(--paper)] p-4 shadow-[var(--shadow-card)]">
-      <h3 className="text-sm font-semibold text-[var(--ink)]">Cost over time</h3>
-      <p className="mt-1 text-xs text-[var(--muted)]">
-        Mapped providers stacked (USD). Missing series are omitted — not $0.
-      </p>
-      <div className="mt-4" style={{ height: CHART_HEIGHT }}>
+    <ChartPanel
+      title="Cost over time"
+      subtitle="Mapped providers stacked (USD). Missing series are omitted — not $0."
+    >
+      <div style={{ height: CHART_HEIGHT_PX }}>
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={rows} margin={{ top: 8, right: 16, left: 0, bottom: 8 }}>
+          <BarChart data={rows} margin={{ top: 8, right: 16, left: 4, bottom: 8 }}>
             <CartesianGrid stroke="var(--chart-grid)" vertical={false} />
             <XAxis
               dataKey="period"
@@ -63,9 +64,10 @@ export function ProviderStackChart({ points, providerKeys }: ProviderStackChartP
             />
             <YAxis
               tick={{ fill: 'var(--muted)', fontSize: 11 }}
-              axisLine={{ stroke: 'var(--chart-axis)' }}
+              axisLine={false}
               tickLine={false}
-              tickFormatter={(value: number) => `$${value}`}
+              width={48}
+              tickFormatter={formatChartAxisUsd}
             />
             <Tooltip
               content={({ active, payload, label }) => {
@@ -101,11 +103,12 @@ export function ProviderStackChart({ points, providerKeys }: ProviderStackChartP
                 stackId="providers"
                 fill={chartColor(index)}
                 maxBarSize={36}
+                isAnimationActive={false}
               />
             ))}
           </BarChart>
         </ResponsiveContainer>
       </div>
-    </div>
+    </ChartPanel>
   );
 }

@@ -11,6 +11,7 @@ import { loadSyncStatus } from '@/core/sync/load-status';
 import { ruleViewForProjectProvider, type BudgetRuleView } from '@/core/budgets/rule-view';
 import type { CostView } from '@/core/cost/types';
 import type { ProviderKey } from '@/generated/prisma/enums';
+import { sortByPeriodCostDesc } from '@/features/projects/sort-projects-by-cost';
 import { prisma } from '@/shared/db';
 import {
   rangePayload,
@@ -87,26 +88,28 @@ export async function loadProviderDetail(
       today: costViewForRows(unmappedRows(todayRows), cost.syncAtByAccountId, fallback),
       period: costViewForRows(unmappedRows(periodRows), cost.syncAtByAccountId, fallback),
     },
-    projects: links
-      .filter((link) => !query.projectId || link.projectId === query.projectId)
-      .map((link) => ({
-        projectId: link.project.id,
-        slug: link.project.slug,
-        name: link.project.name,
-        archived: link.project.archived,
-        projectProviderId: link.id,
-        today: costViewForRows(
-          rowsForProject(todayRows, link.projectId),
-          cost.syncAtByAccountId,
-          fallback,
-        ),
-        period: costViewForRows(
-          rowsForProject(periodRows, link.projectId),
-          cost.syncAtByAccountId,
-          fallback,
-        ),
-        budget: ruleViewForProjectProvider(rules, link.id),
-      })),
+    projects: sortByPeriodCostDesc(
+      links
+        .filter((link) => !query.projectId || link.projectId === query.projectId)
+        .map((link) => ({
+          projectId: link.project.id,
+          slug: link.project.slug,
+          name: link.project.name,
+          archived: link.project.archived,
+          projectProviderId: link.id,
+          today: costViewForRows(
+            rowsForProject(todayRows, link.projectId),
+            cost.syncAtByAccountId,
+            fallback,
+          ),
+          period: costViewForRows(
+            rowsForProject(periodRows, link.projectId),
+            cost.syncAtByAccountId,
+            fallback,
+          ),
+          budget: ruleViewForProjectProvider(rules, link.id),
+        })),
+    ),
     sync: {
       ...sync,
       accounts: sync.accounts.filter((account) => account.providerKey === providerKey),

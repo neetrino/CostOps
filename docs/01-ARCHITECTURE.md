@@ -20,7 +20,7 @@ Primary budget object: **Project × Provider**.
 
 ## Users
 
-- **Operator.** Views overview, projects, provider boards; edits daily limits; maps resources; runs manual sync/backfill.
+- **Operator.** Views the projects board, project detail, and provider boards; edits daily limits; maps resources; runs manual sync/backfill.
 - **System.** Vercel Cron runs due provider accounts, upserts data, evaluates budgets.
 
 ---
@@ -51,7 +51,7 @@ Style: **modular monolith** on Next.js. One deployable. Adapters are plugins, no
 
 | Component | Tech | Location | Role |
 |-----------|------|----------|------|
-| Web UI | Next.js 16 App Router, React 19, Tailwind 4, Recharts | `src/app`, `src/features` | Overview, projects, provider boards, settings |
+| Web UI | Next.js 16 App Router, React 19, Tailwind 4, Recharts | `src/app`, `src/features` | Projects board (home), project detail, provider boards, settings |
 | API | Route Handlers + Zod | `src/app/api` | Reads aggregates, mutations for budgets/mapping, cron |
 | Core | TypeScript modules | `src/core` | Cost, metrics, sync orchestration, budgets, alerts, mapping |
 | Adapters | Per-provider packages | `src/providers/<key>` | API clients, schemas, metric maps, cost source type |

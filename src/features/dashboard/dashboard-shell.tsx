@@ -9,8 +9,7 @@ import { UnmappedInboxController } from '@/features/dashboard/unmapped-inbox-con
 import { SignOutButton } from '@/shared/ui/sign-out-button';
 
 const NAV = [
-  { href: '/', label: 'Overview' },
-  { href: '/projects', label: 'Projects' },
+  { href: '/', label: 'Projects' },
   { href: '/providers/neon', label: 'Neon' },
   { href: '/providers/vercel', label: 'Vercel' },
   { href: '/providers/upstash', label: 'Upstash' },
@@ -22,6 +21,22 @@ type DashboardShellProps = {
   children: React.ReactNode;
 };
 
+function isBoardPath(pathname: string): boolean {
+  return (
+    pathname === '/' ||
+    pathname === '/unmapped' ||
+    pathname.startsWith('/projects/') ||
+    pathname.startsWith('/providers/')
+  );
+}
+
+function navActive(href: string, pathname: string): boolean {
+  if (href === '/') {
+    return pathname === '/' || pathname.startsWith('/projects/');
+  }
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
 export function DashboardShell({ children }: DashboardShellProps) {
   const pathname = usePathname();
   const [syncKey, setSyncKey] = useState(0);
@@ -29,7 +44,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
   return (
     <div className="min-h-screen bg-[var(--canvas)]">
       <header className="sticky top-0 z-20 border-b border-[var(--line)] bg-[var(--sidebar)]/95 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-[1600px] flex-wrap items-center gap-3 px-4 py-3 lg:px-6">
+        <div className="flex flex-wrap items-center gap-3 px-4 py-3 lg:px-6">
           <Link href="/" className="mr-2 shrink-0">
             <p className="text-[10px] font-semibold tracking-[0.2em] text-[var(--muted)] uppercase">
               Neetrino
@@ -38,10 +53,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
           </Link>
           <nav className="flex flex-1 flex-wrap items-center gap-1">
             {NAV.map((item) => {
-              const active =
-                item.href === '/'
-                  ? pathname === '/'
-                  : pathname === item.href || pathname.startsWith(`${item.href}/`);
+              const active = navActive(item.href, pathname);
               return (
                 <Link
                   key={item.href}
@@ -62,7 +74,9 @@ export function DashboardShell({ children }: DashboardShellProps) {
           <SignOutButton />
         </div>
       </header>
-      <main className="mx-auto max-w-[1600px] px-4 py-6 lg:px-6">{children}</main>
+      <main className={isBoardPath(pathname) ? '' : 'mx-auto max-w-[1600px] px-4 py-6 lg:px-6'}>
+        {children}
+      </main>
       <UnmappedInboxController />
     </div>
   );

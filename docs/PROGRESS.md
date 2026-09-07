@@ -2,7 +2,7 @@
 
 **Phase.** 4 — Upstash (GCP postponed)  
 **Overall.** 94% (Neon + Vercel + project totals + Upstash adapter; operator mapping and preview/parity still open)  
-**Updated.** 2026-09-07 (inbox Save as project for standalone apps)
+**Updated.** 2026-09-07 (Vercel backfill + billed vs included credit)
 
 ---
 
@@ -50,9 +50,9 @@
 - [x] Shared UTC date presets + Zod range (`current_month` / `previous_month` / 1 / 7 / 30 / 60 / custom, 400-day cap)
 - [x] CostView on every cost (`costUsd` null when missing/error — never a bare 0)
 - [x] Inline writes: project-provider budget, project rename/archive, resource mapping, credential expiry/rotate
-- [x] Visual dashboard: app shell, Overview `/`, Projects `/projects` (URL filters, KPI strip, Recharts, cards/list, inline budget, freshness, sync chip)
+- [x] Visual dashboard: app shell, home `/` is the projects board (URL filters, KPI strip, Recharts, cards/list, inline budget, freshness, sync chip); `/projects` redirects to `/`
 - [x] Phase 1 detail routes: `/projects/[slug]`, `/providers/[key]`, `/unmapped`, `/integrations` (filter rail, charts, inline budget, mapping, credential health)
-- [x] Nav: Overview, Projects, Neon, Vercel, Unmapped, Integrations; project cards link to detail
+- [x] Nav: Projects (home), Neon, Vercel, Upstash, Unmapped, Integrations; project cards link to detail
 - [x] Vercel `CostProviderAdapter` (`src/providers/vercel/`): GET `/v10/projects`, FOCUS GET `/v1/billing/charges`, Zod, credential meta (`supportsExpiryDate: false`)
 - [x] Seed + cron ensure Provider `VERCEL` + ProviderAccount from `VERCEL_TEAM_ID`
 - [x] `/providers/vercel` board + unmapped inbox for `vercel_project` / `vercel_unallocated`
@@ -217,6 +217,14 @@ The `404 costs_not_found` was observed on a short UTC `from=today 00:00Z&to=now`
 - Mapping picker is a searchable list (name, slug, provider chips). Duplicate names stay separate. Unmapped is a valid choice. A project does not need all three providers.
 - After a non-empty provider discover, resources missing from the live list are archived (history kept). Picker hides projects with no live resource. Extra ToonExpo rows were leftover Neon IDs, not extra DBs in the console.
 - Inbox **Save as project** (`POST /api/resources/[id]/project`) creates a CostOps project from one resource. Vercel/Upstash-only is valid. Team leftover (`_unallocated`) cannot become a project — Archive only.
+- `POST /api/sync/backfill` + `scripts/backfill.ts` fill missing UTC days (Sync now is today only). Vercel totals are invoice **BilledCost**; included plan credit is not added.
+
+### 2026-09-07 — home = projects board
+
+- `/` is the projects board (rail, KPI, near-limit strip, full-width compare + series, cards/list). `/projects` redirects to `/` and keeps the query string.
+- Nav no longer has a separate Overview. Project detail breadcrumb goes to `/`.
+- Charts stack full width (not two columns). Compare shows every project with cost; series uses a ranked highlight legend. Search also filters the charts.
+- `/api/overview` stays; the Overview page was removed.
 
 ---
 

@@ -5,6 +5,7 @@ import {
   BarChart,
   CartesianGrid,
   Cell,
+  LabelList,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -12,10 +13,14 @@ import {
 } from 'recharts';
 import type { CompareBarDatum } from '@/features/projects/chart-data';
 import { formatChartUsd } from '@/features/projects/chart-data';
+import { formatChartAxisUsd, formatChartBarLabel } from '@/features/projects/chart-format';
+import { ChartPanel } from '@/features/projects/chart-panel';
 import { chartColor } from '@/shared/ui/chart-colors';
 import { EmptyPanel } from '@/shared/ui/state-panels';
 
-const CHART_HEIGHT = 360;
+const BAR_SLOT_PX = 88;
+const CHART_HEIGHT_PX = 400;
+const CHART_MIN_WIDTH_PX = 520;
 const GRID = 'var(--chart-grid)';
 const AXIS = 'var(--chart-axis)';
 
@@ -29,39 +34,48 @@ type ProjectCompareChartProps = {
 export function ProjectCompareChart({
   data,
   title = 'Project comparison',
-  subtitle = 'Period estimated cost (USD)',
+  subtitle = 'Period cost (USD), ranked',
   emptyTitle = 'No comparable projects',
 }: ProjectCompareChartProps) {
   if (data.length === 0) {
     return <EmptyPanel title={emptyTitle} detail="Costs may be missing in this range." />;
   }
 
+  const innerWidth = Math.max(CHART_MIN_WIDTH_PX, data.length * BAR_SLOT_PX);
+
   return (
-    <div className="rounded-[var(--radius)] border border-[var(--line)] bg-[var(--paper)] p-4 shadow-[var(--shadow-card)]">
-      <h3 className="text-sm font-semibold text-[var(--ink)]">{title}</h3>
-      <p className="mt-1 text-xs text-[var(--muted)]">{subtitle}</p>
-      <div className="mt-4 overflow-x-auto">
-        <div style={{ minWidth: Math.max(520, data.length * 88), height: CHART_HEIGHT }}>
+    <ChartPanel title={title} subtitle={`${subtitle} · ${data.length} with cost`}>
+      <div className="overflow-x-auto pb-1">
+        <div style={{ width: innerWidth, minWidth: '100%', height: CHART_HEIGHT_PX }}>
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data} margin={{ top: 16, right: 12, left: 4, bottom: 48 }}>
+            <BarChart data={data} margin={{ top: 28, right: 12, left: 4, bottom: 48 }}>
               <CartesianGrid stroke={GRID} vertical={false} />
               <XAxis
                 dataKey="label"
-                tick={{ fill: 'var(--muted)', fontSize: 11 }}
+                tick={{ fill: 'var(--muted)', fontSize: 10 }}
                 axisLine={{ stroke: AXIS }}
                 tickLine={false}
                 interval={0}
-                angle={-28}
+                angle={-32}
                 textAnchor="end"
-                height={56}
+                height={52}
               />
               <YAxis
                 tick={{ fill: 'var(--muted)', fontSize: 11 }}
-                axisLine={{ stroke: AXIS }}
+                axisLine={false}
                 tickLine={false}
-                tickFormatter={(value: number) => `$${value}`}
+                width={48}
+                tickFormatter={formatChartAxisUsd}
+                label={{
+                  value: 'USD',
+                  angle: -90,
+                  position: 'insideLeft',
+                  fill: 'var(--muted)',
+                  fontSize: 11,
+                }}
               />
               <Tooltip
+                cursor={{ fill: 'rgba(28, 25, 23, 0.04)' }}
                 content={({ active, payload }) => {
                   if (!active || !payload?.[0]?.payload) {
                     return null;
@@ -77,15 +91,24 @@ export function ProjectCompareChart({
                   );
                 }}
               />
-              <Bar dataKey="costUsd" radius={[4, 4, 0, 0]}>
+              <Bar dataKey="costUsd" radius={[6, 6, 0, 0]} maxBarSize={BAR_SLOT_PX - 18} isAnimationActive={false}>
                 {data.map((row, index) => (
                   <Cell key={row.projectId} fill={chartColor(index)} />
                 ))}
+                <LabelList
+                  dataKey="costUsd"
+                  position="top"
+                  fill="var(--muted)"
+                  fontSize={10}
+                  formatter={(value) =>
+                    typeof value === 'number' ? formatChartBarLabel(value) : ''
+                  }
+                />
               </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
       </div>
-    </div>
+    </ChartPanel>
   );
 }

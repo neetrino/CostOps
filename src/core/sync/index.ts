@@ -5,5 +5,6 @@ export { loadSyncStatus } from './load-status';
 export { reconcileYesterday } from './reconcile-yesterday';
 export { currentDayRange, runAccountSync } from './run-account-sync';
 export { runDueAccountSyncs, runForcedAccountSyncs } from './run-due-syncs';
+export { runProviderBackfill, backfillBodySchema, parseBackfillRange } from './backfill';
 export type { AccountSyncResult, SyncMode } from './run-account-sync';
 export type { SyncStatusView } from './load-status';
