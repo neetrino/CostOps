@@ -35,7 +35,7 @@ function ProjectCard({
 }) {
   const primaryProvider = firstAlertableProvider(project.providers);
   const overLimit =
-    primaryProvider?.budget &&
+    primaryProvider?.budget?.enabled &&
     project.today.costUsd !== null &&
     project.today.costUsd >= primaryProvider.budget.limitUsd;
 

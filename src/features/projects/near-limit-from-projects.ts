@@ -20,7 +20,7 @@ export function buildBoardNearLimitItems(projects: ProjectListRow[]): BoardNearL
     for (const provider of project.providers) {
       if (
         isFixedVpsProvider(provider.providerKey) ||
-        !provider.budget ||
+        !provider.budget?.enabled ||
         provider.today.costUsd === null
       ) {
         continue;

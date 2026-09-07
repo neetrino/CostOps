@@ -4,6 +4,10 @@ import { prisma } from '@/shared/db';
 import { isPrismaUniqueViolation } from '@/shared/prisma-errors';
 import type { ProviderKey } from '@/generated/prisma/enums';
 
+/**
+ * Ensures a daily PROJECT_PROVIDER rule exists. New rules start at the env $1
+ * default and **enabled** so Telegram watches spend without an operator Set.
+ */
 export async function ensureProjectProviderBudgetRule(input: {
   projectId: string;
   projectProviderId: string;
@@ -38,7 +42,7 @@ export async function ensureProjectProviderBudgetRule(input: {
         providerKey: input.providerKey,
         limitUsd: defaults.limitUsd.toFixed(4),
         escalationPercent: defaults.escalationPercent.toFixed(2),
-        enabled: false,
+        enabled: true,
       },
     });
     return {

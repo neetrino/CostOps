@@ -163,6 +163,17 @@ Paid models: not used. Fable 5: orchestrator only.
 
 ---
 
+## 2026-09-07 — daily Project × Provider alerts on by default
+
+| Decision | Why |
+|----------|-----|
+| New `PROJECT_PROVIDER` rules start `enabled: true` at `$1` | Phase 1 disabled them to avoid a first-sync Telegram flood. Operator wants control on as soon as spend exists — no Set / Sync now. |
+| Enable existing non-HETZNER `PROJECT_PROVIDER` rows | Degusto and others already showed $1 / Near daily limit while `enabled: false`, so Telegram never fired. |
+| Leave `PROJECT_TOTAL` optional / off until Set | “Everyone $1” is the per-provider daily watch, not a project-wide total. |
+| HETZNER / VPS stays out of daily Telegram | FIXED monthly fee is analytics, not spend control. |
+
+---
+
 ## 2026-09-07 — home is the projects board
 
 | Decision | Why |

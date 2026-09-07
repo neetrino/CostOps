@@ -62,6 +62,26 @@ describe('buildBoardNearLimitItems', () => {
     expect(rows[0]?.usagePercent).toBe(80);
   });
 
+  it('skips disabled budgets so the strip matches Telegram', () => {
+    const rows = buildBoardNearLimitItems([
+      project({
+        id: 'off',
+        name: 'Off',
+        slug: 'off',
+        providers: [
+          {
+            providerKey: 'VERCEL',
+            projectProviderId: 'pp-off',
+            today: cost(1.18),
+            period: cost(1.18),
+            budget: { id: 'b-off', limitUsd: 1, escalationPercent: 30, enabled: false },
+          },
+        ],
+      }),
+    ]);
+    expect(rows).toHaveLength(0);
+  });
+
   it('skips missing spend and missing budgets', () => {
     const rows = buildBoardNearLimitItems([
       project({
