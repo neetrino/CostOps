@@ -97,3 +97,36 @@ Paid models: not used. Fable 5: orchestrator only.
 |----------|-----|
 | Merge fix accepted; stop Phase 1 coding | Hose is reviewable. Next actions are operator: rename env key → dry-run → `--apply`; then Vercel preview |
 | Do not start Phase 2 (Vercel adapter) | Spec: 7-day Neon parity after history copy + preview, not a new provider |
+
+---
+
+## 2026-09-07 — operator: local-only, no preview wait
+
+| Decision | Why |
+|----------|-----|
+| Renamed typo env key locally | Value was already there; script only reads `OLD_NEON_PROJECT_DATABASE_URL` |
+| History `--apply` still blocked | Old URL auth failed; CostOps URL works. Same default db name `neondb`, different Neon hosts |
+| No Vercel preview from me | Operator deploys when Phase work is done. Preview was only for 7-day parallel with old Neon — not required to code |
+| Start Phase 2 Vercel **adapter** locally | Different from deploy. Tokens already in `.env`. Not blocked on preview |
+
+---
+
+## 2026-09-07 — operator: don't wait, finish locally, CI on main
+
+| Decision | Why |
+|----------|-----|
+| Renamed typo key; hose still blocked | `OLD_NEON_*` already equals `neon/.env` `DATABASE_URL`; password still rejected. Cannot invent a new one |
+| Require **Quality checks** on `main` | Operator: PR to main must run format, Prisma validate, lint, typecheck, test, build |
+| Audit stays non-blocking | QUALITY_AUTOMATION_PLAN |
+| Continue Phase 2 locally | Tokens present; not waiting on history password |
+
+---
+
+## 2026-09-07 — after Vercel adapter (`def18ea`)
+
+| Decision | Why |
+|----------|-----|
+| Vercel adapter accepted | Live FOCUS charges work; current-day short window 404 is honest `missing`, not $0 |
+| Do not auto-map 38 Vercel resources by fuzzy name | Same as Neon remap table: exact inbox / operator map. `_unallocated` stays unmapped |
+| History `--apply` already running | Wait for it to finish before more CostOps DB writes |
+| Token expiry not invented | Integrations field exists; operator sets the date they chose in Vercel |

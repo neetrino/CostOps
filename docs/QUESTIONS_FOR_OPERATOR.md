@@ -8,8 +8,8 @@ If this list is empty at the end of Phase 1, nothing is blocked on you.
 
 ## Open
 
-1. **Local `.env` typo** — ключ записан как `OLD_NEON_PROJECTDATABASE_URL` (нет `_` перед `DATABASE`). Переименуй в `OLD_NEON_PROJECT_DATABASE_URL`. Hose: `53b9da9` + merge `b067bf8` (`pnpm migrate:from-neon`, dry-run по умолчанию). Старый Neon с явным порогом перезапишет правило; дефолт $1 **не** затирает UI Set. Не подставляй CostOps `DATABASE_URL`. После переименования напиши — прогоним dry-run, потом `--apply`.
-2. **Preview / Vercel** — Phase 1 код локально готов (кроме live history copy). Деплой не делаю, пока не дашь CostOps Vercel project.
+1. **Vercel token expiry** — на `/integrations` поставь дату, которую выбрал при создании токена (API её не отдаёт).
+2. **Vercel → проекты** — 38 строк в `/unmapped`. Сам по имени не склеиваю. Когда будет минута — разметь в инбоксе, потом лимиты Project × Vercel.
 
 ---
 
