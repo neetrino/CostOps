@@ -34,7 +34,7 @@ Migrate-on-deploy: follow `setup-production-migrations` + `docs/reference/workfl
 
 - Branch protection on `main` (required CI) — **done 2026-09-07:** ruleset `main` requires the GitHub Actions check **Quality checks** (format, Prisma validate, lint, typecheck, test, build). Audit stays informational.
 - Secret scanning
-- Dependabot: GitHub Actions + npm
+- Dependabot: GitHub Actions + npm, monthly grouped patch/minor only (no majors)
 
 ---
 
