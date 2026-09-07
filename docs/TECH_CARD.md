@@ -64,7 +64,7 @@
 | 4.2 | ORM | Prisma 7.x | ✅ | |
 | 4.3 | DB roles | `app_user` + `readonly_user` | ✅ | |
 | 4.4 | Connection limit | **5** pooled | ✅ | |
-| 4.5 | statement_timeout | **30s** | ✅ | Sync/backfill AbortSignal 60–120s |
+| 4.5 | statement_timeout | **30s** | ✅ | Sync/backfill AbortSignal 60–120s; Vercel sync/cron function **300s** |
 | 4.6 | idle_in_transaction_session_timeout | **15s** | ✅ | |
 | 4.7 | lock_timeout | **10s** | ✅ | |
 | 4.8 | Seed data | prisma db seed (dev) | ✅ | |

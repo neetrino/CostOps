@@ -21,7 +21,10 @@ export const STALE_INTERVAL_MULTIPLIER = 2;
 export const SYNC_MAX_RETRIES = 3;
 export const SYNC_RETRY_BASE_MS = 500;
 export const PROVIDER_API_TIMEOUT_MS = 60_000;
-export const CRON_MAX_DURATION_SECONDS = 60;
+/** Vercel Pro function cap. Must exceed one provider pull (60s outbound) × 3 accounts + alerts. */
+export const CRON_MAX_DURATION_SECONDS = 300;
+/** Stop starting another account so Vercel does not kill the function mid-write. */
+export const SYNC_BATCH_RESERVE_SECONDS = 15;
 
 export const CREDENTIAL_WARN_DAYS_LONG = 30;
 export const CREDENTIAL_WARN_DAYS_SHORT = 7;

@@ -57,15 +57,8 @@ describe('evaluateSpendAlertsForDay', () => {
       id: 'rule-disabled',
       limitUsd: 1,
       escalationPercent: 30,
-    });
-    vi.mocked(prisma.budgetRule.findUnique).mockResolvedValue({
-      id: 'rule-disabled',
       enabled: false,
-      scope: 'PROJECT_PROVIDER',
-      projectProviderId: 'pp-1',
-      projectId: 'p-1',
-      providerKey: 'NEON',
-    } as Awaited<ReturnType<typeof prisma.budgetRule.findUnique>>);
+    });
 
     await evaluateSpendAlertsForDay({ budgetDate: day, lastSyncAt });
 
@@ -86,15 +79,21 @@ describe('evaluateSpendAlertsForDay', () => {
       id: 'rule-enabled',
       limitUsd: 1,
       escalationPercent: 30,
+      enabled: true,
     });
-    vi.mocked(prisma.budgetRule.findUnique).mockResolvedValue({
+    const enabledRule = {
       id: 'rule-enabled',
       enabled: true,
-      scope: 'PROJECT_PROVIDER',
+      scope: 'PROJECT_PROVIDER' as const,
       projectProviderId: 'pp-1',
       projectId: 'p-1',
-      providerKey: 'NEON',
-    } as Awaited<ReturnType<typeof prisma.budgetRule.findUnique>>);
+      providerKey: 'NEON' as const,
+    };
+    vi.mocked(prisma.budgetRule.findMany)
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([enabledRule] as unknown as Awaited<
+        ReturnType<typeof prisma.budgetRule.findMany>
+      >);
 
     await evaluateSpendAlertsForDay({ budgetDate: day, lastSyncAt });
 

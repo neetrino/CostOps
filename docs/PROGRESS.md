@@ -118,6 +118,11 @@ Discrepancies vs docs:
 - UI: `/projects/[slug]` hero Total + provider lines + stacked Recharts series (no gradients).
 - This slice did **not** write CostOps `DATABASE_URL` (no `--apply`, migrate, seed, or sync). `migrate-from-neon --apply` may still be running separately.
 
+### 2026-09-07 — Sync function timeout
+
+- Production **Sync now** / hourly cron hit `FUNCTION_INVOCATION_TIMEOUT` at 60s (three providers + alerts). Telegram never ran.
+- Sync/cron/reconcile `maxDuration` is **300s** (Vercel Pro). Batch stops before the hard kill so finished accounts keep alerts.
+
 ### 2026-09-07 — CI on main
 
 - GitHub ruleset `main` requires the **Quality checks** job (Prisma validate, format, lint, typecheck, test, build).

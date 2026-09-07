@@ -7,7 +7,12 @@ export async function ensureProjectProviderBudgetRule(input: {
   projectId: string;
   projectProviderId: string;
   providerKey: ProviderKey;
-}): Promise<{ id: string; limitUsd: number; escalationPercent: number }> {
+}): Promise<{
+  id: string;
+  limitUsd: number;
+  escalationPercent: number;
+  enabled: boolean;
+}> {
   const scopeKey = budgetScopeKey({
     scope: 'PROJECT_PROVIDER',
     projectProviderId: input.projectProviderId,
@@ -19,6 +24,7 @@ export async function ensureProjectProviderBudgetRule(input: {
       id: existing.id,
       limitUsd: Number(existing.limitUsd.toString()),
       escalationPercent: Number(existing.escalationPercent.toString()),
+      enabled: existing.enabled,
     };
   }
   const created = await prisma.budgetRule.create({
@@ -37,5 +43,6 @@ export async function ensureProjectProviderBudgetRule(input: {
     id: created.id,
     limitUsd: defaults.limitUsd,
     escalationPercent: defaults.escalationPercent,
+    enabled: created.enabled,
   };
 }
