@@ -15,6 +15,7 @@ import { ProjectProviderSection } from '@/features/projects/project-provider-sec
 import { ProjectTotalHero } from '@/features/projects/project-total-hero';
 import { ProviderStackChart } from '@/features/projects/provider-stack-chart';
 import type { ProjectDetailResponse } from '@/features/projects/types';
+import { providerUiLabel } from '@/shared/provider-label';
 import { Button } from '@/shared/ui/button';
 import { CardSkeleton, EmptyPanel, ErrorPanel } from '@/shared/ui/state-panels';
 
@@ -102,7 +103,7 @@ function ProjectDetailContent() {
       buildCompareBarData(
         (detail?.providers ?? []).map((row) => ({
           projectId: row.projectProviderId,
-          name: row.providerKey,
+          name: providerUiLabel(row.providerKey),
           cost: row.period,
         })),
       ),
@@ -199,7 +200,10 @@ function ProjectDetailContent() {
               <EmptyPanel title="No provider links" detail="Map resources or run sync." />
             ) : (
               detail.providers.map((provider) => (
-                <ProjectProviderSection key={provider.projectProviderId} provider={provider} />
+                <ProjectProviderSection
+                  key={provider.projectProviderId}
+                  provider={provider}
+                />
               ))
             )}
           </section>

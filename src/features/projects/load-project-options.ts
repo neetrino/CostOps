@@ -1,12 +1,27 @@
 import type { ProjectOptionsResponse } from '@/features/unmapped/types';
 import { prisma } from '@/shared/db';
 
-/** Lightweight catalog for the unmapped picker — no cost aggregates. */
-export async function loadProjectOptions(): Promise<ProjectOptionsResponse> {
+const LIVE_BOARD_PROVIDER_KEYS = ['NEON', 'VERCEL', 'UPSTASH'] as const;
+
+/** Lightweight catalog for pickers — no cost aggregates. */
+export async function loadProjectOptions(
+  input: { includeEmpty?: boolean; liveBoard?: boolean } = {},
+): Promise<ProjectOptionsResponse> {
   const rows = await prisma.project.findMany({
     where: {
       archived: false,
-      resources: { some: { archivedAt: null } },
+      ...(input.liveBoard
+        ? {
+            resources: {
+              some: {
+                archivedAt: null,
+                providerKey: { in: [...LIVE_BOARD_PROVIDER_KEYS] },
+              },
+            },
+          }
+        : input.includeEmpty
+          ? {}
+          : { resources: { some: { archivedAt: null } } }),
     },
     select: {
       id: true,

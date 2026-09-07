@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { BoardNearLimitItem } from '@/features/projects/near-limit-from-projects';
 import { CostViewDisplay } from '@/shared/ui/cost-view-display';
+import { providerUiLabel } from '@/shared/provider-label';
 import { formatUsd } from '@/shared/money';
 
 type NearLimitStripProps = {
@@ -25,7 +26,7 @@ export function NearLimitStrip({ rows }: NearLimitStripProps) {
             >
               <span className="font-medium text-[var(--ink)]">
                 {row.projectName}
-                <span className="text-[var(--muted)]"> · {row.providerKey}</span>
+                <span className="text-[var(--muted)]"> · {providerUiLabel(row.providerKey)}</span>
               </span>
               <span className="text-[var(--muted)]">{row.usagePercent}%</span>
               <CostViewDisplay cost={row.spend} size="sm" />

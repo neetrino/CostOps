@@ -32,6 +32,8 @@ export type ProjectResourceRow = {
   externalId: string;
   displayName: string;
   resourceType: string;
+  fixedMonthlyUsd: number | null;
+  fixedEffectiveOn: string | null;
   today: CostView;
   period: CostView;
 };

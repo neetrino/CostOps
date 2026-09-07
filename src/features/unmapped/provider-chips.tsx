@@ -1,8 +1,4 @@
-const PROVIDER_LABEL: Record<string, string> = {
-  NEON: 'Neon',
-  VERCEL: 'Vercel',
-  UPSTASH: 'Upstash',
-};
+import { providerUiLabel } from '@/shared/provider-label';
 
 export function ProviderChips({ providerKeys }: { providerKeys: readonly string[] }) {
   if (providerKeys.length === 0) {
@@ -15,7 +11,7 @@ export function ProviderChips({ providerKeys }: { providerKeys: readonly string[
           key={key}
           className="rounded-[var(--radius-sm)] bg-[var(--accent-soft)] px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-[var(--ok)] uppercase"
         >
-          {PROVIDER_LABEL[key] ?? key}
+          {providerUiLabel(key)}
         </span>
       ))}
     </span>

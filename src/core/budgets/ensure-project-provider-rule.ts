@@ -1,6 +1,7 @@
 import { budgetScopeKey } from '@/core/budgets/scope-key';
 import { defaultBudgetLimits } from '@/core/budgets/defaults';
 import { prisma } from '@/shared/db';
+import { isPrismaUniqueViolation } from '@/shared/prisma-errors';
 import type { ProviderKey } from '@/generated/prisma/enums';
 
 export async function ensureProjectProviderBudgetRule(input: {
@@ -27,22 +28,35 @@ export async function ensureProjectProviderBudgetRule(input: {
       enabled: existing.enabled,
     };
   }
-  const created = await prisma.budgetRule.create({
-    data: {
-      scopeKey,
-      scope: 'PROJECT_PROVIDER',
-      projectId: input.projectId,
-      projectProviderId: input.projectProviderId,
-      providerKey: input.providerKey,
-      limitUsd: defaults.limitUsd.toFixed(4),
-      escalationPercent: defaults.escalationPercent.toFixed(2),
-      enabled: false,
-    },
-  });
-  return {
-    id: created.id,
-    limitUsd: defaults.limitUsd,
-    escalationPercent: defaults.escalationPercent,
-    enabled: created.enabled,
-  };
+  try {
+    const created = await prisma.budgetRule.create({
+      data: {
+        scopeKey,
+        scope: 'PROJECT_PROVIDER',
+        projectId: input.projectId,
+        projectProviderId: input.projectProviderId,
+        providerKey: input.providerKey,
+        limitUsd: defaults.limitUsd.toFixed(4),
+        escalationPercent: defaults.escalationPercent.toFixed(2),
+        enabled: false,
+      },
+    });
+    return {
+      id: created.id,
+      limitUsd: defaults.limitUsd,
+      escalationPercent: defaults.escalationPercent,
+      enabled: created.enabled,
+    };
+  } catch (error) {
+    if (!isPrismaUniqueViolation(error)) {
+      throw error;
+    }
+    const raced = await prisma.budgetRule.findUniqueOrThrow({ where: { scopeKey } });
+    return {
+      id: raced.id,
+      limitUsd: Number(raced.limitUsd.toString()),
+      escalationPercent: Number(raced.escalationPercent.toString()),
+      enabled: raced.enabled,
+    };
+  }
 }

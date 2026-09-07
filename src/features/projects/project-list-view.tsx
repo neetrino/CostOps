@@ -4,6 +4,8 @@ import Link from 'next/link';
 import type { ProjectListRow } from '@/features/projects/types';
 import { BudgetInlineField } from '@/features/projects/budget-inline-field';
 import { CostViewDisplay } from '@/shared/ui/cost-view-display';
+import { firstAlertableProvider } from '@/features/projects/alertable-provider';
+import { providerUiLabel } from '@/shared/provider-label';
 import { formatUsd } from '@/shared/money';
 
 type ProjectListViewProps = {
@@ -29,7 +31,7 @@ export function ProjectListView({ projects, onBudgetSaved }: ProjectListViewProp
         </thead>
         <tbody className="divide-y divide-[var(--line)]">
           {projects.map((project) => {
-            const primary = project.providers[0];
+            const primary = firstAlertableProvider(project.providers);
             return (
               <tr key={project.id} className="align-top">
                 <td className="px-4 py-3">
@@ -52,7 +54,7 @@ export function ProjectListView({ projects, onBudgetSaved }: ProjectListViewProp
                 <td className="px-4 py-3 text-xs text-[var(--muted)]">
                   {project.providers.map((link) => (
                     <div key={link.projectProviderId} className="flex justify-between gap-4">
-                      <span>{link.providerKey}</span>
+                      <span>{providerUiLabel(link.providerKey)}</span>
                       <span className="font-[family-name:var(--font-mono)] tabular-nums">
                         {link.period.costUsd === null ? '—' : formatUsd(link.period.costUsd)}
                       </span>

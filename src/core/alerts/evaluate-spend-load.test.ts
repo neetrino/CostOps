@@ -39,7 +39,11 @@ describe('evaluateSpendAlertsForDay', () => {
       TELEGRAM_CHAT_ID: 'chat',
     } as ReturnType<typeof getEnv>);
     vi.mocked(loadDayCostRows).mockResolvedValue([]);
+    vi.mocked(prisma.projectProvider.findMany).mockResolvedValue([]);
+    vi.mocked(prisma.budgetRule.findMany).mockReset();
     vi.mocked(prisma.budgetRule.findMany).mockResolvedValue([]);
+    vi.mocked(ensureProjectProviderBudgetRule).mockReset();
+    vi.mocked(evaluateSpendForTarget).mockReset();
     vi.mocked(evaluateSpendForTarget).mockResolvedValue('skipped');
   });
 
@@ -98,5 +102,73 @@ describe('evaluateSpendAlertsForDay', () => {
     await evaluateSpendAlertsForDay({ budgetDate: day, lastSyncAt });
 
     expect(evaluateSpendForTarget).toHaveBeenCalledOnce();
+  });
+
+  it('skips HETZNER PROJECT_PROVIDER targets', async () => {
+    vi.mocked(prisma.projectProvider.findMany).mockResolvedValue([
+      {
+        id: 'pp-vps',
+        projectId: 'p-1',
+        providerKey: 'HETZNER',
+        project: { name: 'NBOS', archived: false },
+        provider: { displayName: 'VPS' },
+      },
+    ] as unknown as Awaited<ReturnType<typeof prisma.projectProvider.findMany>>);
+
+    await evaluateSpendAlertsForDay({ budgetDate: day, lastSyncAt });
+
+    expect(ensureProjectProviderBudgetRule).not.toHaveBeenCalled();
+    expect(evaluateSpendForTarget).not.toHaveBeenCalled();
+  });
+
+  it('excludes FIXED rows from daily spend aggregation', async () => {
+    vi.mocked(prisma.projectProvider.findMany).mockResolvedValue([]);
+    vi.mocked(loadDayCostRows).mockResolvedValue([
+      {
+        costUsd: 14,
+        sourceStatus: 'final',
+        sourceType: 'FIXED',
+        isPartial: false,
+        projectId: 'p-1',
+        projectProviderId: 'pp-vps',
+        providerKey: 'HETZNER',
+      },
+      {
+        costUsd: 0.5,
+        sourceStatus: 'partial',
+        sourceType: 'ESTIMATED',
+        isPartial: true,
+        projectId: 'p-1',
+        projectProviderId: 'pp-neon',
+        providerKey: 'NEON',
+      },
+    ]);
+    const totalRule = {
+      id: 'rule-total',
+      enabled: true,
+      scope: 'PROJECT_TOTAL' as const,
+      projectProviderId: null,
+      projectId: 'p-1',
+      providerKey: null,
+    };
+    vi.mocked(prisma.budgetRule.findMany)
+      .mockResolvedValueOnce([
+        {
+          ...totalRule,
+          limitUsd: { toString: () => '2' },
+          escalationPercent: { toString: () => '30' },
+          project: { name: 'NBOS' },
+          provider: null,
+        },
+      ] as unknown as Awaited<ReturnType<typeof prisma.budgetRule.findMany>>)
+      .mockResolvedValueOnce([totalRule] as unknown as Awaited<
+        ReturnType<typeof prisma.budgetRule.findMany>
+      >);
+
+    await evaluateSpendAlertsForDay({ budgetDate: day, lastSyncAt });
+
+    expect(evaluateSpendForTarget).toHaveBeenCalledOnce();
+    const payload = vi.mocked(evaluateSpendForTarget).mock.calls[0]?.[0];
+    expect(payload?.target.spend).toMatchObject({ kind: 'value', costUsd: 0.5 });
   });
 });

@@ -65,6 +65,8 @@ export interface CostProviderAdapter {
   supportsIntraday: boolean;
   supportsBackfill: boolean;
   recommendedSyncIntervalMinutes?: number;
+  /** Default true. Fixed/manual adapters have no rotate-token UX. */
+  requiresCredentials?: boolean;
   credentials: ProviderCredentialMeta;
   syncResources(ctx: ProviderContext): Promise<ResourceSyncResult>;
   fetchCosts(ctx: ProviderContext, range: DateRange): Promise<NormalizedCost[]>;

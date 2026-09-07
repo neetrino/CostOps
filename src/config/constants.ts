@@ -65,6 +65,12 @@ export const UPSTASH_VECTOR_RESOURCE_TYPE = 'upstash_vector';
 export const UPSTASH_SEARCH_RESOURCE_TYPE = 'upstash_search';
 export const UPSTASH_QSTASH_RESOURCE_TYPE = 'upstash_qstash';
 
+export const HETZNER_CREDENTIAL_REF = 'HETZNER_FIXED';
+export const HETZNER_EXTERNAL_ACCOUNT_ID = 'internal';
+export const HETZNER_DISPLAY_NAME = 'VPS';
+export const HETZNER_RESOURCE_TYPE = 'vps_server';
+export const HETZNER_FIXED_SYNC_INTERVAL_MINUTES = 1440;
+
 export const SYNC_NOW_RATE_LIMIT_PER_MINUTE = 12;
 export const SYNC_NOW_RATE_WINDOW_MS = 60_000;
 export const MAX_BACKFILL_DAYS = 31;

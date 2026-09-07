@@ -10,6 +10,8 @@ import { loadDashboardCostContext } from '@/core/cost/load-dashboard-costs';
 import { ruleViewForProjectProvider, ruleViewForProjectTotal } from '@/core/budgets/rule-view';
 import type { ProjectDetailResponse } from '@/features/projects/types';
 import { prisma } from '@/shared/db';
+import { utcDayKey } from '@/shared/dates';
+import { decimalToNumber } from '@/shared/money';
 import { rangePayload, type ResolvedDashboardQuery } from '@/shared/dashboard-query';
 
 export async function loadProjectDetail(
@@ -70,6 +72,12 @@ export async function loadProjectDetail(
             externalId: resource.externalId,
             displayName: resource.displayName,
             resourceType: resource.resourceType,
+            fixedMonthlyUsd: resource.fixedMonthlyUsd
+              ? decimalToNumber(resource.fixedMonthlyUsd)
+              : null,
+            fixedEffectiveOn: resource.fixedEffectiveOn
+              ? utcDayKey(resource.fixedEffectiveOn)
+              : null,
             today: costViewForRows(
               rowsForResource(todayRows, resource.id),
               cost.syncAtByAccountId,

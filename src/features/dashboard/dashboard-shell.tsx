@@ -14,6 +14,7 @@ const NAV = [
   { href: '/providers/neon', label: 'Neon' },
   { href: '/providers/vercel', label: 'Vercel' },
   { href: '/providers/upstash', label: 'Upstash' },
+  { href: '/providers/hetzner', label: 'VPS' },
   { href: '/unmapped', label: 'Unmapped' },
   { href: '/integrations', label: 'Integrations' },
 ] as const;

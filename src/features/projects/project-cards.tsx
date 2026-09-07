@@ -4,6 +4,8 @@ import Link from 'next/link';
 import type { ProjectListRow } from '@/features/projects/types';
 import { BudgetInlineField } from '@/features/projects/budget-inline-field';
 import { CostViewDisplay } from '@/shared/ui/cost-view-display';
+import { firstAlertableProvider } from '@/features/projects/alertable-provider';
+import { providerUiLabel } from '@/shared/provider-label';
 import { formatUsd } from '@/shared/money';
 
 type ProjectCardsProps = {
@@ -31,7 +33,7 @@ function ProjectCard({
   project: ProjectListRow;
   onBudgetSaved: () => void;
 }) {
-  const primaryProvider = project.providers[0];
+  const primaryProvider = firstAlertableProvider(project.providers);
   const overLimit =
     primaryProvider?.budget &&
     project.today.costUsd !== null &&
@@ -68,7 +70,7 @@ function ProjectCard({
             <ul className="mt-2 space-y-1 text-xs">
               {project.providers.map((link) => (
                 <li key={link.projectProviderId} className="flex justify-between gap-2">
-                  <span className="text-[var(--ink)]">{link.providerKey}</span>
+                  <span className="text-[var(--ink)]">{providerUiLabel(link.providerKey)}</span>
                   <span className="font-[family-name:var(--font-mono)] tabular-nums text-[var(--muted)]">
                     {link.period.costUsd === null ? '—' : formatUsd(link.period.costUsd)}
                   </span>

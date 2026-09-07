@@ -16,6 +16,8 @@ Skip evaluation when Telegram env is unset (same as Neon: log and return).
 
 Do not alert from clearly invalid or missing cost (`error` / `missing`). `partial` current-day cost **may** alert — Neon already alerts on intraday estimates.
 
+Daily spend evaluation **ignores** `CostEntry.sourceType = FIXED` (static VPS). HETZNER `PROJECT_PROVIDER` targets are not loaded. The monthly fee is analytics-only; Telegram still watches live Neon/Vercel/Upstash spend.
+
 Provider **credential** failures and token expiry are a separate engine: [CREDENTIAL_ROTATION.md](./CREDENTIAL_ROTATION.md). They must not be folded into spend first-breach. A dead token must never become a silent `$0` day.
 
 ---

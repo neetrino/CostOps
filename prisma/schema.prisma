@@ -175,6 +175,8 @@ model Resource {
   displayName       String       @map("display_name")
   resourceType      String       @map("resource_type")
   metadata          Json?
+  fixedMonthlyUsd   Decimal?     @map("fixed_monthly_usd") @db.Decimal(12, 4)
+  fixedEffectiveOn  DateTime?    @map("fixed_effective_on") @db.Date
   discoveredAt      DateTime     @default(now()) @map("discovered_at")
   archivedAt        DateTime?    @map("archived_at")
   createdAt         DateTime     @default(now()) @map("created_at")

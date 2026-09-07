@@ -18,6 +18,15 @@ import {
   type RangePayload,
   type ResolvedDashboardQuery,
 } from '@/shared/dashboard-query';
+import { utcDayKey } from '@/shared/dates';
+import { decimalToNumber } from '@/shared/money';
+
+export type ProviderVpsLine = {
+  id: string;
+  displayName: string;
+  monthlyAmountUsd: number | null;
+  effectiveOn: string | null;
+};
 
 export type ProviderProjectRow = {
   projectId: string;
@@ -28,6 +37,7 @@ export type ProviderProjectRow = {
   today: CostView;
   period: CostView;
   budget: BudgetRuleView | null;
+  vpsLines: ProviderVpsLine[];
 };
 
 export type ProviderDetailResponse = {
@@ -49,7 +59,7 @@ export async function loadProviderDetail(
   if (!provider) {
     return null;
   }
-  const [cost, links, rules, unmappedCount, sync] = await Promise.all([
+  const [cost, links, rules, unmappedCount, sync, vpsResources] = await Promise.all([
     loadDashboardCostContext({
       from: query.from,
       to: query.to,
@@ -69,7 +79,36 @@ export async function loadProviderDetail(
       where: { providerKey, projectId: null, archivedAt: null },
     }),
     loadSyncStatus(now),
+    providerKey === 'HETZNER'
+      ? prisma.resource.findMany({
+          where: { providerKey: 'HETZNER', archivedAt: null },
+          select: {
+            id: true,
+            projectProviderId: true,
+            displayName: true,
+            fixedMonthlyUsd: true,
+            fixedEffectiveOn: true,
+          },
+          orderBy: { displayName: 'asc' },
+        })
+      : Promise.resolve([]),
   ]);
+  const vpsLinesByLink = new Map<string, ProviderVpsLine[]>();
+  for (const resource of vpsResources) {
+    if (!resource.projectProviderId) {
+      continue;
+    }
+    const lines = vpsLinesByLink.get(resource.projectProviderId) ?? [];
+    lines.push({
+      id: resource.id,
+      displayName: resource.displayName,
+      monthlyAmountUsd: resource.fixedMonthlyUsd
+        ? decimalToNumber(resource.fixedMonthlyUsd)
+        : null,
+      effectiveOn: resource.fixedEffectiveOn ? utcDayKey(resource.fixedEffectiveOn) : null,
+    });
+    vpsLinesByLink.set(resource.projectProviderId, lines);
+  }
   const periodRows = rowsForProvider(
     rowsInDashboardPeriod(cost.entries, query.from, query.to, query.preset),
     providerKey,
@@ -94,6 +133,7 @@ export async function loadProviderDetail(
     projects: sortByPeriodCostDesc(
       links
         .filter((link) => !query.projectId || link.projectId === query.projectId)
+        .filter((link) => providerKey !== 'HETZNER' || !link.project.archived)
         .map((link) => ({
           projectId: link.project.id,
           slug: link.project.slug,
@@ -111,6 +151,7 @@ export async function loadProviderDetail(
             fallback,
           ),
           budget: ruleViewForProjectProvider(rules, link.id),
+          vpsLines: vpsLinesByLink.get(link.id) ?? [],
         })),
     ),
     sync: {

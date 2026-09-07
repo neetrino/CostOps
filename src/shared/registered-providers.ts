@@ -1,4 +1,4 @@
-export const REGISTERED_PROVIDER_KEYS = ['NEON', 'UPSTASH', 'VERCEL'] as const;
+export const REGISTERED_PROVIDER_KEYS = ['NEON', 'UPSTASH', 'VERCEL', 'HETZNER'] as const;
 export type RegisteredProviderKey = (typeof REGISTERED_PROVIDER_KEYS)[number];
 
 export function parseRegisteredProviderKey(value: string): RegisteredProviderKey | null {

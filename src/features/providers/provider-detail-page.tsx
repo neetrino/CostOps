@@ -20,6 +20,8 @@ import type { ProviderDetailResponse } from '@/features/providers/load-provider-
 import { BackfillPeriodButton } from '@/features/providers/backfill-period-button';
 import { ProviderProjectCards } from '@/features/providers/provider-project-cards';
 import { ProviderProjectList } from '@/features/providers/provider-project-list';
+import { VpsAddProject } from '@/features/providers/vps-add-project';
+import { isFixedVpsProvider } from '@/shared/provider-label';
 import { CostViewDisplay } from '@/shared/ui/cost-view-display';
 import { CardSkeleton, EmptyPanel, ErrorPanel } from '@/shared/ui/state-panels';
 
@@ -180,6 +182,10 @@ function ProviderDetailContent() {
             </label>
           </header>
 
+          {isFixedVpsProvider(detail.provider.key) ? (
+            <VpsAddProject onAdded={() => void load()} />
+          ) : null}
+
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <HeroMetric label="Today" cost={detail.today} accent />
             <HeroMetric label="Selected period" cost={detail.period} />
@@ -215,12 +221,26 @@ function ProviderDetailContent() {
           {filteredProjects.length === 0 ? (
             <EmptyPanel
               title="No projects in range"
-              detail={search ? 'Try clearing search.' : 'Run sync or widen the date range.'}
+              detail={
+                search
+                  ? 'Try clearing search.'
+                  : isFixedVpsProvider(detail.provider.key)
+                    ? 'Add a project above to attach a monthly VPS line.'
+                    : 'Run sync or widen the date range.'
+              }
             />
           ) : viewMode === 'cards' ? (
-            <ProviderProjectCards projects={filteredProjects} onBudgetSaved={() => void load()} />
+            <ProviderProjectCards
+              projects={filteredProjects}
+              hideDailyLimit={isFixedVpsProvider(detail.provider.key)}
+              onBudgetSaved={() => void load()}
+            />
           ) : (
-            <ProviderProjectList projects={filteredProjects} onBudgetSaved={() => void load()} />
+            <ProviderProjectList
+              projects={filteredProjects}
+              hideDailyLimit={isFixedVpsProvider(detail.provider.key)}
+              onBudgetSaved={() => void load()}
+            />
           )}
         </>
       )}

@@ -16,6 +16,7 @@ export async function loadIntegrations() {
         lastErrorAt: account.lastErrorAt,
         lastSuccessfulSyncAt: account.lastSuccessfulSyncAt,
       });
+      const requiresCredentials = adapter?.requiresCredentials !== false;
       return {
         id: account.id,
         providerKey: account.providerKey,
@@ -31,9 +32,16 @@ export async function loadIntegrations() {
         lastAuthFailureCode: account.lastAuthFailureCode,
         credentialRotatedAt: account.credentialRotatedAt?.toISOString() ?? null,
         credentialHealth: health.health,
-        credentialCreateUrl: adapter?.credentials.credentialCreateUrl ?? null,
-        credentialCreatePath: adapter?.credentials.credentialCreatePath ?? null,
-        credentialDocsUrl: adapter?.credentials.credentialDocsUrl ?? null,
+        requiresCredentials,
+        credentialCreateUrl: requiresCredentials
+          ? (adapter?.credentials.credentialCreateUrl ?? null)
+          : null,
+        credentialCreatePath: requiresCredentials
+          ? (adapter?.credentials.credentialCreatePath ?? null)
+          : null,
+        credentialDocsUrl: requiresCredentials
+          ? (adapter?.credentials.credentialDocsUrl ?? null)
+          : null,
       };
     }),
   };

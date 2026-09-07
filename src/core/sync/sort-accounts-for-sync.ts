@@ -2,6 +2,7 @@ const PROVIDER_SYNC_ORDER: Record<string, number> = {
   NEON: 0,
   UPSTASH: 1,
   VERCEL: 2,
+  HETZNER: 3,
 };
 
 /**
