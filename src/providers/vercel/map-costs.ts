@@ -124,11 +124,13 @@ function toCostRow(
   isPartial: boolean,
 ): NormalizedCost {
   const billedUsd = acc?.billedUsd ?? 0;
+  const effectiveUsd = acc?.effectiveUsd ?? 0;
+  // Usage (who spent), including plan credit. Invoice remainder stays in metadata.billedUsd.
   return {
     externalId,
     bucketDate,
-    costUsd: billedUsd,
-    originalAmount: billedUsd,
+    costUsd: effectiveUsd,
+    originalAmount: effectiveUsd,
     originalCurrency: 'USD',
     sourceType: 'API',
     sourceStatus: isPartial ? 'partial' : 'fresh',
@@ -136,7 +138,7 @@ function toCostRow(
     dimensionKey: '_',
     metadata: {
       billedUsd,
-      effectiveUsd: acc?.effectiveUsd ?? 0,
+      effectiveUsd,
       chargeCount: acc?.chargeCount ?? 0,
     },
   };

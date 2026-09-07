@@ -11,7 +11,7 @@ type KpiStripProps = {
 
 function periodCostLabel(sourceType: CostView['sourceType']): string {
   if (sourceType === 'API') {
-    return 'Billed cost';
+    return 'Usage cost';
   }
   if (sourceType === 'FIXED') {
     return 'Fixed cost';
@@ -24,10 +24,10 @@ function periodCostLabel(sourceType: CostView['sourceType']): string {
 
 function periodCostHint(sourceType: CostView['sourceType'], providerKey?: string): string {
   if (providerKey === 'VERCEL') {
-    return 'Invoice billed · plan credit not counted';
+    return 'Usage · included credit counted';
   }
   if (sourceType === 'API') {
-    return 'API billed · period total';
+    return 'API usage · period total';
   }
   return 'Approximate · period total';
 }

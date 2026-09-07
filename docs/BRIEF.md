@@ -20,6 +20,17 @@ Single-organization internal use. Not a customer-facing billing portal.
 
 ---
 
+## What we count
+
+The job is **control spend**, not reconcile a provider invoice.
+
+- Per project, per day and per month: how much was actually consumed.
+- Included plan credit and on-demand overage are both usage. The $20 Vercel credit still has an owner — we need who spent it and how much sat on top.
+- Telegram alerts when that usage grows (first-breach / escalation). Invoice vs prepaid does not change the number or the alert.
+- Missing/stale provider data stays `missing` / `stale`, never silent `$0`.
+
+---
+
 ## Must-have features (priority)
 
 1. **Neon parity** — preserve the existing Neon dashboard: history, filters, charts, estimated cost, per-project daily limits, escalation Telegram alerts, sync/backfill/reconciliation — high

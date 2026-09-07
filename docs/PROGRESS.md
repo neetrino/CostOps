@@ -2,7 +2,7 @@
 
 **Phase.** 4 — Upstash (GCP postponed)  
 **Overall.** 94% (Neon + Vercel + project totals + Upstash adapter; operator mapping and preview/parity still open)  
-**Updated.** 2026-09-07 (Vercel backfill + billed vs included credit)
+**Updated.** 2026-09-07 (Vercel usage = EffectiveCost, including plan credit)
 
 ---
 
@@ -201,7 +201,7 @@ Discrepancies vs docs:
 - `supportsIntraday: false`. `supportsBackfill: true`.
 - Team-level charges (empty Tags: Pro, seats, some $0 SKUs) land on resource `_unallocated`.
 - Listed projects with no charges on a **200** day get API `$0` `fresh` (the API returned a complete charge set).
-- No ESTIMATED formula — billed USD only.
+- No ESTIMATED formula. `costUsd` is FOCUS **EffectiveCost** (usage, including included credit). `BilledCost` is metadata only.
 
 Charges exist: yes. Yesterday-style Pacific day ~1.8k lines / ~$7.5 billed team-wide in the probe window.
 
@@ -217,7 +217,7 @@ The `404 costs_not_found` was observed on a short UTC `from=today 00:00Z&to=now`
 - Mapping picker is a searchable list (name, slug, provider chips). Duplicate names stay separate. Unmapped is a valid choice. A project does not need all three providers.
 - After a non-empty provider discover, resources missing from the live list are archived (history kept). Picker hides projects with no live resource. Extra ToonExpo rows were leftover Neon IDs, not extra DBs in the console.
 - Inbox **Save as project** (`POST /api/resources/[id]/project`) creates a CostOps project from one resource. Vercel/Upstash-only is valid. Team leftover (`_unallocated`) cannot become a project — Archive only.
-- `POST /api/sync/backfill` + `scripts/backfill.ts` fill missing UTC days (Sync now is today only). Vercel totals are invoice **BilledCost**; included plan credit is not added.
+- `POST /api/sync/backfill` + `scripts/backfill.ts` fill missing UTC days (Sync now is today only). Vercel totals and Telegram use **EffectiveCost** (who spent, including plan credit).
 
 ### 2026-09-07 — home = projects board
 

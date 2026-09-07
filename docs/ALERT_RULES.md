@@ -2,6 +2,8 @@
 
 CostOps owns alerting. Providers only supply data. v1 channel: Telegram Bot API.
 
+Spend in a rule is **usage** (`CostEntry.costUsd`), including plan-included consumption. Do not alert on invoice remainder. Included vs on-demand does not change the threshold math.
+
 Preserve Neon first-breach + escalation + dedupe. Generalize the target from “Neon project” to a `BudgetRule` scope.
 
 ---
