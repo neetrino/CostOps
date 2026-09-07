@@ -2,7 +2,7 @@ import { costViewForRows, latestSyncForAccounts } from '@/core/cost/cost-view';
 import {
   rowsForProject,
   rowsForProvider,
-  rowsInRange,
+  rowsInDashboardPeriod,
   rowsOnUtcDay,
   unmappedRows,
 } from '@/core/cost/filter-entries';
@@ -70,7 +70,10 @@ export async function loadProviderDetail(
     }),
     loadSyncStatus(now),
   ]);
-  const periodRows = rowsForProvider(rowsInRange(cost.entries, query.from, query.to), providerKey);
+  const periodRows = rowsForProvider(
+    rowsInDashboardPeriod(cost.entries, query.from, query.to, query.preset),
+    providerKey,
+  );
   const todayRows = rowsForProvider(rowsOnUtcDay(cost.entries, cost.today), providerKey);
   const fallback = latestSyncForAccounts(cost.accounts, providerKey);
 

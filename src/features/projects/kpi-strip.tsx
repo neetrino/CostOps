@@ -24,7 +24,7 @@ function periodCostLabel(sourceType: CostView['sourceType']): string {
 
 function periodCostHint(sourceType: CostView['sourceType'], providerKey?: string): string {
   if (providerKey === 'VERCEL') {
-    return 'Usage · included credit counted';
+    return 'Current billing cycle · credit counted';
   }
   if (sourceType === 'API') {
     return 'API usage · period total';

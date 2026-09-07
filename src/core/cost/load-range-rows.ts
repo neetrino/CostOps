@@ -30,7 +30,16 @@ export async function loadRangeCostRows(filter: CostRangeFilter): Promise<CostEn
     bucketDate: row.bucketDate,
     resourceId: row.resourceId,
     providerAccountId: row.providerAccountId,
+    providerBillingCycleStart: metadataString(row.metadata, 'billingCycleStart'),
   }));
+}
+
+function metadataString(metadata: unknown, key: string): string | null {
+  if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata)) {
+    return null;
+  }
+  const value = (metadata as Record<string, unknown>)[key];
+  return typeof value === 'string' ? value : null;
 }
 
 export type AccountSyncRow = {

@@ -1,6 +1,10 @@
 import { combineProviderCostViews } from '@/core/cost/combine-views';
 import { costViewForRows, latestSyncForAccounts } from '@/core/cost/cost-view';
-import { rowsForProjectProvider, rowsInRange, rowsOnUtcDay } from '@/core/cost/filter-entries';
+import {
+  rowsForProjectProvider,
+  rowsInDashboardPeriod,
+  rowsOnUtcDay,
+} from '@/core/cost/filter-entries';
 import { loadDashboardCostContext } from '@/core/cost/load-dashboard-costs';
 import { ruleViewForProjectProvider } from '@/core/budgets/rule-view';
 import type {
@@ -31,7 +35,7 @@ export async function loadProjects(query: ResolvedDashboardQuery): Promise<Proje
       where: { scope: 'PROJECT_PROVIDER' },
     }),
   ]);
-  const periodRows = rowsInRange(cost.entries, query.from, query.to);
+  const periodRows = rowsInDashboardPeriod(cost.entries, query.from, query.to, query.preset);
   const todayRows = rowsOnUtcDay(cost.entries, cost.today);
 
   const rows: ProjectListRow[] = projects.map((project) => {

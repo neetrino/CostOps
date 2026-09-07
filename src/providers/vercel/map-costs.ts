@@ -3,6 +3,7 @@ import { vercelMetricKey } from '@/providers/vercel/metrics';
 import { utcDayKey } from '@/shared/dates';
 import type { NormalizedCost, NormalizedMetric } from '@/providers/types';
 import type { VercelFocusCharge } from '@/providers/vercel/schemas';
+import type { VercelBillingCycle } from '@/providers/vercel/fetch-billing-cycle';
 
 export type VercelProjectRef = {
   externalId: string;
@@ -42,6 +43,7 @@ export function vercelChargesToCosts(input: {
   projects: VercelProjectRef[];
   bucketDate: Date;
   isPartial: boolean;
+  billingCycle?: VercelBillingCycle | null;
 }): NormalizedCost[] {
   const totals = new Map<string, CostAccumulator>();
   for (const charge of input.charges) {
@@ -65,11 +67,12 @@ export function vercelChargesToCosts(input: {
       totals.get(project.externalId),
       input.bucketDate,
       input.isPartial,
+      input.billingCycle,
     ),
   );
   for (const [externalId, acc] of totals) {
     if (!knownIds.has(externalId)) {
-      rows.push(toCostRow(externalId, acc, input.bucketDate, input.isPartial));
+      rows.push(toCostRow(externalId, acc, input.bucketDate, input.isPartial, input.billingCycle));
     }
   }
   return rows;
@@ -134,6 +137,7 @@ function toCostRow(
   acc: CostAccumulator | undefined,
   bucketDate: Date,
   isPartial: boolean,
+  billingCycle?: VercelBillingCycle | null,
 ): NormalizedCost {
   const billedUsd = acc?.billedUsd ?? 0;
   const effectiveUsd = acc?.effectiveUsd ?? 0;
@@ -152,6 +156,8 @@ function toCostRow(
       billedUsd,
       effectiveUsd,
       chargeCount: acc?.chargeCount ?? 0,
+      billingCycleStart: billingCycle?.start ?? null,
+      billingCycleEnd: billingCycle?.end ?? null,
     },
   };
 }

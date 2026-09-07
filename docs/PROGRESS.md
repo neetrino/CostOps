@@ -202,6 +202,7 @@ Discrepancies vs docs:
 - Team-level usage charges with empty Tags land on resource `_unallocated`. Pro and seat subscription accruals are excluded because `EffectiveCost` already counts the included credit they fund; adding both would double-count usage.
 - Listed projects with no charges on a **200** day get API `$0` `fresh` (the API returned a complete charge set).
 - No ESTIMATED formula. `costUsd` is FOCUS **EffectiveCost** (usage, including included credit). `BilledCost` is metadata only.
+- The active billing-cycle bounds come from `/v1/invoices` Pro line items and are stored in cost metadata. The `current_month` board filters Vercel to that cycle (Sep 3–7 = about `$27.29` in the live verification); custom ranges retain calendar history, including Sep 1–2.
 
 Charges exist: yes. Yesterday-style Pacific day ~1.8k lines / ~$7.5 billed team-wide in the probe window.
 

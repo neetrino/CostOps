@@ -58,6 +58,29 @@ export const vercelFocusChargeSchema = z
 
 export type VercelFocusCharge = z.infer<typeof vercelFocusChargeSchema>;
 
+const vercelInvoiceLineItemSchema = z
+  .object({
+    description: z.string(),
+    periodStart: z.string(),
+    periodEnd: z.string(),
+  })
+  .passthrough();
+
+export const vercelInvoicesResponseSchema = z
+  .object({
+    data: z.array(
+      z
+        .object({
+          createdAt: z.string(),
+          lineItems: z.array(vercelInvoiceLineItemSchema),
+        })
+        .passthrough(),
+    ),
+  })
+  .passthrough();
+
+export type VercelInvoicesResponse = z.infer<typeof vercelInvoicesResponseSchema>;
+
 export const vercelErrorEnvelopeSchema = z
   .object({
     error: z

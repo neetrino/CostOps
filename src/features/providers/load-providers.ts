@@ -1,6 +1,6 @@
 import { rollupFreshness } from '@/core/cost/freshness';
 import { costViewForRows, latestSyncForAccounts } from '@/core/cost/cost-view';
-import { rowsForProvider, rowsInRange, rowsOnUtcDay } from '@/core/cost/filter-entries';
+import { rowsForProvider, rowsInDashboardPeriod, rowsOnUtcDay } from '@/core/cost/filter-entries';
 import { loadDashboardCostContext } from '@/core/cost/load-dashboard-costs';
 import { accountFreshness } from '@/core/sync/account-freshness';
 import type { CostView } from '@/core/cost/types';
@@ -53,7 +53,7 @@ export async function loadProviders(
       },
     }),
   ]);
-  const periodRows = rowsInRange(cost.entries, query.from, query.to);
+  const periodRows = rowsInDashboardPeriod(cost.entries, query.from, query.to, query.preset);
   const todayRows = rowsOnUtcDay(cost.entries, cost.today);
 
   return {
