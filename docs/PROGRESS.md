@@ -215,6 +215,7 @@ The `404 costs_not_found` was observed on a short UTC `from=today 00:00Z&to=now`
 - Archive sets `Resource.archivedAt` (not delete). Archived tab restores. Spend stays on the resource.
 - Full-screen inbox popup on each dashboard visit while open unmapped work exists. × / Not now dismisses this tab visit; new rows reopen it.
 - Mapping picker is a searchable list (name, slug, provider chips). Duplicate names stay separate. Unmapped is a valid choice. A project does not need all three providers.
+- After a non-empty provider discover, resources missing from the live list are archived (history kept). Picker hides projects with no live resource. Extra ToonExpo rows were leftover Neon IDs, not extra DBs in the console.
 
 ---
 

@@ -4,7 +4,10 @@ import { prisma } from '@/shared/db';
 /** Lightweight catalog for the unmapped picker — no cost aggregates. */
 export async function loadProjectOptions(): Promise<ProjectOptionsResponse> {
   const rows = await prisma.project.findMany({
-    where: { archived: false },
+    where: {
+      archived: false,
+      resources: { some: { archivedAt: null } },
+    },
     select: {
       id: true,
       name: true,

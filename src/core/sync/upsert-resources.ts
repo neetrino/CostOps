@@ -1,4 +1,5 @@
 import { ensureProjectForUnmappedResource } from '@/core/mapping/ensure-project-for-resource';
+import { shouldArchiveMissingResources } from '@/core/sync/archive-missing-resources';
 import { prisma } from '@/shared/db';
 import type { ProviderKey } from '@/generated/prisma/enums';
 import type { ResourceSyncResult } from '@/providers/types';
@@ -45,16 +46,58 @@ export async function upsertDiscoveredResources(input: {
       externalId: item.externalId,
       projectId: row.projectId,
     });
-    const fresh = await prisma.resource.findUniqueOrThrow({ where: { id: row.id } });
+    const fresh = await refreshDiscoveredResource(row.id);
     // Archived rows stay linked so spend does not detach from the resource.
-    byExternalId.set(fresh.externalId, {
-      id: fresh.id,
-      projectId: fresh.projectId,
-      projectProviderId: fresh.projectProviderId,
-      externalId: fresh.externalId,
-    });
+    byExternalId.set(fresh.externalId, fresh);
   }
+  await archiveResourcesMissingFromDiscovery({
+    providerAccountId: input.providerAccountId,
+    discoveredIds: input.discovered.map((item) => item.externalId),
+  });
   return byExternalId;
+}
+
+async function refreshDiscoveredResource(resourceId: string): Promise<ResourceLink> {
+  const row = await prisma.resource.findUniqueOrThrow({
+    where: { id: resourceId },
+    select: {
+      id: true,
+      projectId: true,
+      projectProviderId: true,
+      externalId: true,
+      archivedAt: true,
+    },
+  });
+  if (!row.archivedAt || !row.projectId) {
+    return {
+      id: row.id,
+      projectId: row.projectId,
+      projectProviderId: row.projectProviderId,
+      externalId: row.externalId,
+    };
+  }
+  return prisma.resource.update({
+    where: { id: row.id },
+    data: { archivedAt: null },
+    select: { id: true, projectId: true, projectProviderId: true, externalId: true },
+  });
+}
+
+async function archiveResourcesMissingFromDiscovery(input: {
+  providerAccountId: string;
+  discoveredIds: string[];
+}): Promise<void> {
+  if (!shouldArchiveMissingResources(input.discoveredIds.length)) {
+    return;
+  }
+  await prisma.resource.updateMany({
+    where: {
+      providerAccountId: input.providerAccountId,
+      archivedAt: null,
+      externalId: { notIn: input.discoveredIds },
+    },
+    data: { archivedAt: new Date() },
+  });
 }
 
 export async function loadAccountResources(
