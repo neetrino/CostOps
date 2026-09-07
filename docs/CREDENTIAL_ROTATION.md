@@ -115,7 +115,8 @@ export type ProviderCredentialMeta = {
 |----------|--------------|------|--------|
 | Neon | [console.neon.tech](https://console.neon.tech) → org **Settings → API keys** | [Manage API keys](https://neon.com/docs/manage/api-keys) | No auto-expiry; notify on 401 after revoke |
 | Vercel | [vercel.com/account/tokens](https://vercel.com/account/tokens) (Personal Account → Tokens) | [Access tokens](https://vercel.com/docs/accounts/access-tokens) | Yes — operator must save the chosen expiry |
-| Upstash / GCP / others | Fill when the adapter is added | — | Per vendor |
+| Upstash | [console.upstash.com/account/api](https://console.upstash.com/account/api) (Account → Management API) | [Developer API](https://upstash.com/docs/devops/developer-api/authentication) | No auto-expiry; notify on 401 |
+| GCP | [IAM service accounts](https://console.cloud.google.com/iam-admin/serviceaccounts) + billing account | Cloud Billing export / BigQuery | Operator stores key file path in `GOOGLE_APPLICATION_CREDENTIALS` |
 
 Vercel Team ID: team **Settings → General**. Not a secret, but keep next to the token in Settings.
 

@@ -21,6 +21,10 @@ NEON_PRICING_PLAN
 
 Vercel (Phase 2): `VERCEL_API_TOKEN`, `VERCEL_TEAM_ID`.
 
+Upstash (Phase 4): `UPSTASH_EMAIL`, `UPSTASH_API_KEY` (Management API basic auth).
+
+GCP (Phase 4): `GCP_PROJECT_ID`, `GCP_BILLING_ACCOUNT_ID`, `GOOGLE_APPLICATION_CREDENTIALS` (path to the service-account JSON).
+
 Secrets stay in env / Vercel. No ciphertext in Postgres in v1.
 
 `NEON_PERSONAL_API_KEY` is not a CostOps contract. The Neon app does not read it; only the org Console key (`NEON_API_KEY`) is used for consumption sync.

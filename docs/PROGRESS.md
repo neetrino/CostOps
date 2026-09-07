@@ -67,7 +67,7 @@
 
 ## In progress
 
-- [ ] Live Neon history dry-run/`--apply` (old DB password rejected; key is correct)
+- [x] Live Neon history `--apply` (2026-09-07, ~60 min): 65 resources, 42938 metrics, 6134 costs, 21 alerts
 - [ ] Map Vercel resources onto CostOps projects and enable Project × Vercel limits
 
 ---

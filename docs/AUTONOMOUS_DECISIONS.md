@@ -130,3 +130,13 @@ Paid models: not used. Fable 5: orchestrator only.
 | Do not auto-map 38 Vercel resources by fuzzy name | Same as Neon remap table: exact inbox / operator map. `_unallocated` stays unmapped |
 | History `--apply` already running | Wait for it to finish before more CostOps DB writes |
 | Token expiry not invented | Integrations field exists; operator sets the date they chose in Vercel |
+
+---
+
+## 2026-09-07 — after Phase 3 (`09ca23a`)
+
+| Decision | Why |
+|----------|-----|
+| Phase 3 accepted | Mapped-provider Total + `PATCH .../budget-total`; unmapped stays off project total |
+| No Phase 4 yet (Upstash/GCP/…) | No next-provider tokens; DoD is one provider at a time |
+| Next after `--apply` finishes | Browser-check project detail totals; then operator unmapped + token expiry |

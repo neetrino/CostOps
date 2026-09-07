@@ -63,6 +63,11 @@ export const envSchema = z
     }, z.coerce.number().min(0.1).max(100)),
     VERCEL_API_TOKEN: optionalNonEmptyString,
     VERCEL_TEAM_ID: optionalNonEmptyString,
+    UPSTASH_EMAIL: optionalNonEmptyString,
+    UPSTASH_API_KEY: optionalNonEmptyString,
+    GCP_PROJECT_ID: optionalNonEmptyString,
+    GCP_BILLING_ACCOUNT_ID: optionalNonEmptyString,
+    GOOGLE_APPLICATION_CREDENTIALS: optionalNonEmptyString,
     OLD_NEON_PROJECT_DATABASE_URL: optionalNonEmptyString,
   })
   .superRefine((value, ctx) => {
