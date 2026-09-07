@@ -11,7 +11,6 @@ import { useUnauthorizedRedirect } from '@/features/dashboard/use-unauthorized-r
 import { buildCompareBarData } from '@/features/projects/chart-data';
 import { DashboardBoard } from '@/features/projects/dashboard-board';
 import { FilterRail } from '@/features/projects/filter-rail';
-import { KpiStrip } from '@/features/projects/kpi-strip';
 import { ProjectCompareChart } from '@/features/projects/project-compare-chart';
 import { UsageSeriesChart } from '@/features/projects/usage-series-chart';
 import { sortByPeriodCostDesc } from '@/features/projects/sort-projects-by-cost';
@@ -127,8 +126,6 @@ function ProviderDetailContent() {
     [filteredProjects],
   );
 
-  const kpiTotal = detail?.period ?? emptyCost();
-
   const visibleIds = useMemo(
     () => new Set(filteredProjects.map((project) => project.projectId)),
     [filteredProjects],
@@ -191,18 +188,6 @@ function ProviderDetailContent() {
             <HeroMetric label="Selected period" cost={detail.period} />
             <UnmappedTile unmapped={detail.unmapped} />
           </div>
-
-          <KpiStrip
-            total={kpiTotal}
-            byProvider={[
-              {
-                providerKey: detail.provider.key,
-                displayName: detail.provider.displayName,
-                cost: kpiTotal,
-              },
-            ]}
-            loading={false}
-          />
 
           <ProjectCompareChart data={compareData} />
           <UsageSeriesChart
@@ -296,16 +281,6 @@ function UnmappedTile({ unmapped }: { unmapped: ProviderDetailResponse['unmapped
       ) : null}
     </div>
   );
-}
-
-function emptyCost(): CostView {
-  return {
-    costUsd: null,
-    sourceStatus: 'missing',
-    sourceType: null,
-    isPartial: false,
-    lastSuccessfulSyncAt: null,
-  };
 }
 
 export function ProviderDetailPage() {
