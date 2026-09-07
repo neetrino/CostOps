@@ -68,6 +68,8 @@ describe('filterFixedCostsForRewrite', () => {
       new Set([fixedMonthKey('vps-nbos', new Date('2026-08-01T00:00:00.000Z'))]),
       now,
     );
-    expect(filtered.map((row) => row.bucketDate.toISOString().slice(0, 10))).toEqual(['2026-09-01']);
+    expect(filtered.map((row) => row.bucketDate.toISOString().slice(0, 10))).toEqual([
+      '2026-09-01',
+    ]);
   });
 });

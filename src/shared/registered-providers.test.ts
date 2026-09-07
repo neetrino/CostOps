@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  compareProviderNavOrder,
-  parseRegisteredProviderKey,
-} from '@/shared/registered-providers';
+import { compareProviderNavOrder, parseRegisteredProviderKey } from '@/shared/registered-providers';
 
 describe('parseRegisteredProviderKey', () => {
   it('accepts cron path casing', () => {

@@ -32,12 +32,7 @@ export async function materializeFixedVpsCosts(input: {
       fixedEffectiveOn: true,
     },
   });
-  if (
-    !resource ||
-    resource.archivedAt ||
-    !resource.fixedMonthlyUsd ||
-    !resource.fixedEffectiveOn
-  ) {
+  if (!resource || resource.archivedAt || !resource.fixedMonthlyUsd || !resource.fixedEffectiveOn) {
     return 0;
   }
   const allCosts = fixedResourcesToCosts(

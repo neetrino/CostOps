@@ -200,10 +200,7 @@ function ProjectDetailContent() {
               <EmptyPanel title="No provider links" detail="Map resources or run sync." />
             ) : (
               detail.providers.map((provider) => (
-                <ProjectProviderSection
-                  key={provider.projectProviderId}
-                  provider={provider}
-                />
+                <ProjectProviderSection key={provider.projectProviderId} provider={provider} />
               ))
             )}
           </section>

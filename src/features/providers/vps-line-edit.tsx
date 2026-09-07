@@ -77,7 +77,12 @@ export function VpsLineEdit({ resourceId, monthlyAmountUsd, onChanged }: VpsLine
         >
           Update
         </Button>
-        <Button variant="ghost" className="text-xs" disabled={saving} onClick={() => void archive()}>
+        <Button
+          variant="ghost"
+          className="text-xs"
+          disabled={saving}
+          onClick={() => void archive()}
+        >
           Stop
         </Button>
       </div>

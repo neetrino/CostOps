@@ -56,7 +56,7 @@ export function utcMonthsOverlapping(from: Date, to: Date): Date[] {
   const start = startOfUtcMonth(from);
   const end = startOfUtcMonth(to);
   const months: Date[] = [];
-  for (let cursor = start; cursor.getTime() <= end.getTime(); ) {
+  for (let cursor = start; cursor.getTime() <= end.getTime();) {
     months.push(cursor);
     cursor = new Date(Date.UTC(cursor.getUTCFullYear(), cursor.getUTCMonth() + 1, 1));
   }

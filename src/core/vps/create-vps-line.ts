@@ -17,8 +17,7 @@ export type VpsLineView = {
 };
 
 export type CreateVpsLineResult =
-  | { ok: true; data: VpsLineView }
-  | { ok: false; code: 'NOT_FOUND'; message: string };
+  { ok: true; data: VpsLineView } | { ok: false; code: 'NOT_FOUND'; message: string };
 
 export async function createVpsLine(
   slug: string,
@@ -30,9 +29,7 @@ export async function createVpsLine(
     return { ok: false, code: 'NOT_FOUND', message: 'Project not found' };
   }
   const account = await ensureHetznerAccount();
-  const effectiveOn = startOfUtcMonth(
-    body.effectiveOn ? parseIsoDateOnly(body.effectiveOn) : now,
-  );
+  const effectiveOn = startOfUtcMonth(body.effectiveOn ? parseIsoDateOnly(body.effectiveOn) : now);
   const link = await findOrCreateProjectProvider(project.id, 'HETZNER');
   const resource = await prisma.resource.create({
     data: {

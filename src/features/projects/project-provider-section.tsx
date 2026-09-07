@@ -15,7 +15,9 @@ export function ProjectProviderSection({ provider }: ProjectProviderSectionProps
       <div className="border-b border-[var(--line)] bg-[var(--sidebar)] px-4 py-3">
         <h3 className="font-semibold text-[var(--ink)]">{providerUiLabel(provider.providerKey)}</h3>
         <p className="mt-1 text-xs text-[var(--muted)]">
-          {isVps ? 'Static monthly hosting · edit on the VPS tab' : 'Resources mapped to this project'}
+          {isVps
+            ? 'Static monthly hosting · edit on the VPS tab'
+            : 'Resources mapped to this project'}
         </p>
       </div>
       {provider.resources.length === 0 ? (

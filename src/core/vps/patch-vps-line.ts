@@ -7,8 +7,7 @@ import { parseIsoDateOnly, startOfUtcMonth, toUtcDateOnly, utcDayKey } from '@/s
 import { decimalToNumber, toFixedUsd } from '@/shared/money';
 
 export type PatchVpsLineResult =
-  | { ok: true; data: VpsLineView }
-  | { ok: false; code: 'NOT_FOUND'; message: string };
+  { ok: true; data: VpsLineView } | { ok: false; code: 'NOT_FOUND'; message: string };
 
 export async function patchVpsLine(
   resourceId: string,

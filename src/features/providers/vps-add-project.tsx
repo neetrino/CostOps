@@ -34,9 +34,7 @@ export function VpsAddProject({ onAdded }: VpsAddProjectProps) {
     setLoading(true);
     setError(null);
     try {
-      const payload = await fetchJson<ProjectOptionsResponse>(
-        '/api/projects/options?liveBoard=1',
-      );
+      const payload = await fetchJson<ProjectOptionsResponse>('/api/projects/options?liveBoard=1');
       setProjects(payload.projects);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load projects');

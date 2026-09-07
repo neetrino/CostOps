@@ -189,10 +189,7 @@ function ProjectsContent() {
         />
       ) : (
         <>
-          <KpiStrip
-            byProvider={totalsData?.byProvider ?? []}
-            loading={loading && !totalsData}
-          />
+          <KpiStrip byProvider={totalsData?.byProvider ?? []} loading={loading && !totalsData} />
           <NearLimitStrip rows={nearLimit} />
           <ProjectCompareChart data={compareData} />
           <UsageSeriesChart

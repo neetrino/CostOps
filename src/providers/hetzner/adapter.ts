@@ -22,9 +22,8 @@ export const hetznerAdapter: CostProviderAdapter = {
   },
 
   async fetchCosts(ctx: ProviderContext, range: DateRange): Promise<NormalizedCost[]> {
-    const { loadActiveFixedVpsResources, loadExistingPastFixedMonthKeys } = await import(
-      '@/providers/hetzner/load-resources'
-    );
+    const { loadActiveFixedVpsResources, loadExistingPastFixedMonthKeys } =
+      await import('@/providers/hetzner/load-resources');
     const resources = await loadActiveFixedVpsResources(ctx.account.id);
     const costs = fixedResourcesToCosts(resources, range);
     const existingPast = await loadExistingPastFixedMonthKeys(ctx.account.id, ctx.now);

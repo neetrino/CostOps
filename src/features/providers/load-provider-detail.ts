@@ -102,9 +102,7 @@ export async function loadProviderDetail(
     lines.push({
       id: resource.id,
       displayName: resource.displayName,
-      monthlyAmountUsd: resource.fixedMonthlyUsd
-        ? decimalToNumber(resource.fixedMonthlyUsd)
-        : null,
+      monthlyAmountUsd: resource.fixedMonthlyUsd ? decimalToNumber(resource.fixedMonthlyUsd) : null,
       effectiveOn: resource.fixedEffectiveOn ? utcDayKey(resource.fixedEffectiveOn) : null,
     });
     vpsLinesByLink.set(resource.projectProviderId, lines);
