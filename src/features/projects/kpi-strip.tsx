@@ -22,9 +22,12 @@ function periodCostLabel(sourceType: CostView['sourceType']): string {
   return 'Estimated cost';
 }
 
-function periodCostHint(sourceType: CostView['sourceType']): string {
-  if (sourceType === 'API') {
+function periodCostHint(sourceType: CostView['sourceType'], providerKey?: string): string {
+  if (providerKey === 'VERCEL') {
     return 'Invoice billed · plan credit not counted';
+  }
+  if (sourceType === 'API') {
+    return 'API billed · period total';
   }
   return 'Approximate · period total';
 }
@@ -43,11 +46,12 @@ export function KpiStrip({ total, byProvider, loading }: KpiStripProps) {
     );
   }
 
-  const tiles = [
+  const tiles: Array<{ label: string; cost: CostView; providerKey?: string }> = [
     { label: periodCostLabel(total.sourceType), cost: total },
     ...byProvider.slice(0, 3).map((row) => ({
       label: row.displayName,
       cost: row.cost,
+      providerKey: row.providerKey,
     })),
   ];
 
@@ -65,7 +69,7 @@ export function KpiStrip({ total, byProvider, loading }: KpiStripProps) {
             <CostViewDisplay cost={tile.cost} size="md" />
           </div>
           <p className="mt-2 text-[10px] text-[var(--muted)]">
-            {periodCostHint(tile.cost.sourceType)}
+            {periodCostHint(tile.cost.sourceType, tile.providerKey)}
           </p>
         </div>
       ))}
