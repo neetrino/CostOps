@@ -1,7 +1,7 @@
 # Progress — Neetrino CostOps
 
-**Phase.** 1 local + CI; Phase 2 Vercel adapter in progress  
-**Overall.** 86% (foundation + sync/alerts + dashboard + history script; live copy blocked on old-DB password)  
+**Phase.** 2 — Vercel adapter (local)  
+**Overall.** 90% (Neon + Vercel adapters; preview/parity and operator mapping still open)  
 **Updated.** 2026-09-07
 
 ---
@@ -12,7 +12,7 @@
 |-------|--------|----------|
 | 0. Architecture + docs | ✅ TECH_CARD confirmed | 100% |
 | 1. Core + Neon parity | 🔄 UI + history script; preview/parity next | 86% |
-| 2. Vercel | ⏳ | 0% |
+| 2. Vercel | 🔄 Adapter + board + tests; operator mapping next | 80% |
 | 3. Project totals | ⏳ | 0% |
 | 4. Next providers | ⏳ | 0% |
 | 5. Advanced FinOps | ⏳ Out of v1 cutover | 0% |
@@ -36,7 +36,7 @@
 - [x] Password + httpOnly JWT auth (Next.js 16 `src/proxy.ts` request gate)
 - [x] Routes: `/`, `/login`, `/api/health`, `/api/auth/login`, `/api/auth/logout`
 - [x] ESLint, Prettier, Vitest, Husky, commitlint, CI (Node 24)
-- [x] Seed: Provider `NEON` + ProviderAccount from `NEON_ORG_ID` when set
+- [x] Seed: Provider `NEON`/`VERCEL` + ProviderAccount from `NEON_ORG_ID` / `VERCEL_TEAM_ID` when set
 - [x] Neon `CostProviderAdapter` (client, Zod, consumption v2, list projects, map-metrics, launch/scale pricing, credential meta)
 - [x] Provider registry + contract check (`credentialCreateUrl` required)
 - [x] Generic sync orchestration with SyncRun on **intraday** and daily reconcile
@@ -52,7 +52,10 @@
 - [x] Inline writes: project-provider budget, project rename/archive, resource mapping, credential expiry/rotate
 - [x] Visual dashboard: app shell, Overview `/`, Projects `/projects` (URL filters, KPI strip, Recharts, cards/list, inline budget, freshness, sync chip)
 - [x] Phase 1 detail routes: `/projects/[slug]`, `/providers/[key]`, `/unmapped`, `/integrations` (filter rail, charts, inline budget, mapping, credential health)
-- [x] Nav: Overview, Projects, Neon, Unmapped, Integrations; project cards link to detail
+- [x] Nav: Overview, Projects, Neon, Vercel, Unmapped, Integrations; project cards link to detail
+- [x] Vercel `CostProviderAdapter` (`src/providers/vercel/`): GET `/v10/projects`, FOCUS GET `/v1/billing/charges`, Zod, credential meta (`supportsExpiryDate: true`)
+- [x] Seed + cron ensure Provider `VERCEL` + ProviderAccount from `VERCEL_TEAM_ID`
+- [x] `/providers/vercel` board + unmapped inbox for `vercel_project` / `vercel_unallocated`
 - [x] Design tokens extended in `globals.css` (warning/stale/chart solids; no gradients)
 - [x] `scripts/migrate-from-neon.ts` (dry-run default; `--apply` not run in this slice)
 
@@ -61,14 +64,15 @@
 ## In progress
 
 - [ ] Live Neon history dry-run/`--apply` (old DB password rejected; key is correct)
-- [ ] Phase 2 Vercel adapter
+- [ ] Map Vercel resources onto CostOps projects and enable Project × Vercel limits
 
 ---
 
 ## Next
 
-1. Fresh old-Neon Connect URL, then `pnpm migrate:from-neon` → `--apply`
-2. Operator deploys CostOps when ready (no preview wait)
+1. Map Vercel inbox rows in `/unmapped` to existing projects
+2. Fresh old-Neon Connect URL, then `pnpm migrate:from-neon` → `--apply`
+3. Operator deploys CostOps when ready (no preview wait)
 
 ---
 
@@ -80,8 +84,6 @@
 - `next build` was failing: `maxDuration` must be a numeric literal, not `CRON_MAX_DURATION_SECONDS`.
 
 ---
-
-## Notes
 
 ### 2026-09-05 — foundation
 
@@ -134,6 +136,38 @@
 - Manual remap table is an empty stub — no Degusto-style merges by name.
 - Default is dry-run. This slice did not run `--apply` against a live database.
 - `mergeBudgetRule` on apply: explicit old thresholds update; env-default rows no longer clobber operator UI sets.
+
+### 2026-09-07 — Phase 2 Vercel adapter (live API)
+
+Token + team env present. GET only. No secrets logged.
+
+| Endpoint | Status | Notes |
+|----------|--------|-------|
+| `GET /v2/user` | 200 | Token valid |
+| `GET /v10/projects?limit=100` | 200 | `{ projects, pagination }`. 37 team projects; `id`/`name`; `pagination.next` null on last page |
+| `GET /v9/projects` | 200 | Same shape (v10 used) |
+| `GET /v1/billing/charges` | 200 | `application/jsonl` FOCUS v1.3. `from`/`to` required. BilledCost **number**. Tags `{ ProjectId, ProjectName }` or `{}` |
+| `GET /v1/billing/charges` current incomplete window | 404 | `{ error: { code: "costs_not_found" } }` |
+| `GET /v1/billing/charges` missing `from` | 400 | `bad_request` |
+| `GET /v2/billing` | 404 | `not_found` — unused |
+| `GET /v1/invoices` | 200 | Invoice list exists; not used (charges are project-attributed) |
+
+Discrepancies vs docs:
+
+- Docs example `BilledCost`/`Tags` as strings; live `BilledCost` is number and `Tags` is an object.
+- `RegionId`/`RegionName` often absent.
+- Charge periods are **America/Los_Angeles** midnight (`2026-09-04T07:00:00.000Z` PDT). A naive UTC midnight window returns the **previous** Pacific day. Adapter requests the Pacific day for CostOps UTC date D.
+- Current Pacific/incomplete day is `404 costs_not_found` — written as `missing`, not `$0`, and does **not** fail the SyncRun. Billing `403` would be `error` costs (token can still list projects). `401`/`403` on `/v10/projects` still trip credential AUTH_FAILED.
+- `supportsIntraday: false`. `supportsBackfill: true`.
+- Team-level charges (empty Tags: Pro, seats, some $0 SKUs) land on resource `_unallocated`.
+- Listed projects with no charges on a **200** day get API `$0` `fresh` (the API returned a complete charge set).
+- No ESTIMATED formula — billed USD only.
+
+Charges exist: yes. Yesterday-style Pacific day ~1.8k lines / ~$7.5 billed team-wide in the probe window.
+
+Live adapter sync (Vercel account only): today `ok` 140 read / 102 written (38 `PARTIAL` cost rows — Pacific window for the current UTC date returned 200, not the short-window `404`); yesterday reconcile `ok` 418 read / 380 written (38 `FINAL`). 38 resources, all unmapped (`37` projects + `_unallocated`).
+
+The `404 costs_not_found` was observed on a short UTC `from=today 00:00Z&to=now` request, not on the Pacific-aligned 24h window the adapter uses.
 
 ---
 

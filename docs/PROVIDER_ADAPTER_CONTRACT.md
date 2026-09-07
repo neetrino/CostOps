@@ -122,7 +122,7 @@ load enabled accounts due for sync
 | Key | Intraday | Backfill | Cost source | Notes |
 |-----|----------|----------|-------------|-------|
 | NEON | yes (hourly slots summed) | yes | ESTIMATED from usage + plan rates | Port `lib/neon/*`, `lib/sync/*`, `lib/usage/*` |
-| VERCEL | verify API | verify API | API if billing exists | Do not hard-code stale billing fields |
+| VERCEL | no (current Pacific day often `404 costs_not_found`) | yes (FOCUS daily) | API `GET /v1/billing/charges` (JSONL) | Observed API in `docs/PROGRESS.md`. GET only. |
 | UPSTASH | provider-specific | if API allows | API or documented ESTIMATED | |
 | GCP | provider-specific | yes if export/API | API | |
 | HETZNER | no | n/a | FIXED recurring | |

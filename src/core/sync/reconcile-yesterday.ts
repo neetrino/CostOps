@@ -1,5 +1,5 @@
 import { findEnabledProviderAccounts } from '@/core/sync/find-accounts';
-import { ensureNeonAccountFromEnv } from '@/core/sync/ensure-neon-account';
+import { ensureRegisteredAccountsFromEnv } from '@/core/sync/ensure-accounts';
 import { runAccountSync, type AccountSyncResult } from '@/core/sync/run-account-sync';
 import { getYesterdayUtc } from '@/shared/dates';
 
@@ -7,7 +7,7 @@ import { getYesterdayUtc } from '@/shared/dates';
  * Fetches the previous UTC day and marks CostEntry rows FINAL / not partial.
  */
 export async function reconcileYesterday(now: Date = new Date()): Promise<AccountSyncResult[]> {
-  await ensureNeonAccountFromEnv();
+  await ensureRegisteredAccountsFromEnv();
   const yesterday = getYesterdayUtc(now);
   const accounts = await findEnabledProviderAccounts();
   const results: AccountSyncResult[] = [];

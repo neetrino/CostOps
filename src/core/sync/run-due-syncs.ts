@@ -1,6 +1,6 @@
 import { evaluateCredentialExpiryForAccounts } from '@/core/alerts/run-credential-expiry';
 import { findDueProviderAccounts, findEnabledProviderAccounts } from '@/core/sync/find-accounts';
-import { ensureNeonAccountFromEnv } from '@/core/sync/ensure-neon-account';
+import { ensureRegisteredAccountsFromEnv } from '@/core/sync/ensure-accounts';
 import {
   currentDayRange,
   runAccountSync,
@@ -9,7 +9,7 @@ import {
 import { logger } from '@/shared/logger';
 
 export async function runDueAccountSyncs(now: Date = new Date()): Promise<AccountSyncResult[]> {
-  await ensureNeonAccountFromEnv();
+  await ensureRegisteredAccountsFromEnv();
   try {
     await evaluateCredentialExpiryForAccounts(now);
   } catch (error) {
@@ -32,7 +32,7 @@ export async function runDueAccountSyncs(now: Date = new Date()): Promise<Accoun
 }
 
 export async function runForcedAccountSyncs(now: Date = new Date()): Promise<AccountSyncResult[]> {
-  await ensureNeonAccountFromEnv();
+  await ensureRegisteredAccountsFromEnv();
   const accounts = await findEnabledProviderAccounts();
   const results: AccountSyncResult[] = [];
   for (const account of accounts) {

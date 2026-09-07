@@ -11,6 +11,7 @@ const NAV = [
   { href: '/', label: 'Overview' },
   { href: '/projects', label: 'Projects' },
   { href: '/providers/neon', label: 'Neon' },
+  { href: '/providers/vercel', label: 'Vercel' },
   { href: '/unmapped', label: 'Unmapped' },
   { href: '/integrations', label: 'Integrations' },
 ] as const;
@@ -35,13 +36,10 @@ export function DashboardShell({ children }: DashboardShellProps) {
           </Link>
           <nav className="flex flex-1 flex-wrap items-center gap-1">
             {NAV.map((item) => {
-              const base = item.href.split('/').slice(0, 2).join('/') || item.href;
               const active =
                 item.href === '/'
                   ? pathname === '/'
-                  : pathname === item.href ||
-                    pathname.startsWith(`${item.href}/`) ||
-                    (base !== '/' && pathname.startsWith(`${base}/`));
+                  : pathname === item.href || pathname.startsWith(`${item.href}/`);
               return (
                 <Link
                   key={item.href}

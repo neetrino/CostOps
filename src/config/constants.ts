@@ -29,6 +29,9 @@ export const AUTH_FAILED_WINDOW_KEY = 'open';
 
 export const DEFAULT_COST_DIMENSION_KEY = '_';
 export const NEON_RESOURCE_TYPE = 'neon_project';
+export const VERCEL_RESOURCE_TYPE = 'vercel_project';
+export const VERCEL_UNALLOCATED_RESOURCE_TYPE = 'vercel_unallocated';
+export const VERCEL_UNALLOCATED_EXTERNAL_ID = '_unallocated';
 
 export const NEON_CREDENTIAL_REF = 'NEON';
 export const NEON_API_BASE = 'https://console.neon.tech/api/v2';
@@ -36,6 +39,16 @@ export const NEON_CREATE_TOKEN_URL = 'https://console.neon.tech/app/settings/api
 export const NEON_CREDENTIAL_DOCS_URL = 'https://neon.com/docs/manage/api-keys';
 export const NEON_CREDENTIAL_CREATE_PATH = 'Organization → Settings → API keys';
 export const NEON_CREDENTIAL_ENV_VARS = ['NEON_API_KEY', 'NEON_ORG_ID'] as const;
+
+export const VERCEL_CREDENTIAL_REF = 'VERCEL';
+export const VERCEL_API_BASE = 'https://api.vercel.com';
+export const VERCEL_CREATE_TOKEN_URL = 'https://vercel.com/account/tokens';
+export const VERCEL_CREDENTIAL_DOCS_URL = 'https://vercel.com/docs/accounts/access-tokens';
+export const VERCEL_CREDENTIAL_CREATE_PATH = 'Personal Account → Tokens';
+export const VERCEL_CREDENTIAL_ENV_VARS = ['VERCEL_API_TOKEN', 'VERCEL_TEAM_ID'] as const;
+export const VERCEL_BILLING_TIME_ZONE = 'America/Los_Angeles';
+export const VERCEL_PROJECT_PAGE_SIZE = 100;
+export const VERCEL_PROJECT_PAGE_LIMIT = 50;
 
 export const SYNC_NOW_RATE_LIMIT_PER_MINUTE = 5;
 export const SYNC_NOW_RATE_WINDOW_MS = 60_000;

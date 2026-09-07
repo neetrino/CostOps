@@ -9,6 +9,26 @@ type KpiStripProps = {
   loading: boolean;
 };
 
+function periodCostLabel(sourceType: CostView['sourceType']): string {
+  if (sourceType === 'API') {
+    return 'Billed cost';
+  }
+  if (sourceType === 'FIXED') {
+    return 'Fixed cost';
+  }
+  if (sourceType === 'MANUAL') {
+    return 'Manual cost';
+  }
+  return 'Estimated cost';
+}
+
+function periodCostHint(sourceType: CostView['sourceType']): string {
+  if (sourceType === 'API') {
+    return 'API billed · period total';
+  }
+  return 'Approximate · period total';
+}
+
 export function KpiStrip({ total, byProvider, loading }: KpiStripProps) {
   if (loading) {
     return (
@@ -24,7 +44,7 @@ export function KpiStrip({ total, byProvider, loading }: KpiStripProps) {
   }
 
   const tiles = [
-    { label: 'Estimated cost', cost: total },
+    { label: periodCostLabel(total.sourceType), cost: total },
     ...byProvider.slice(0, 3).map((row) => ({
       label: row.displayName,
       cost: row.cost,
@@ -44,7 +64,9 @@ export function KpiStrip({ total, byProvider, loading }: KpiStripProps) {
           <div className="mt-2">
             <CostViewDisplay cost={tile.cost} size="md" />
           </div>
-          <p className="mt-2 text-[10px] text-[var(--muted)]">Approximate · period total</p>
+          <p className="mt-2 text-[10px] text-[var(--muted)]">
+            {periodCostHint(tile.cost.sourceType)}
+          </p>
         </div>
       ))}
     </div>

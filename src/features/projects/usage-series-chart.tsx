@@ -34,7 +34,7 @@ export function UsageSeriesChart({ points, projectNames }: UsageSeriesChartProps
   return (
     <div className="rounded-[var(--radius)] border border-[var(--line)] bg-[var(--paper)] p-4 shadow-[var(--shadow-card)]">
       <h3 className="text-sm font-semibold text-[var(--ink)]">Usage over time</h3>
-      <p className="mt-1 text-xs text-[var(--muted)]">Estimated cost by project (USD)</p>
+      <p className="mt-1 text-xs text-[var(--muted)]">Cost by project (USD)</p>
       <div className="mt-4 h-[360px]">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartRows} margin={{ top: 8, right: 16, left: 0, bottom: 8 }}>
