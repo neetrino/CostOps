@@ -88,7 +88,11 @@ async function applyMapping(
   await prisma.$transaction([
     prisma.resource.update({
       where: { id: resourceId },
-      data: { projectId, projectProviderId },
+      data: {
+        projectId,
+        projectProviderId,
+        ...(projectId ? { archivedAt: null } : {}),
+      },
     }),
     prisma.costEntry.updateMany({
       where: { resourceId },

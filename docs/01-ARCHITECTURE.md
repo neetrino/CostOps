@@ -151,7 +151,7 @@ Optional DASHBOARD_PASSWORD
 | Provider | NEON, VERCEL, … |
 | ProviderAccount | Connected org/team + credential ref, optional expiry, sync settings |
 | ProjectProvider | Degusto × Neon — main daily budget target |
-| Resource | External object; `projectId` null = unmapped |
+| Resource | External object; `projectId` null = unmapped; `archivedAt` hides it from the inbox without deleting history |
 | CostEntry | Normalized USD cost for a UTC day (+ dimension) |
 | MetricEntry | Provider-specific usage point |
 | BudgetRule | Limit + escalation for a scope |

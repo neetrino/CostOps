@@ -2,7 +2,7 @@
 
 **Phase.** 4 — Upstash (GCP postponed)  
 **Overall.** 94% (Neon + Vercel + project totals + Upstash adapter; operator mapping and preview/parity still open)  
-**Updated.** 2026-09-07
+**Updated.** 2026-09-07 (inbox archive + suggestions + entry popup)
 
 ---
 
@@ -71,13 +71,13 @@
 ## In progress
 
 - [x] Live Neon history `--apply` (2026-09-07, ~60 min): 65 resources, 42938 metrics, 6134 costs, 21 alerts
-- [ ] Map Vercel / Upstash resources onto CostOps projects and enable Project × Provider limits
+- [ ] Operator confirms suggested Vercel / Upstash maps (or archives trash) and enables Project × Provider limits
 
 ---
 
 ## Next
 
-1. Map Vercel and Upstash inbox rows in `/unmapped` to existing projects
+1. Confirm suggested maps in `/unmapped` (or archive trash) and enable Project × Provider limits
 2. Operator deploys CostOps when ready (no preview wait)
 3. GCP later (billing quota / SA JSON)
 
@@ -208,6 +208,14 @@ Charges exist: yes. Yesterday-style Pacific day ~1.8k lines / ~$7.5 billed team-
 Live adapter sync (Vercel account only): today `ok` 140 read / 102 written (38 `PARTIAL` cost rows — Pacific window for the current UTC date returned 200, not the short-window `404`); yesterday reconcile `ok` 418 read / 380 written (38 `FINAL`). 38 resources, all unmapped (`37` projects + `_unallocated`).
 
 The `404 costs_not_found` was observed on a short UTC `from=today 00:00Z&to=now` request, not on the Pacific-aligned 24h window the adapter uses.
+
+### 2026-09-07 — unmapped inbox
+
+- Suggested project is prefilled from name similarity. Nothing is mapped until Map.
+- Archive sets `Resource.archivedAt` (not delete). Archived tab restores. Spend stays on the resource.
+- Full-screen inbox popup on each dashboard visit while open unmapped work exists. × / Not now dismisses this tab visit; new rows reopen it.
+- Mapping picker is a searchable list (name, slug, provider chips). Duplicate names stay separate. Unmapped is a valid choice. A project does not need all three providers.
+- After a non-empty provider discover, resources missing from the live list are archived (history kept). Picker hides projects with no live resource. Extra ToonExpo rows were leftover Neon IDs, not extra DBs in the console.
 
 ---
 

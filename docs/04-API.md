@@ -28,13 +28,16 @@ Generalize Neon `/api/usage/*`. Keep response fields stable enough to port UI, t
 |--------|------|---------|
 | GET | `/api/overview` | Today + period totals, breakdowns, health, near-limit |
 | GET | `/api/projects` | Project list rows |
+| GET | `/api/projects/options` | Active projects + provider keys for the mapping picker |
 | GET | `/api/projects/[slug]` | Project detail: mapped-provider total, breakdown, optional totalBudget |
 | GET | `/api/providers` | Provider cards |
 | GET | `/api/providers/[key]` | Provider board (Neon board first) |
 | GET | `/api/usage/series` | Time series (metric, groupBy day/week/month) |
 | GET | `/api/usage/totals` | Aggregates for a range + filters |
 | GET | `/api/sync/status` | Recent SyncRuns + account freshness |
-| GET | `/api/resources/unmapped` | Discovered resources without `projectId` |
+| GET | `/api/resources/unmapped` | Inbox: unmapped resources (`projectId` null, not archived) + suggested project |
+| GET | `/api/resources/archived` | Archived unmapped resources (restore from `/unmapped`) |
+| GET | `/api/resources/inbox-status` | Open inbox count + short preview for the entry popup |
 | GET | `/api/alerts` | Alert events for a date range |
 | GET | `/api/integrations` | Provider accounts + credential health + create-token URLs |
 
@@ -79,7 +82,8 @@ Do not emit `0` when status is `missing` or `error` without also sending that st
 | PATCH | `/api/projects/[slug]/budget-total` | Optional PROJECT_TOTAL limit + escalation % |
 | PATCH | `/api/budget-rules/[id]` | Optional aggregate rules |
 | POST | `/api/budget-rules` | Create optional scope rule |
-| PATCH | `/api/resources/[id]/mapping` | Assign or unassign Project |
+| PATCH | `/api/resources/[id]/mapping` | Assign or unassign Project (mapping a project also clears archive) |
+| PATCH | `/api/resources/[id]/archive` | `{ archived: true \| false }` — hide or restore an unmapped resource. History stays |
 | POST | `/api/sync/now` | Manual sync (rate limited) |
 | POST | `/api/sync/backfill` | Range backfill for one account |
 | PATCH | `/api/provider-accounts/[id]/credential` | Set `credentialExpiresAt` or mark rotated |

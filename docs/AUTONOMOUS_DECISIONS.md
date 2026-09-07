@@ -155,3 +155,6 @@ Paid models: not used. Fable 5: orchestrator only.
 | Vector/Search daily cost `missing` | No daily USD series in the Management API stats (only `monthly_cost`). Discover later when indexes exist. |
 | Tokens never stored | List payloads include Redis rest tokens and QStash tokens. Zod keeps identity fields only. |
 | No stored token expiry dates | Operator does not type Vercel/Neon/Upstash expiry in admin. Status + Telegram only from live 401/403. |
+| Suggest inbox maps, never auto-PATCH | Best-name match is prefilled. Operator confirms or changes. Ambiguous / `_unallocated` / QStash stay unmatched. |
+| Archive ≠ delete | `Resource.archivedAt` hides trash from `/unmapped`. Restore returns it. Cost rows stay. |
+| Archive resources gone from the provider list | After a non-empty discover, leftover IDs are archived. Empty discover does not wipe. History stays. |
