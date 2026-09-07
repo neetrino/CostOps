@@ -23,13 +23,7 @@ export function CostOpsMark({ size = 32, className }: CostOpsMarkProps) {
       focusable="false"
     >
       <path d={ARROW} fill="#4CAF50" />
-      <g
-        fill="none"
-        stroke="#fff"
-        strokeWidth="2.35"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
+      <g fill="none" stroke="#fff" strokeWidth="2.35" strokeLinecap="round" strokeLinejoin="round">
         <path d={DOLLAR_SPINE} />
         <path d={DOLLAR_S} />
       </g>
