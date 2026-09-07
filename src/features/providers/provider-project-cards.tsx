@@ -44,7 +44,7 @@ function ProviderProjectCard({
   onBudgetSaved: () => void;
 }) {
   const overLimit =
-    project.budget &&
+    project.budget?.enabled &&
     project.today.costUsd !== null &&
     project.today.costUsd >= project.budget.limitUsd;
 

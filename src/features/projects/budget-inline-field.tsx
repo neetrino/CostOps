@@ -115,7 +115,9 @@ export function BudgetInlineField({ savePath, budget, onSaved }: BudgetInlineFie
       {error ? (
         <p className="max-w-[14rem] text-right text-[10px] text-[var(--danger)]">{error}</p>
       ) : null}
-      {step !== null ? (
+      {budget && !budget.enabled ? (
+        <p className="text-[10px] text-[var(--muted)]">Telegram off until Set</p>
+      ) : step !== null ? (
         <p className="text-[10px] text-[var(--muted)]">
           +{pct}% ≈ ${step.toFixed(2)} step
         </p>
