@@ -1,5 +1,6 @@
 export { defaultBudgetLimits } from './defaults';
 export { ensureProjectProviderBudgetRule } from './ensure-project-provider-rule';
+export { ensureProjectTotalBudgetRule } from './ensure-project-total-rule';
 export { escalationStepUsd } from './escalation';
 export { budgetScopeKey } from './scope-key';
 export {
@@ -7,7 +8,12 @@ export {
   patchProjectProviderBudget,
   planBudgetPatch,
 } from './patch-project-provider-budget';
-export { createPrismaBudgetPatchStore } from './prisma-budget-patch-store';
+export { patchProjectTotalBudget } from './patch-project-total-budget';
+export {
+  createPrismaBudgetPatchStore,
+  createPrismaProjectTotalBudgetStore,
+} from './prisma-budget-patch-store';
 export type { BudgetPatchBody, BudgetPatchView } from './patch-project-provider-budget';
-export { ruleViewForProjectProvider, toBudgetRuleView } from './rule-view';
+export type { ProjectTotalBudgetView } from './patch-project-total-budget';
+export { ruleViewForProjectProvider, ruleViewForProjectTotal, toBudgetRuleView } from './rule-view';
 export type { BudgetRuleView } from './rule-view';

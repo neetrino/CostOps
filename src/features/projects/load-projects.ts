@@ -1,10 +1,6 @@
+import { combineProviderCostViews } from '@/core/cost/combine-views';
 import { costViewForRows, latestSyncForAccounts } from '@/core/cost/cost-view';
-import {
-  rowsForProject,
-  rowsForProjectProvider,
-  rowsInRange,
-  rowsOnUtcDay,
-} from '@/core/cost/filter-entries';
+import { rowsForProjectProvider, rowsInRange, rowsOnUtcDay } from '@/core/cost/filter-entries';
 import { loadDashboardCostContext } from '@/core/cost/load-dashboard-costs';
 import { ruleViewForProjectProvider } from '@/core/budgets/rule-view';
 import type {
@@ -36,7 +32,6 @@ export async function loadProjects(query: ResolvedDashboardQuery): Promise<Proje
   ]);
   const periodRows = rowsInRange(cost.entries, query.from, query.to);
   const todayRows = rowsOnUtcDay(cost.entries, cost.today);
-  const fallback = latestSyncForAccounts(cost.accounts, query.providerKey);
 
   const rows: ProjectListRow[] = projects.map((project) => {
     const providers: ProjectProviderRow[] = project.projectProviders
@@ -64,16 +59,8 @@ export async function loadProjects(query: ResolvedDashboardQuery): Promise<Proje
       slug: project.slug,
       name: project.name,
       archived: project.archived,
-      today: costViewForRows(
-        rowsForProject(todayRows, project.id),
-        cost.syncAtByAccountId,
-        fallback,
-      ),
-      period: costViewForRows(
-        rowsForProject(periodRows, project.id),
-        cost.syncAtByAccountId,
-        fallback,
-      ),
+      today: combineProviderCostViews(providers.map((provider) => provider.today)),
+      period: combineProviderCostViews(providers.map((provider) => provider.period)),
       providers,
     };
   });

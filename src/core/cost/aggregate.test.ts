@@ -43,6 +43,25 @@ describe('cost aggregation', () => {
     );
   });
 
+  it('excludes unmapped spend from PROJECT_TOTAL (stays on provider/global)', () => {
+    const unmapped = row({
+      costUsd: 9.99,
+      projectId: null,
+      projectProviderId: null,
+      providerKey: 'VERCEL',
+    });
+    const mapped = row({ costUsd: 1.62, projectId: 'proj-1', providerKey: 'VERCEL' });
+    const scoped = filterRowsForScope([mapped, unmapped], {
+      scope: 'PROJECT_TOTAL',
+      projectId: 'proj-1',
+    });
+    expect(scoped).toEqual([mapped]);
+    expect(
+      aggregateForScope([mapped, unmapped], { scope: 'PROVIDER_TOTAL', providerKey: 'VERCEL' })
+        .costUsd,
+    ).toBe(11.61);
+  });
+
   it('PROVIDER_TOTAL includes unmapped spend', () => {
     const rows = [
       row({ costUsd: 1, providerKey: 'NEON', projectId: null }),

@@ -52,10 +52,10 @@ Goal: CostOps can replace the Neon dashboard for Neon-only use.
 
 ## Phase 3 — Cross-provider project totals
 
-- Project detail breakdown
-- Optional PROJECT_TOTAL rules + Telegram
-- Unmapped spend visible on provider/global, not silently dropped
-- Multi-provider overview
+- [x] Project detail breakdown
+- [x] Optional PROJECT_TOTAL rules + Telegram
+- [x] Unmapped spend visible on provider/global, not silently dropped
+- [x] Multi-provider overview
 
 ---
 

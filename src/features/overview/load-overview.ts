@@ -1,7 +1,8 @@
 import { credentialHealth } from '@/core/alerts/credential-health';
+import { combineProviderCostViews } from '@/core/cost/combine-views';
 import { costViewForRows, latestSyncForAccounts } from '@/core/cost/cost-view';
 import {
-  rowsForProject,
+  rowsForProjectProvider,
   rowsForProvider,
   rowsInRange,
   rowsOnUtcDay,
@@ -49,7 +50,7 @@ export async function loadOverview(
       cost,
       query.providerKey,
     ),
-    byProject: buildProjectRows(catalog.projects, todayRows, periodRows, cost),
+    byProject: buildProjectRows(catalog.projects, todayRows, periodRows, cost, query.providerKey),
     nearLimit: buildNearLimitRows({
       rules: catalog.rules,
       todayRows,
@@ -81,7 +82,12 @@ async function loadOverviewCatalog() {
     prisma.provider.findMany({ orderBy: { displayName: 'asc' } }),
     prisma.project.findMany({
       where: { archived: false },
-      select: { id: true, slug: true, name: true },
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+        projectProviders: { select: { id: true, providerKey: true } },
+      },
       orderBy: { name: 'asc' },
     }),
     prisma.budgetRule.findMany({
@@ -133,27 +139,42 @@ function buildProviderRows(
 }
 
 function buildProjectRows(
-  projects: Array<{ id: string; slug: string; name: string }>,
+  projects: Array<{
+    id: string;
+    slug: string;
+    name: string;
+    projectProviders: Array<{ id: string; providerKey: string }>;
+  }>,
   todayRows: ReturnType<typeof rowsOnUtcDay>,
   periodRows: ReturnType<typeof rowsInRange>,
   cost: Awaited<ReturnType<typeof loadDashboardCostContext>>,
+  providerKey?: string,
 ): OverviewProjectRow[] {
   const rows = projects.map((project) => {
-    const fallback = latestSyncForAccounts(cost.accounts);
+    const links = project.projectProviders.filter(
+      (link) => !providerKey || link.providerKey === providerKey,
+    );
+    const views = links.map((link) => {
+      const fallback = latestSyncForAccounts(cost.accounts, link.providerKey);
+      return {
+        today: costViewForRows(
+          rowsForProjectProvider(todayRows, link.id),
+          cost.syncAtByAccountId,
+          fallback,
+        ),
+        period: costViewForRows(
+          rowsForProjectProvider(periodRows, link.id),
+          cost.syncAtByAccountId,
+          fallback,
+        ),
+      };
+    });
     return {
       projectId: project.id,
       slug: project.slug,
       name: project.name,
-      today: costViewForRows(
-        rowsForProject(todayRows, project.id),
-        cost.syncAtByAccountId,
-        fallback,
-      ),
-      period: costViewForRows(
-        rowsForProject(periodRows, project.id),
-        cost.syncAtByAccountId,
-        fallback,
-      ),
+      today: combineProviderCostViews(views.map((item) => item.today)),
+      period: combineProviderCostViews(views.map((item) => item.period)),
     };
   });
   return rows.sort((left, right) => (right.period.costUsd ?? -1) - (left.period.costUsd ?? -1));

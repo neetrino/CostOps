@@ -6,6 +6,7 @@ export { loadDashboardCostContext } from './load-dashboard-costs';
 export { costIdempotencyKey } from './idempotency';
 export { upsertCostEntries } from './upsert';
 export { toCostView, viewFromRows, costViewForRows } from './cost-view';
+export { combineProviderCostViews } from './combine-views';
 export { buildCostSeries } from './build-series';
 export { enumeratePeriodKeys, periodKeyForDate, periodHoursForKey } from './series-buckets';
 export type { BudgetScopeFilter, CostAggregate, CostEntryRow, CostRow, CostView } from './types';

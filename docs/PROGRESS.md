@@ -1,7 +1,7 @@
 # Progress — Neetrino CostOps
 
-**Phase.** 2 — Vercel adapter (local)  
-**Overall.** 90% (Neon + Vercel adapters; preview/parity and operator mapping still open)  
+**Phase.** 3 — Cross-provider project totals  
+**Overall.** 92% (Neon + Vercel + project totals; preview/parity and operator mapping still open)  
 **Updated.** 2026-09-07
 
 ---
@@ -13,7 +13,7 @@
 | 0. Architecture + docs | ✅ TECH_CARD confirmed | 100% |
 | 1. Core + Neon parity | 🔄 UI + history script; preview/parity next | 86% |
 | 2. Vercel | 🔄 Adapter + board + tests; operator mapping next | 80% |
-| 3. Project totals | ⏳ | 0% |
+| 3. Project totals | 🔄 UI + PROJECT_TOTAL patch; live DB apply still running | 85% |
 | 4. Next providers | ⏳ | 0% |
 | 5. Advanced FinOps | ⏳ Out of v1 cutover | 0% |
 
@@ -58,6 +58,10 @@
 - [x] `/providers/vercel` board + unmapped inbox for `vercel_project` / `vercel_unallocated`
 - [x] Design tokens extended in `globals.css` (warning/stale/chart solids; no gradients)
 - [x] `scripts/migrate-from-neon.ts` (dry-run default; `--apply` not run in this slice)
+- [x] Phase 3 project totals: `combineProviderCostViews` (mapped only; missing provider → `partial`, never bare $0)
+- [x] Project detail story: hero Total → Neon/Vercel lines + PROJECT_TOTAL inline limit → resources
+- [x] Stacked provider series on `/projects/[slug]`; Overview “By project” uses the same mapped-provider rollup
+- [x] `PATCH /api/projects/[slug]/budget-total` (ensure PROJECT_TOTAL, `enabled: true` only when a limit is set)
 
 ---
 
@@ -77,6 +81,14 @@
 ---
 
 ## Notes
+
+### 2026-09-07 — Phase 3 project totals
+
+- Project total = sum of **mapped** Project × Provider CostViews. Unmapped spend stays on provider/global.
+- If any mapped provider is missing/error, the total is `partial` (or `stale` if worse) — not a fake complete sum. All-missing → `costUsd: null`.
+- Optional `PROJECT_TOTAL` BudgetRule via `PATCH /api/projects/[slug]/budget-total`. Same enable-on-limit rule as Project × Provider. Telegram eval was already in `evaluate-spend.ts`.
+- UI: `/projects/[slug]` hero Total + provider lines + stacked Recharts series (no gradients).
+- This slice did **not** write CostOps `DATABASE_URL` (no `--apply`, migrate, seed, or sync). `migrate-from-neon --apply` may still be running separately.
 
 ### 2026-09-07 — CI on main
 

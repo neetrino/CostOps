@@ -28,7 +28,7 @@ Generalize Neon `/api/usage/*`. Keep response fields stable enough to port UI, t
 |--------|------|---------|
 | GET | `/api/overview` | Today + period totals, breakdowns, health, near-limit |
 | GET | `/api/projects` | Project list rows |
-| GET | `/api/projects/[slug]` | Project detail + provider breakdown |
+| GET | `/api/projects/[slug]` | Project detail: mapped-provider total, breakdown, optional totalBudget |
 | GET | `/api/providers` | Provider cards |
 | GET | `/api/providers/[key]` | Provider board (Neon board first) |
 | GET | `/api/usage/series` | Time series (metric, groupBy day/week/month) |
@@ -76,6 +76,7 @@ Do not emit `0` when status is `missing` or `error` without also sending that st
 | PATCH | `/api/projects/[slug]` | Rename / archive |
 | POST | `/api/projects` | Create project |
 | PATCH | `/api/project-providers/[id]/budget` | Daily limit + escalation % |
+| PATCH | `/api/projects/[slug]/budget-total` | Optional PROJECT_TOTAL limit + escalation % |
 | PATCH | `/api/budget-rules/[id]` | Optional aggregate rules |
 | POST | `/api/budget-rules` | Create optional scope rule |
 | PATCH | `/api/resources/[id]/mapping` | Assign or unassign Project |

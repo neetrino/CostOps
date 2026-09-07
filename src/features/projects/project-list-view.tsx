@@ -62,7 +62,7 @@ export function ProjectListView({ projects, onBudgetSaved }: ProjectListViewProp
                 <td className="px-4 py-3">
                   {primary ? (
                     <BudgetInlineField
-                      projectProviderId={primary.projectProviderId}
+                      savePath={`/api/project-providers/${primary.projectProviderId}/budget`}
                       budget={primary.budget}
                       onSaved={onBudgetSaved}
                     />

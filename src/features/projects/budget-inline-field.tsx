@@ -11,7 +11,7 @@ import { fetchJson } from '@/features/dashboard/api-client';
 import { Button } from '@/shared/ui/button';
 
 type BudgetInlineFieldProps = {
-  projectProviderId: string;
+  savePath: string;
   budget: BudgetView | null;
   onSaved: () => void;
 };
@@ -34,7 +34,7 @@ function parsePct(value: string): { ok: true; pct: number } | { ok: false; error
   return { ok: true, pct: n };
 }
 
-export function BudgetInlineField({ projectProviderId, budget, onSaved }: BudgetInlineFieldProps) {
+export function BudgetInlineField({ savePath, budget, onSaved }: BudgetInlineFieldProps) {
   const defaultLimit = budget?.limitUsd ?? DEFAULT_TELEGRAM_SPEND_ALERT_USD;
   const defaultPct =
     budget?.escalationPercent ?? DEFAULT_SPEND_ALERT_ESCALATION_PERCENT_OF_THRESHOLD;
@@ -66,7 +66,7 @@ export function BudgetInlineField({ projectProviderId, budget, onSaved }: Budget
     }
     setSaving(true);
     try {
-      await fetchJson(`/api/project-providers/${projectProviderId}/budget`, {
+      await fetchJson(savePath, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -80,7 +80,7 @@ export function BudgetInlineField({ projectProviderId, budget, onSaved }: Budget
     } finally {
       setSaving(false);
     }
-  }, [limit, onSaved, pct, projectProviderId]);
+  }, [limit, onSaved, pct, savePath]);
 
   return (
     <div className="flex flex-col items-end gap-1">

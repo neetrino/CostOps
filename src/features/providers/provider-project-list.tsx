@@ -47,7 +47,7 @@ export function ProviderProjectList({ projects, onBudgetSaved }: ProviderProject
               </td>
               <td className="px-4 py-3">
                 <BudgetInlineField
-                  projectProviderId={project.projectProviderId}
+                  savePath={`/api/project-providers/${project.projectProviderId}/budget`}
                   budget={project.budget}
                   onSaved={onBudgetSaved}
                 />

@@ -66,7 +66,7 @@ function ProviderProjectCard({
         <div className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-[var(--line)] pt-3">
           <span className="text-xs font-medium text-[var(--muted)]">Daily limit</span>
           <BudgetInlineField
-            projectProviderId={project.projectProviderId}
+            savePath={`/api/project-providers/${project.projectProviderId}/budget`}
             budget={project.budget}
             onSaved={onBudgetSaved}
           />

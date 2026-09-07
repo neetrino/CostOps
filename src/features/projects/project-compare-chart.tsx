@@ -21,19 +21,25 @@ const AXIS = 'var(--chart-axis)';
 
 type ProjectCompareChartProps = {
   data: CompareBarDatum[];
+  title?: string;
+  subtitle?: string;
+  emptyTitle?: string;
 };
 
-export function ProjectCompareChart({ data }: ProjectCompareChartProps) {
+export function ProjectCompareChart({
+  data,
+  title = 'Project comparison',
+  subtitle = 'Period estimated cost (USD)',
+  emptyTitle = 'No comparable projects',
+}: ProjectCompareChartProps) {
   if (data.length === 0) {
-    return (
-      <EmptyPanel title="No comparable projects" detail="Costs may be missing in this range." />
-    );
+    return <EmptyPanel title={emptyTitle} detail="Costs may be missing in this range." />;
   }
 
   return (
     <div className="rounded-[var(--radius)] border border-[var(--line)] bg-[var(--paper)] p-4 shadow-[var(--shadow-card)]">
-      <h3 className="text-sm font-semibold text-[var(--ink)]">Project comparison</h3>
-      <p className="mt-1 text-xs text-[var(--muted)]">Period estimated cost (USD)</p>
+      <h3 className="text-sm font-semibold text-[var(--ink)]">{title}</h3>
+      <p className="mt-1 text-xs text-[var(--muted)]">{subtitle}</p>
       <div className="mt-4 overflow-x-auto">
         <div style={{ minWidth: Math.max(520, data.length * 88), height: CHART_HEIGHT }}>
           <ResponsiveContainer width="100%" height="100%">

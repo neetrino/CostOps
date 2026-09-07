@@ -47,6 +47,7 @@ export type ProjectDetailResponse = {
   };
   today: CostView;
   period: CostView;
+  totalBudget: BudgetView | null;
   providers: Array<
     ProjectProviderRow & {
       resources: ProjectResourceRow[];

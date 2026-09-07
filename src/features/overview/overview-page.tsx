@@ -114,7 +114,7 @@ function OverviewContent() {
           }))}
         />
         <OverviewTable
-          title="By project"
+          title="By project (mapped providers)"
           rows={topProjects.map((row) => ({
             key: row.projectId,
             name: row.name,

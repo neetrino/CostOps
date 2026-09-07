@@ -26,6 +26,22 @@ export function toBudgetRuleView(
   };
 }
 
+export function ruleViewForProjectTotal(
+  rules: Array<{
+    id: string;
+    scope: string;
+    projectId: string | null;
+    limitUsd: { toString(): string };
+    escalationPercent: { toString(): string };
+    enabled: boolean;
+  }>,
+  projectId: string,
+): BudgetRuleView | null {
+  const rule =
+    rules.find((item) => item.scope === 'PROJECT_TOTAL' && item.projectId === projectId) ?? null;
+  return toBudgetRuleView(rule);
+}
+
 export function ruleViewForProjectProvider(
   rules: Array<{
     id: string;
