@@ -49,9 +49,9 @@
 | 3.1 | Type | Next.js Route Handlers | ✅ | ADR-002 |
 | 3.2 | Validation | Zod | ✅ | |
 | 3.3 | API format | REST (internal JSON) | ✅ | |
-| 3.4 | Rate limiting | 5 login/min/IP; cron via `CRON_SECRET` | ✅ | |
+| 3.4 | Rate limiting | 5 login/min/IP; 12 sync-now/min/IP; cron via `CRON_SECRET` | ✅ | |
 | 3.5 | API docs | Markdown `docs/04-API.md` | ✅ | |
-| 3.6 | Cron | Vercel Cron | ✅ | |
+| 3.6 | Cron | Vercel Cron, one provider per invocation | ✅ | |
 | 3.7 | File uploads | not needed | ➖ | |
 
 ---

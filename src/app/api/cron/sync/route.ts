@@ -1,14 +1,16 @@
 import { NextResponse } from 'next/server';
-import { runDueAccountSyncs } from '@/core/sync/run-due-syncs';
+import { runStoredSpendAlertPass } from '@/core/sync/run-stored-alert-pass';
 import { requireCronSecret } from '@/shared/auth/require-cron-secret';
 import { jsonError, safeErrorMessage } from '@/shared/http';
 import { logger } from '@/shared/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-/** Vercel/Next segment config must be a literal (same as CRON_MAX_DURATION_SECONDS). */
-export const maxDuration = 300;
+export const maxDuration = 60;
 
+/**
+ * Alert-only pass. Provider pulls live on /api/cron/sync/[provider].
+ */
 export async function GET(request: Request): Promise<NextResponse> {
   const auth = requireCronSecret(request);
   if (!auth.ok) {
@@ -16,13 +18,10 @@ export async function GET(request: Request): Promise<NextResponse> {
   }
 
   try {
-    const results = await runDueAccountSyncs();
-    return NextResponse.json({
-      ok: results.every((result) => result.ok),
-      results,
-    });
+    await runStoredSpendAlertPass();
+    return NextResponse.json({ ok: true, mode: 'alerts' });
   } catch (error) {
-    logger.error({ err: error }, 'Cron due-sync failed');
-    return jsonError('SYNC_FAILED', safeErrorMessage(error), 500);
+    logger.error({ err: error }, 'Cron stored-alert pass failed');
+    return jsonError('ALERTS_FAILED', safeErrorMessage(error), 500);
   }
 }

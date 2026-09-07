@@ -13,8 +13,9 @@ Validate query/body with Zod. Never return secrets.
 | POST | `/api/auth/login` | public | Set session cookie |
 | POST | `/api/auth/logout` | session | Clear cookie |
 | GET | `/api/health` | public | Liveness, no heavy DB |
-| GET | `/api/cron/sync` | `CRON_SECRET` | Run due provider accounts |
-| GET | `/api/cron/reconcile-yesterday` | `CRON_SECRET` | Finalize previous UTC day |
+| GET | `/api/cron/sync` | `CRON_SECRET` | Telegram pass over stored today (no provider pull) |
+| GET | `/api/cron/sync/[provider]` | `CRON_SECRET` | Due sync for one provider (`neon` / `upstash` / `vercel`) |
+| GET | `/api/cron/reconcile-yesterday/[provider]` | `CRON_SECRET` | Finalize yesterday for one provider |
 
 Cron checks `Authorization: Bearer <CRON_SECRET>` (same as Neon).
 
@@ -85,7 +86,7 @@ Do not emit `0` when status is `missing` or `error` without also sending that st
 | PATCH | `/api/resources/[id]/mapping` | Assign or unassign Project (mapping a project also clears archive) |
 | POST | `/api/resources/[id]/project` | Create a standalone CostOps project from this inbox resource (not team leftover) |
 | PATCH | `/api/resources/[id]/archive` | `{ archived: true \| false }` — hide or restore an unmapped resource. History stays |
-| POST | `/api/sync/now` | Manual sync (rate limited) |
+| POST | `/api/sync/now` | Manual sync for one `{ providerKey }` (rate limited). UI calls Neon → Upstash → Vercel |
 | POST | `/api/sync/backfill` | Range backfill for one account |
 | PATCH | `/api/provider-accounts/[id]/credential` | Set `credentialExpiresAt` or mark rotated |
 

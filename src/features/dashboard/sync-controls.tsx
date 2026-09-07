@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { SyncStatusView } from '@/core/sync/load-status';
 import { fetchJson } from '@/features/dashboard/api-client';
+import { REGISTERED_PROVIDER_KEYS } from '@/shared/registered-providers';
 import { Button } from '@/shared/ui/button';
 
 type SyncNowButtonProps = {
@@ -19,11 +20,23 @@ export function SyncNowButton({ onComplete }: SyncNowButtonProps) {
     }
     setPending(true);
     setError(null);
+    const failures: string[] = [];
     try {
-      await fetchJson('/api/sync/now', { method: 'POST' });
+      for (const providerKey of REGISTERED_PROVIDER_KEYS) {
+        try {
+          await fetchJson('/api/sync/now', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ providerKey }),
+          });
+        } catch (err) {
+          failures.push(`${providerKey}: ${err instanceof Error ? err.message : 'Sync failed'}`);
+        }
+      }
       onComplete?.();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Sync failed');
+      if (failures.length > 0) {
+        setError(failures.join(' · '));
+      }
     } finally {
       setPending(false);
     }

@@ -43,7 +43,7 @@
 - [x] CostEntry / MetricEntry upsert by idempotency key; current day PARTIAL / ESTIMATED; yesterday FINAL
 - [x] Spend alerts: first breach, escalation, P2002, Telegram-then-write
 - [x] Credential AUTH_FAILED once per incident (calendar 30d / 7d / expired disabled; no stored expiry date)
-- [x] Cron: `GET /api/cron/sync`, `GET /api/cron/reconcile-yesterday`; `vercel.json` `0 * * * *` and `0 2 * * *`
+- [x] Cron: per-provider `GET /api/cron/sync/{neon,upstash,vercel}` (staggered hourly) + matching yesterday reconcile; `GET /api/cron/sync` is alert-only
 - [x] `POST /api/sync/now` (session + rate limit), `GET /api/sync/status`
 - [x] Vitest: aggregation, alerts, freshness, Neon formula, credential 401, adapter contract
 - [x] Dashboard read APIs: overview, projects, providers, usage series/totals, alerts, integrations, unmapped
@@ -121,7 +121,8 @@ Discrepancies vs docs:
 ### 2026-09-07 — Sync function timeout
 
 - Production **Sync now** / hourly cron hit `FUNCTION_INVOCATION_TIMEOUT` at 60s (three providers + alerts). Telegram never ran.
-- Sync/cron/reconcile `maxDuration` is **300s** (Vercel Pro). Batch stops before the hard kill so finished accounts keep alerts.
+- Same model as old Neon: **one provider per invocation**. Hourly cron staggered (`:00` Neon, `:10` Upstash, `:20` Vercel). Sync now calls them as three HTTP requests. Alerts also run from stored spend before each pull.
+- Sync/cron/reconcile `maxDuration` is **300s** (Vercel Pro).
 
 ### 2026-09-07 — CI on main
 

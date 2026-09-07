@@ -1,12 +1,28 @@
 {
   "crons": [
     {
-      "path": "/api/cron/sync",
+      "path": "/api/cron/sync/neon",
       "schedule": "0 * * * *"
     },
     {
-      "path": "/api/cron/reconcile-yesterday",
+      "path": "/api/cron/sync/upstash",
+      "schedule": "10 * * * *"
+    },
+    {
+      "path": "/api/cron/sync/vercel",
+      "schedule": "20 * * * *"
+    },
+    {
+      "path": "/api/cron/reconcile-yesterday/neon",
       "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/cron/reconcile-yesterday/upstash",
+      "schedule": "10 2 * * *"
+    },
+    {
+      "path": "/api/cron/reconcile-yesterday/vercel",
+      "schedule": "20 2 * * *"
     }
   ]
 }
