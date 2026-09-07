@@ -2,15 +2,21 @@
 
 import Link from 'next/link';
 import type { ProviderProjectRow } from '@/features/providers/load-provider-detail';
+import { VpsLineEdit } from '@/features/providers/vps-line-edit';
 import { BudgetInlineField } from '@/features/projects/budget-inline-field';
 import { CostViewDisplay } from '@/shared/ui/cost-view-display';
 
 type ProviderProjectListProps = {
   projects: ProviderProjectRow[];
+  hideDailyLimit?: boolean;
   onBudgetSaved: () => void;
 };
 
-export function ProviderProjectList({ projects, onBudgetSaved }: ProviderProjectListProps) {
+export function ProviderProjectList({
+  projects,
+  hideDailyLimit = false,
+  onBudgetSaved,
+}: ProviderProjectListProps) {
   if (projects.length === 0) {
     return null;
   }
@@ -22,7 +28,9 @@ export function ProviderProjectList({ projects, onBudgetSaved }: ProviderProject
             <th className="px-4 py-3 font-semibold">Project</th>
             <th className="px-4 py-3 font-semibold">Period</th>
             <th className="px-4 py-3 font-semibold">Today</th>
-            <th className="px-4 py-3 font-semibold">Daily limit</th>
+            <th className="px-4 py-3 font-semibold">
+              {hideDailyLimit ? 'Monthly fee' : 'Daily limit'}
+            </th>
           </tr>
         </thead>
         <tbody className="divide-y divide-[var(--line)]">
@@ -46,11 +54,28 @@ export function ProviderProjectList({ projects, onBudgetSaved }: ProviderProject
                 <CostViewDisplay cost={project.today} size="sm" />
               </td>
               <td className="px-4 py-3">
-                <BudgetInlineField
-                  savePath={`/api/project-providers/${project.projectProviderId}/budget`}
-                  budget={project.budget}
-                  onSaved={onBudgetSaved}
-                />
+                {hideDailyLimit ? (
+                  project.vpsLines.length === 0 ? (
+                    <span className="text-xs text-[var(--muted)]">No active VPS line</span>
+                  ) : (
+                    <div className="space-y-3">
+                      {project.vpsLines.map((line) => (
+                        <VpsLineEdit
+                          key={line.id}
+                          resourceId={line.id}
+                          monthlyAmountUsd={line.monthlyAmountUsd}
+                          onChanged={onBudgetSaved}
+                        />
+                      ))}
+                    </div>
+                  )
+                ) : (
+                  <BudgetInlineField
+                    savePath={`/api/project-providers/${project.projectProviderId}/budget`}
+                    budget={project.budget}
+                    onSaved={onBudgetSaved}
+                  />
+                )}
               </td>
             </tr>
           ))}

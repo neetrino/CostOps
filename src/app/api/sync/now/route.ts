@@ -26,7 +26,11 @@ export async function POST(request: Request): Promise<NextResponse> {
   const parsed = syncNowBodySchema.safeParse(body);
   const providerKey = parsed.success ? parseRegisteredProviderKey(parsed.data.providerKey) : null;
   if (!providerKey) {
-    return jsonError('VALIDATION_ERROR', 'providerKey must be NEON, UPSTASH, or VERCEL', 400);
+    return jsonError(
+      'VALIDATION_ERROR',
+      'providerKey must be NEON, UPSTASH, VERCEL, or HETZNER',
+      400,
+    );
   }
 
   const ip = clientIpFromHeaders(request.headers);

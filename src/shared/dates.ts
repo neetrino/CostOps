@@ -46,6 +46,23 @@ export function isSameUtcDay(left: Date, right: Date): boolean {
   return utcDayKey(left) === utcDayKey(right);
 }
 
+/** First UTC calendar day of the month that contains `date`. */
+export function startOfUtcMonth(date: Date): Date {
+  return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1));
+}
+
+/** First-of-month UTC dates whose months overlap the inclusive range. */
+export function utcMonthsOverlapping(from: Date, to: Date): Date[] {
+  const start = startOfUtcMonth(from);
+  const end = startOfUtcMonth(to);
+  const months: Date[] = [];
+  for (let cursor = start; cursor.getTime() <= end.getTime();) {
+    months.push(cursor);
+    cursor = new Date(Date.UTC(cursor.getUTCFullYear(), cursor.getUTCMonth() + 1, 1));
+  }
+  return months;
+}
+
 export function formatUtcClock(date: Date): string {
   const hours = String(date.getUTCHours()).padStart(2, '0');
   const minutes = String(date.getUTCMinutes()).padStart(2, '0');

@@ -14,7 +14,7 @@ Validate query/body with Zod. Never return secrets.
 | POST | `/api/auth/logout` | session | Clear cookie |
 | GET | `/api/health` | public | Liveness, no heavy DB |
 | GET | `/api/cron/sync` | `CRON_SECRET` | Telegram pass over stored today (no provider pull) |
-| GET | `/api/cron/sync/[provider]` | `CRON_SECRET` | Due sync for one provider (`neon` / `upstash` / `vercel`) |
+| GET | `/api/cron/sync/[provider]` | `CRON_SECRET` | Due sync for one provider (`neon` / `upstash` / `vercel` / `hetzner`) |
 | GET | `/api/cron/reconcile-yesterday/[provider]` | `CRON_SECRET` | Finalize yesterday for one provider |
 
 Cron checks `Authorization: Bearer <CRON_SECRET>` (same as Neon).
@@ -29,7 +29,7 @@ Generalize Neon `/api/usage/*`. Keep response fields stable enough to port UI, t
 |--------|------|---------|
 | GET | `/api/overview` | Today + period totals, breakdowns, health, near-limit |
 | GET | `/api/projects` | Project list rows |
-| GET | `/api/projects/options` | Active projects + provider keys for the mapping picker |
+| GET | `/api/projects/options` | Active projects + provider keys. `liveBoard=1` = non-archived Projects with a live Neon/Vercel/Upstash resource. `includeEmpty=1` lists projects with no resources |
 | GET | `/api/projects/[slug]` | Project detail: mapped-provider total, breakdown, optional totalBudget |
 | GET | `/api/providers` | Provider cards |
 | GET | `/api/providers/[key]` | Provider board (Neon board first) |
@@ -81,12 +81,14 @@ Do not emit `0` when status is `missing` or `error` without also sending that st
 | POST | `/api/projects` | Create project |
 | PATCH | `/api/project-providers/[id]/budget` | Daily limit + escalation % |
 | PATCH | `/api/projects/[slug]/budget-total` | Optional PROJECT_TOTAL limit + escalation % |
+| POST | `/api/projects/[slug]/vps-lines` | Add a static VPS line from the VPS board (`displayName`, `monthlyAmountUsd`, optional `effectiveOn`) |
+| PATCH | `/api/resources/[id]/vps-line` | Update VPS name / monthly amount / start month / archive |
 | PATCH | `/api/budget-rules/[id]` | Optional aggregate rules |
 | POST | `/api/budget-rules` | Create optional scope rule |
 | PATCH | `/api/resources/[id]/mapping` | Assign or unassign Project (mapping a project also clears archive) |
 | POST | `/api/resources/[id]/project` | Create a standalone CostOps project from this inbox resource (not team leftover) |
 | PATCH | `/api/resources/[id]/archive` | `{ archived: true \| false }` — hide or restore an unmapped resource. History stays |
-| POST | `/api/sync/now` | Manual sync for one `{ providerKey }` (rate limited). UI calls Neon → Upstash → Vercel |
+| POST | `/api/sync/now` | Manual sync for one `{ providerKey }` (rate limited). UI calls Neon → Upstash → Vercel → Hetzner |
 | POST | `/api/sync/backfill` | Range backfill for one account |
 | PATCH | `/api/provider-accounts/[id]/credential` | Set `credentialExpiresAt` or mark rotated |
 

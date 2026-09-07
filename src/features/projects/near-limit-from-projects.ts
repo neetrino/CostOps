@@ -1,6 +1,7 @@
 import { NEAR_LIMIT_MAX_ROWS, NEAR_LIMIT_USAGE_PERCENT } from '@/config/constants';
 import type { CostView } from '@/core/cost/types';
 import type { ProjectListRow } from '@/features/projects/types';
+import { isFixedVpsProvider } from '@/shared/provider-label';
 import { usagePercent } from '@/shared/money';
 
 export type BoardNearLimitItem = {
@@ -17,7 +18,11 @@ export function buildBoardNearLimitItems(projects: ProjectListRow[]): BoardNearL
   const rows: BoardNearLimitItem[] = [];
   for (const project of projects) {
     for (const provider of project.providers) {
-      if (!provider.budget || provider.today.costUsd === null) {
+      if (
+        isFixedVpsProvider(provider.providerKey) ||
+        !provider.budget ||
+        provider.today.costUsd === null
+      ) {
         continue;
       }
       const percent = usagePercent(provider.today.costUsd, provider.budget.limitUsd);

@@ -1,4 +1,5 @@
 import { assertAdapterContract } from '@/providers/assert-adapter-contract';
+import { hetznerAdapter } from '@/providers/hetzner/adapter';
 import { neonAdapter } from '@/providers/neon/adapter';
 import { upstashAdapter } from '@/providers/upstash/adapter';
 import { vercelAdapter } from '@/providers/vercel/adapter';
@@ -19,6 +20,7 @@ export function registerAdapter(adapter: CostProviderAdapter): void {
 registerAdapter(neonAdapter);
 registerAdapter(vercelAdapter);
 registerAdapter(upstashAdapter);
+registerAdapter(hetznerAdapter);
 
 export function getAdapter(providerKey: string): CostProviderAdapter {
   const adapter = adapters.get(providerKey);

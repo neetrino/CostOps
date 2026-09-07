@@ -169,24 +169,32 @@ function IntegrationAccountCard({
           </p>
         ) : null}
         <div className="mt-auto flex flex-wrap gap-2 border-t border-[var(--line)] pt-4">
-          {rotateUrl ? (
-            <a
-              href={rotateUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center rounded-[var(--radius-sm)] border border-[var(--line-strong)] bg-[var(--paper)] px-3 py-2 text-xs font-semibold text-[var(--ink)] transition hover:border-[var(--accent)]"
-            >
-              Rotate credential ↗
-            </a>
-          ) : null}
-          <Button
-            variant="ghost"
-            className="text-xs"
-            disabled={saving}
-            onClick={() => void markRotated()}
-          >
-            Mark rotated
-          </Button>
+          {account.requiresCredentials === false ? (
+            <p className="text-xs text-[var(--muted)]">
+              Manual fixed cost — no API token to rotate.
+            </p>
+          ) : (
+            <>
+              {rotateUrl ? (
+                <a
+                  href={rotateUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center rounded-[var(--radius-sm)] border border-[var(--line-strong)] bg-[var(--paper)] px-3 py-2 text-xs font-semibold text-[var(--ink)] transition hover:border-[var(--accent)]"
+                >
+                  Rotate credential ↗
+                </a>
+              ) : null}
+              <Button
+                variant="ghost"
+                className="text-xs"
+                disabled={saving}
+                onClick={() => void markRotated()}
+              >
+                Mark rotated
+              </Button>
+            </>
+          )}
         </div>
         {error ? <p className="text-xs text-[var(--danger)]">{error}</p> : null}
       </div>

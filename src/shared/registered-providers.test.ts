@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseRegisteredProviderKey } from '@/shared/registered-providers';
+import { compareProviderNavOrder, parseRegisteredProviderKey } from '@/shared/registered-providers';
 
 describe('parseRegisteredProviderKey', () => {
   it('accepts cron path casing', () => {
@@ -10,5 +10,17 @@ describe('parseRegisteredProviderKey', () => {
   it('rejects unknown keys', () => {
     expect(parseRegisteredProviderKey('gcp')).toBeNull();
     expect(parseRegisteredProviderKey('')).toBeNull();
+  });
+});
+
+describe('compareProviderNavOrder', () => {
+  it('follows Neon → Vercel → Upstash → VPS', () => {
+    const keys = ['HETZNER', 'UPSTASH', 'NEON', 'VERCEL'];
+    expect([...keys].sort(compareProviderNavOrder)).toEqual([
+      'NEON',
+      'VERCEL',
+      'UPSTASH',
+      'HETZNER',
+    ]);
   });
 });

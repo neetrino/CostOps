@@ -2,15 +2,21 @@
 
 import Link from 'next/link';
 import type { ProviderProjectRow } from '@/features/providers/load-provider-detail';
+import { VpsLineEdit } from '@/features/providers/vps-line-edit';
 import { BudgetInlineField } from '@/features/projects/budget-inline-field';
 import { CostViewDisplay } from '@/shared/ui/cost-view-display';
 
 type ProviderProjectCardsProps = {
   projects: ProviderProjectRow[];
+  hideDailyLimit?: boolean;
   onBudgetSaved: () => void;
 };
 
-export function ProviderProjectCards({ projects, onBudgetSaved }: ProviderProjectCardsProps) {
+export function ProviderProjectCards({
+  projects,
+  hideDailyLimit = false,
+  onBudgetSaved,
+}: ProviderProjectCardsProps) {
   if (projects.length === 0) {
     return null;
   }
@@ -20,6 +26,7 @@ export function ProviderProjectCards({ projects, onBudgetSaved }: ProviderProjec
         <ProviderProjectCard
           key={project.projectProviderId}
           project={project}
+          hideDailyLimit={hideDailyLimit}
           onBudgetSaved={onBudgetSaved}
         />
       ))}
@@ -29,9 +36,11 @@ export function ProviderProjectCards({ projects, onBudgetSaved }: ProviderProjec
 
 function ProviderProjectCard({
   project,
+  hideDailyLimit,
   onBudgetSaved,
 }: {
   project: ProviderProjectRow;
+  hideDailyLimit: boolean;
   onBudgetSaved: () => void;
 }) {
   const overLimit =
@@ -63,14 +72,33 @@ function ProviderProjectCard({
           <Metric label="Period" cost={project.period} />
           <Metric label="Today" cost={project.today} />
         </div>
-        <div className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-[var(--line)] pt-3">
-          <span className="text-xs font-medium text-[var(--muted)]">Daily limit</span>
-          <BudgetInlineField
-            savePath={`/api/project-providers/${project.projectProviderId}/budget`}
-            budget={project.budget}
-            onSaved={onBudgetSaved}
-          />
-        </div>
+        {hideDailyLimit ? (
+          <div className="mt-auto space-y-3 border-t border-[var(--line)] pt-3">
+            {project.vpsLines.length === 0 ? (
+              <p className="text-xs text-[var(--muted)]">No active VPS line.</p>
+            ) : (
+              project.vpsLines.map((line) => (
+                <div key={line.id} className="space-y-1">
+                  <p className="text-xs font-medium text-[var(--ink)]">{line.displayName}</p>
+                  <VpsLineEdit
+                    resourceId={line.id}
+                    monthlyAmountUsd={line.monthlyAmountUsd}
+                    onChanged={onBudgetSaved}
+                  />
+                </div>
+              ))
+            )}
+          </div>
+        ) : (
+          <div className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-[var(--line)] pt-3">
+            <span className="text-xs font-medium text-[var(--muted)]">Daily limit</span>
+            <BudgetInlineField
+              savePath={`/api/project-providers/${project.projectProviderId}/budget`}
+              budget={project.budget}
+              onSaved={onBudgetSaved}
+            />
+          </div>
+        )}
       </div>
     </li>
   );

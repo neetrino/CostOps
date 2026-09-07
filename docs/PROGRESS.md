@@ -1,8 +1,8 @@
 # Progress — Neetrino CostOps
 
-**Phase.** 4 — Upstash (GCP postponed)  
-**Overall.** 94% (Neon + Vercel + project totals + Upstash adapter; operator mapping and preview/parity still open)  
-**Updated.** 2026-09-07 (Vercel usage = EffectiveCost, including plan credit)
+**Phase.** 4 — Upstash + VPS FIXED  
+**Overall.** 96% (Neon + Vercel + project totals + Upstash + Hetzner/VPS fixed lines; operator mapping still open)  
+**Updated.** 2026-09-07 (VPS static monthly costs)
 
 ---
 
@@ -14,7 +14,7 @@
 | 1. Core + Neon parity | 🔄 UI + history script; preview/parity next | 86% |
 | 2. Vercel | 🔄 Adapter + board + tests; operator mapping next | 80% |
 | 3. Project totals | ✅ UI + PROJECT_TOTAL + history apply | 90% |
-| 4. Next providers | 🔄 Upstash adapter; GCP postponed; Hetzner blocked | 40% |
+| 4. Next providers | 🔄 Upstash + VPS FIXED; GCP postponed | 70% |
 | 5. Advanced FinOps | ⏳ Out of v1 cutover | 0% |
 
 ---
@@ -65,6 +65,7 @@
 - [x] Upstash `CostProviderAdapter` (`src/providers/upstash/`): Management API Redis + QStash, Zod, credential meta (`supportsExpiryDate: false`)
 - [x] Seed + cron ensure Provider `UPSTASH` + ProviderAccount from `UPSTASH_EMAIL`
 - [x] `/providers/upstash` nav + generic provider board + unmapped `upstash_redis` / `upstash_qstash`
+- [x] Hetzner/VPS FIXED: `Resource.fixedMonthlyUsd` + `fixedEffectiveOn`, adapter without API, add/update/stop only on `/providers/hetzner`, daily alerts skip FIXED
 
 ---
 
@@ -80,6 +81,7 @@
 1. Confirm suggested maps in `/unmapped` (or archive trash) and enable Project × Provider limits
 2. Operator deploys CostOps when ready (no preview wait)
 3. GCP later (billing quota / SA JSON)
+4. Operator adds VPS lines (NBOS, OMMM, …) from the VPS board — amounts are not seeded
 
 ---
 

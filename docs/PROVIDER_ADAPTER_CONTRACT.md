@@ -69,6 +69,7 @@ export interface CostProviderAdapter {
   supportsIntraday: boolean;
   supportsBackfill: boolean;
   recommendedSyncIntervalMinutes?: number;
+  requiresCredentials?: boolean; // default true; false for FIXED/manual
   credentials: ProviderCredentialMeta;
 
   syncResources(ctx: ProviderContext): Promise<ResourceSyncResult>;
@@ -96,7 +97,9 @@ Exact type names may live in `src/core` once Phase 1 starts. The split of respon
 6. Adapters never send Telegram, never evaluate BudgetRules, never write generic columns for one-off metrics.
 7. Credentials are read via `credentialRef` → env. No secrets in adapter source.
 8. Every adapter **must** ship `credentials` metadata (create URL, docs, auth-failure detector). See [CREDENTIAL_ROTATION.md](./CREDENTIAL_ROTATION.md).
-9. If docs disagree with a live response, record it in `docs/PROGRESS.md` and adapter comments. Observed API wins for implementation, documented as a discrepancy.
+9. `requiresCredentials: false` skips rotate-token URLs and env vars (Hetzner/VPS FIXED). `isAuthFailure` still required and returns false.
+10. FIXED Hetzner: for each UTC month that **overlaps** the fetch range and is on/after `fixedEffectiveOn`, emit one row on the 1st (`sourceType=FIXED`). Do not write `$fee / days`. Amount edits rewrite the current month only; existing past month rows stay.
+11. If docs disagree with a live response, record it in `docs/PROGRESS.md` and adapter comments. Observed API wins for implementation, documented as a discrepancy.
 
 ---
 
@@ -125,7 +128,7 @@ load enabled accounts due for sync
 | VERCEL | no (current Pacific day often `404 costs_not_found`) | yes (FOCUS daily) | API `GET /v1/billing/charges` (JSONL) | Observed API in `docs/PROGRESS.md`. GET only. |
 | UPSTASH | yes (current UTC day in Redis `dailybilling` / QStash `daily_billings`) | yes (QStash month; Redis ~5 recent UTC days) | API `GET /v2/redis/stats/{id}` + `GET /v2/qstash/stats/{id}` | Observed API in `docs/PROGRESS.md`. Basic auth. GET only. Days outside the series window are `missing`, not `$0`. |
 | GCP | provider-specific | yes if export/API | API | |
-| HETZNER | no | n/a | FIXED recurring | |
+| HETZNER | no | yes | FIXED recurring | UI label **VPS**. No API token. Operator-entered `$ / month`. |
 
 ---
 

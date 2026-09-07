@@ -19,6 +19,7 @@ import { UsageSeriesChart } from '@/features/projects/usage-series-chart';
 import { sortByPeriodCostDesc } from '@/features/projects/sort-projects-by-cost';
 import { ViewToggle, type BoardViewMode } from '@/features/projects/view-toggle';
 import type { ProjectListResponse } from '@/features/projects/types';
+import { CostViewDisplay } from '@/shared/ui/cost-view-display';
 import { CardSkeleton, EmptyPanel, ErrorPanel } from '@/shared/ui/state-panels';
 
 type UsageTotalsResponse = {
@@ -156,11 +157,18 @@ function ProjectsContent() {
       }
     >
       <header className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="wordmark text-3xl text-[var(--ink)]">Projects</h1>
-          <p className="mt-1 text-sm text-[var(--muted)]">
-            Daily board · {projectsData?.range.from ?? '…'} → {projectsData?.range.to ?? '…'}
-          </p>
+        <div className="flex min-w-0 flex-wrap items-end gap-x-8 gap-y-3">
+          <div>
+            <h1 className="wordmark text-3xl text-[var(--ink)]">Projects</h1>
+          </div>
+          <div>
+            <p className="text-[11px] font-semibold tracking-wide text-[var(--muted)] uppercase">
+              Period total
+            </p>
+            <div className="mt-1">
+              <CostViewDisplay cost={totalsData?.total ?? emptyCost()} size="lg" />
+            </div>
+          </div>
         </div>
         <label className="min-w-[12rem] flex-1 text-xs font-medium text-[var(--muted)] sm:max-w-xs">
           Search
@@ -181,11 +189,7 @@ function ProjectsContent() {
         />
       ) : (
         <>
-          <KpiStrip
-            total={totalsData?.total ?? emptyCost()}
-            byProvider={totalsData?.byProvider ?? []}
-            loading={loading && !totalsData}
-          />
+          <KpiStrip byProvider={totalsData?.byProvider ?? []} loading={loading && !totalsData} />
           <NearLimitStrip rows={nearLimit} />
           <ProjectCompareChart data={compareData} />
           <UsageSeriesChart

@@ -1,6 +1,7 @@
 'use client';
 
 import type { ProjectDetailResponse } from '@/features/projects/types';
+import { isFixedVpsProvider, providerUiLabel } from '@/shared/provider-label';
 import { CostViewDisplay } from '@/shared/ui/cost-view-display';
 
 type ProjectProviderSectionProps = {
@@ -8,11 +9,16 @@ type ProjectProviderSectionProps = {
 };
 
 export function ProjectProviderSection({ provider }: ProjectProviderSectionProps) {
+  const isVps = isFixedVpsProvider(provider.providerKey);
   return (
     <article className="overflow-hidden rounded-[var(--radius)] border border-[var(--line)] bg-[var(--paper)] shadow-[var(--shadow-card)]">
       <div className="border-b border-[var(--line)] bg-[var(--sidebar)] px-4 py-3">
-        <h3 className="font-semibold text-[var(--ink)]">{provider.providerKey}</h3>
-        <p className="mt-1 text-xs text-[var(--muted)]">Resources mapped to this project</p>
+        <h3 className="font-semibold text-[var(--ink)]">{providerUiLabel(provider.providerKey)}</h3>
+        <p className="mt-1 text-xs text-[var(--muted)]">
+          {isVps
+            ? 'Static monthly hosting · edit on the VPS tab'
+            : 'Resources mapped to this project'}
+        </p>
       </div>
       {provider.resources.length === 0 ? (
         <p className="px-4 py-4 text-sm text-[var(--muted)]">No resources linked.</p>
@@ -28,10 +34,12 @@ export function ProjectProviderSection({ provider }: ProjectProviderSectionProps
                   {resource.displayName}
                 </p>
                 <p className="font-[family-name:var(--font-mono)] text-[11px] text-[var(--muted)]">
-                  {resource.resourceType} · {resource.externalId}
+                  {isVps && resource.fixedMonthlyUsd !== null
+                    ? `$${resource.fixedMonthlyUsd.toFixed(2)} / month`
+                    : `${resource.resourceType} · ${resource.externalId}`}
                 </p>
               </div>
-              <div className="flex shrink-0 gap-4 text-right">
+              <div className="flex shrink-0 flex-wrap items-center gap-4 text-right">
                 <div>
                   <p className="text-[10px] text-[var(--muted)]">Period</p>
                   <CostViewDisplay cost={resource.period} size="sm" />

@@ -3,6 +3,10 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../src/generated/prisma/client';
 import {
   DEFAULT_SYNC_INTERVAL_MINUTES,
+  HETZNER_CREDENTIAL_REF,
+  HETZNER_DISPLAY_NAME,
+  HETZNER_EXTERNAL_ACCOUNT_ID,
+  HETZNER_FIXED_SYNC_INTERVAL_MINUTES,
   NEON_CREDENTIAL_REF,
   UPSTASH_CREDENTIAL_REF,
   VERCEL_CREDENTIAL_REF,
@@ -38,10 +42,16 @@ async function seed(): Promise<void> {
       create: { key: 'UPSTASH', displayName: 'Upstash', enabled: true },
       update: { displayName: 'Upstash', enabled: true },
     });
+    await prisma.provider.upsert({
+      where: { key: 'HETZNER' },
+      create: { key: 'HETZNER', displayName: HETZNER_DISPLAY_NAME, enabled: true },
+      update: { displayName: HETZNER_DISPLAY_NAME, enabled: true },
+    });
 
     await seedNeonAccount(prisma);
     await seedVercelAccount(prisma);
     await seedUpstashAccount(prisma);
+    await seedHetznerAccount(prisma);
   } finally {
     await prisma.$disconnect();
   }
@@ -112,6 +122,31 @@ async function seedUpstashAccount(prisma: PrismaClient): Promise<void> {
     update: {
       name: 'Upstash account',
       credentialRef: UPSTASH_CREDENTIAL_REF,
+    },
+  });
+}
+
+async function seedHetznerAccount(prisma: PrismaClient): Promise<void> {
+  await prisma.providerAccount.upsert({
+    where: {
+      providerKey_externalAccountId: {
+        providerKey: 'HETZNER',
+        externalAccountId: HETZNER_EXTERNAL_ACCOUNT_ID,
+      },
+    },
+    create: {
+      providerKey: 'HETZNER',
+      name: 'VPS (manual)',
+      externalAccountId: HETZNER_EXTERNAL_ACCOUNT_ID,
+      credentialRef: HETZNER_CREDENTIAL_REF,
+      recommendedSyncIntervalMinutes: HETZNER_FIXED_SYNC_INTERVAL_MINUTES,
+      syncEnabled: true,
+      status: 'ACTIVE',
+    },
+    update: {
+      name: 'VPS (manual)',
+      credentialRef: HETZNER_CREDENTIAL_REF,
+      recommendedSyncIntervalMinutes: HETZNER_FIXED_SYNC_INTERVAL_MINUTES,
     },
   });
 }

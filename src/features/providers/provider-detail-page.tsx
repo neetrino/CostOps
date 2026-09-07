@@ -11,7 +11,6 @@ import { useUnauthorizedRedirect } from '@/features/dashboard/use-unauthorized-r
 import { buildCompareBarData } from '@/features/projects/chart-data';
 import { DashboardBoard } from '@/features/projects/dashboard-board';
 import { FilterRail } from '@/features/projects/filter-rail';
-import { KpiStrip } from '@/features/projects/kpi-strip';
 import { ProjectCompareChart } from '@/features/projects/project-compare-chart';
 import { UsageSeriesChart } from '@/features/projects/usage-series-chart';
 import { sortByPeriodCostDesc } from '@/features/projects/sort-projects-by-cost';
@@ -20,6 +19,8 @@ import type { ProviderDetailResponse } from '@/features/providers/load-provider-
 import { BackfillPeriodButton } from '@/features/providers/backfill-period-button';
 import { ProviderProjectCards } from '@/features/providers/provider-project-cards';
 import { ProviderProjectList } from '@/features/providers/provider-project-list';
+import { VpsAddProject } from '@/features/providers/vps-add-project';
+import { isFixedVpsProvider } from '@/shared/provider-label';
 import { CostViewDisplay } from '@/shared/ui/cost-view-display';
 import { CardSkeleton, EmptyPanel, ErrorPanel } from '@/shared/ui/state-panels';
 
@@ -125,8 +126,6 @@ function ProviderDetailContent() {
     [filteredProjects],
   );
 
-  const kpiTotal = detail?.period ?? emptyCost();
-
   const visibleIds = useMemo(
     () => new Set(filteredProjects.map((project) => project.projectId)),
     [filteredProjects],
@@ -180,23 +179,15 @@ function ProviderDetailContent() {
             </label>
           </header>
 
+          {isFixedVpsProvider(detail.provider.key) ? (
+            <VpsAddProject onAdded={() => void load()} />
+          ) : null}
+
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <HeroMetric label="Today" cost={detail.today} accent />
             <HeroMetric label="Selected period" cost={detail.period} />
             <UnmappedTile unmapped={detail.unmapped} />
           </div>
-
-          <KpiStrip
-            total={kpiTotal}
-            byProvider={[
-              {
-                providerKey: detail.provider.key,
-                displayName: detail.provider.displayName,
-                cost: kpiTotal,
-              },
-            ]}
-            loading={false}
-          />
 
           <ProjectCompareChart data={compareData} />
           <UsageSeriesChart
@@ -215,12 +206,26 @@ function ProviderDetailContent() {
           {filteredProjects.length === 0 ? (
             <EmptyPanel
               title="No projects in range"
-              detail={search ? 'Try clearing search.' : 'Run sync or widen the date range.'}
+              detail={
+                search
+                  ? 'Try clearing search.'
+                  : isFixedVpsProvider(detail.provider.key)
+                    ? 'Add a project above to attach a monthly VPS line.'
+                    : 'Run sync or widen the date range.'
+              }
             />
           ) : viewMode === 'cards' ? (
-            <ProviderProjectCards projects={filteredProjects} onBudgetSaved={() => void load()} />
+            <ProviderProjectCards
+              projects={filteredProjects}
+              hideDailyLimit={isFixedVpsProvider(detail.provider.key)}
+              onBudgetSaved={() => void load()}
+            />
           ) : (
-            <ProviderProjectList projects={filteredProjects} onBudgetSaved={() => void load()} />
+            <ProviderProjectList
+              projects={filteredProjects}
+              hideDailyLimit={isFixedVpsProvider(detail.provider.key)}
+              onBudgetSaved={() => void load()}
+            />
           )}
         </>
       )}
@@ -276,16 +281,6 @@ function UnmappedTile({ unmapped }: { unmapped: ProviderDetailResponse['unmapped
       ) : null}
     </div>
   );
-}
-
-function emptyCost(): CostView {
-  return {
-    costUsd: null,
-    sourceStatus: 'missing',
-    sourceType: null,
-    isPartial: false,
-    lastSuccessfulSyncAt: null,
-  };
 }
 
 export function ProviderDetailPage() {

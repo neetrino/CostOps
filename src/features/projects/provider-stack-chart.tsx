@@ -19,6 +19,7 @@ import {
 } from '@/features/projects/chart-data';
 import { formatChartAxisUsd } from '@/features/projects/chart-format';
 import { ChartPanel } from '@/features/projects/chart-panel';
+import { providerUiLabel } from '@/shared/provider-label';
 import { chartColor } from '@/shared/ui/chart-colors';
 import { EmptyPanel } from '@/shared/ui/state-panels';
 
@@ -99,7 +100,7 @@ export function ProviderStackChart({ points, providerKeys }: ProviderStackChartP
               <Bar
                 key={key}
                 dataKey={key}
-                name={key}
+                name={providerUiLabel(key)}
                 stackId="providers"
                 fill={chartColor(index)}
                 maxBarSize={36}

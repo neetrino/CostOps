@@ -19,7 +19,7 @@ async function loadProjectProviderTargets(lastSyncAt: Date): Promise<SpendAlertT
   });
   const targets: SpendAlertTarget[] = [];
   for (const link of links) {
-    if (link.project.archived) {
+    if (link.project.archived || link.providerKey === 'HETZNER') {
       continue;
     }
     const rule = await ensureProjectProviderBudgetRule({
@@ -134,7 +134,10 @@ export async function evaluateSpendAlertsForDay(input: {
     if (!rule) {
       continue;
     }
-    const spend = aggregateForScope(rows, scopeFilterFor(target, rule));
+    const spend = aggregateForScope(
+      rows.filter((row) => row.sourceType !== 'FIXED'),
+      scopeFilterFor(target, rule),
+    );
     try {
       await evaluateSpendForTarget({
         target: { ...target, spend },

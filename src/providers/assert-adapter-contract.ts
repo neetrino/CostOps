@@ -18,11 +18,17 @@ function requireUrl(label: string, value: string): void {
 }
 
 /**
- * Every adapter must ship rotate-token UX metadata. Fail closed if the create URL is missing.
+ * API adapters must ship rotate-token UX metadata. Fixed adapters skip credential URLs.
  */
 export function assertAdapterContract(adapter: CostProviderAdapter): void {
   if (!adapter.providerKey.trim()) {
     throw new Error('Adapter missing providerKey');
+  }
+  if (typeof adapter.credentials.isAuthFailure !== 'function') {
+    throw new Error(`Adapter ${adapter.providerKey} missing isAuthFailure`);
+  }
+  if (adapter.requiresCredentials === false) {
+    return;
   }
   requireUrl('credentialCreateUrl', adapter.credentials.credentialCreateUrl);
   requireUrl('credentialDocsUrl', adapter.credentials.credentialDocsUrl);
@@ -31,8 +37,5 @@ export function assertAdapterContract(adapter: CostProviderAdapter): void {
   }
   if (adapter.credentials.envVarNames.length === 0) {
     throw new Error(`Adapter ${adapter.providerKey} missing envVarNames`);
-  }
-  if (typeof adapter.credentials.isAuthFailure !== 'function') {
-    throw new Error(`Adapter ${adapter.providerKey} missing isAuthFailure`);
   }
 }

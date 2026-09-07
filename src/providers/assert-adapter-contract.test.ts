@@ -35,6 +35,30 @@ describe('adapter contract', () => {
     expect(() => assertAdapterContract(adapter)).not.toThrow();
   });
 
+  it('registers Hetzner as a fixed adapter without credentials', () => {
+    const adapter = getAdapter('HETZNER');
+    expect(adapter.providerKey).toBe('HETZNER');
+    expect(adapter.requiresCredentials).toBe(false);
+    expect(adapter.supportsIntraday).toBe(false);
+    expect(adapter.credentials.envVarNames).toEqual([]);
+    expect(() => assertAdapterContract(adapter)).not.toThrow();
+  });
+
+  it('allows missing credential URLs when requiresCredentials is false', () => {
+    expect(() =>
+      assertAdapterContract({
+        ...neonAdapter,
+        requiresCredentials: false,
+        credentials: {
+          ...neonAdapter.credentials,
+          credentialCreateUrl: '',
+          credentialDocsUrl: '',
+          envVarNames: [],
+        },
+      }),
+    ).not.toThrow();
+  });
+
   it('fails when credentialCreateUrl is missing', () => {
     const broken: CostProviderAdapter = {
       ...neonAdapter,

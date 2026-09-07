@@ -53,7 +53,7 @@ export async function assignResourceToProject(input: {
   }
 }
 
-async function findOrCreateProjectProvider(
+export async function findOrCreateProjectProvider(
   projectId: string,
   providerKey: ProviderKey,
 ): Promise<{ id: string }> {

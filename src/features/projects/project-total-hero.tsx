@@ -2,6 +2,7 @@
 
 import { BudgetInlineField } from '@/features/projects/budget-inline-field';
 import type { ProjectDetailResponse } from '@/features/projects/types';
+import { isFixedVpsProvider, providerUiLabel } from '@/shared/provider-label';
 import { CostViewDisplay } from '@/shared/ui/cost-view-display';
 
 type ProjectTotalHeroProps = {
@@ -43,7 +44,9 @@ export function ProjectTotalHero({ slug, detail, onBudgetSaved }: ProjectTotalHe
                 key={provider.projectProviderId}
                 className="flex flex-wrap items-center justify-between gap-3 px-4 py-3"
               >
-                <p className="font-medium text-[var(--ink)]">{provider.providerKey}</p>
+                <p className="font-medium text-[var(--ink)]">
+                  {providerUiLabel(provider.providerKey)}
+                </p>
                 <div className="flex flex-wrap items-center gap-4">
                   <span className="text-xs">
                     Period <CostViewDisplay cost={provider.period} size="sm" />
@@ -51,11 +54,15 @@ export function ProjectTotalHero({ slug, detail, onBudgetSaved }: ProjectTotalHe
                   <span className="text-xs">
                     Today <CostViewDisplay cost={provider.today} size="sm" />
                   </span>
-                  <BudgetInlineField
-                    savePath={`/api/project-providers/${provider.projectProviderId}/budget`}
-                    budget={provider.budget}
-                    onSaved={onBudgetSaved}
-                  />
+                  {isFixedVpsProvider(provider.providerKey) ? (
+                    <span className="text-[10px] text-[var(--muted)]">No daily alert</span>
+                  ) : (
+                    <BudgetInlineField
+                      savePath={`/api/project-providers/${provider.projectProviderId}/budget`}
+                      budget={provider.budget}
+                      onSaved={onBudgetSaved}
+                    />
+                  )}
                 </div>
               </li>
             ))

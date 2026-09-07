@@ -1,26 +1,14 @@
 'use client';
 
 import type { CostView } from '@/core/cost/types';
+import { providerUiLabel } from '@/shared/provider-label';
+import { compareProviderNavOrder } from '@/shared/registered-providers';
 import { CostViewDisplay } from '@/shared/ui/cost-view-display';
 
 type KpiStripProps = {
-  total: CostView;
   byProvider: Array<{ providerKey: string; displayName: string; cost: CostView }>;
   loading: boolean;
 };
-
-function periodCostLabel(sourceType: CostView['sourceType']): string {
-  if (sourceType === 'API') {
-    return 'Usage cost';
-  }
-  if (sourceType === 'FIXED') {
-    return 'Fixed cost';
-  }
-  if (sourceType === 'MANUAL') {
-    return 'Manual cost';
-  }
-  return 'Estimated cost';
-}
 
 function periodCostHint(sourceType: CostView['sourceType'], providerKey?: string): string {
   if (providerKey === 'VERCEL') {
@@ -29,10 +17,13 @@ function periodCostHint(sourceType: CostView['sourceType'], providerKey?: string
   if (sourceType === 'API') {
     return 'API usage · period total';
   }
+  if (sourceType === 'FIXED') {
+    return 'Fixed cost · period total';
+  }
   return 'Approximate · period total';
 }
 
-export function KpiStrip({ total, byProvider, loading }: KpiStripProps) {
+export function KpiStrip({ byProvider, loading }: KpiStripProps) {
   if (loading) {
     return (
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -46,24 +37,19 @@ export function KpiStrip({ total, byProvider, loading }: KpiStripProps) {
     );
   }
 
-  const tiles: Array<{ label: string; cost: CostView; providerKey?: string }> = [
-    { label: periodCostLabel(total.sourceType), cost: total },
-    ...byProvider.slice(0, 3).map((row) => ({
-      label: row.displayName,
-      cost: row.cost,
-      providerKey: row.providerKey,
-    })),
-  ];
+  const tiles = [...byProvider].sort((left, right) =>
+    compareProviderNavOrder(left.providerKey, right.providerKey),
+  );
 
   return (
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
       {tiles.map((tile) => (
         <div
-          key={tile.label}
+          key={tile.providerKey}
           className="rounded-[var(--radius)] border border-[var(--line)] bg-[var(--paper)] px-4 py-4 shadow-[var(--shadow-card)]"
         >
           <p className="text-[11px] font-semibold tracking-wide text-[var(--muted)] uppercase">
-            {tile.label}
+            {providerUiLabel(tile.providerKey) || tile.displayName}
           </p>
           <div className="mt-2">
             <CostViewDisplay cost={tile.cost} size="md" />

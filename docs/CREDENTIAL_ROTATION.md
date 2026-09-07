@@ -84,7 +84,7 @@ Calendar `EXPIRING_30D` / `EXPIRING_7D` / `EXPIRED` kinds remain in the schema b
 
 ## Adapter contract (mandatory for every provider)
 
-Each adapter exports credential UX metadata. Adding Upstash/GCP/Hetzner **requires** these fields — do not ship an adapter without a rotate link.
+Each API adapter exports credential UX metadata. Adding Upstash/GCP **requires** these fields — do not ship an API adapter without a rotate link. FIXED Hetzner/VPS uses `requiresCredentials: false` and has no token.
 
 ```ts
 export type ProviderCredentialMeta = {
@@ -110,6 +110,7 @@ export type ProviderCredentialMeta = {
 | Vercel | [vercel.com/account/tokens](https://vercel.com/account/tokens) (Personal Account → Tokens) | [Access tokens](https://vercel.com/docs/accounts/access-tokens) | No stored date; notify on 401/403 |
 | Upstash | [console.upstash.com/account/api](https://console.upstash.com/account/api) (Account → Management API) | [Developer API](https://upstash.com/docs/devops/developer-api/authentication) | No auto-expiry; notify on 401 |
 | GCP | [IAM service accounts](https://console.cloud.google.com/iam-admin/serviceaccounts) + billing account | Cloud Billing export / BigQuery | Operator stores key file path in `GOOGLE_APPLICATION_CREDENTIALS` |
+| Hetzner / VPS | — | Fixed monthly lines | No token |
 
 Vercel Team ID: team **Settings → General**. Not a secret, but keep next to the token in Settings.
 
