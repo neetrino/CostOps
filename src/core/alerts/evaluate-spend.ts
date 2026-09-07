@@ -27,8 +27,7 @@ async function loadProjectProviderTargets(lastSyncAt: Date): Promise<SpendAlertT
       projectProviderId: link.id,
       providerKey: link.providerKey,
     });
-    const stored = await prisma.budgetRule.findUnique({ where: { id: rule.id } });
-    if (!stored?.enabled) {
+    if (!rule.enabled) {
       continue;
     }
     targets.push({
@@ -123,8 +122,15 @@ export async function evaluateSpendAlertsForDay(input: {
   });
 
   const allTargets = [...projectTargets, ...optionalTargets];
+  if (allTargets.length === 0) {
+    return;
+  }
+  const rules = await prisma.budgetRule.findMany({
+    where: { id: { in: allTargets.map((target) => target.budgetRuleId) } },
+  });
+  const ruleById = new Map(rules.map((rule) => [rule.id, rule]));
   for (const target of allTargets) {
-    const rule = await prisma.budgetRule.findUnique({ where: { id: target.budgetRuleId } });
+    const rule = ruleById.get(target.budgetRuleId);
     if (!rule) {
       continue;
     }

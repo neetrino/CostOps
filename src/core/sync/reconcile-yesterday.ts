@@ -1,6 +1,7 @@
 import { findEnabledProviderAccounts } from '@/core/sync/find-accounts';
 import { ensureRegisteredAccountsFromEnv } from '@/core/sync/ensure-accounts';
-import { runAccountSync, type AccountSyncResult } from '@/core/sync/run-account-sync';
+import type { AccountSyncResult } from '@/core/sync/run-account-sync';
+import { runAccountSyncBatch } from '@/core/sync/run-sync-batch';
 import { getYesterdayUtc } from '@/shared/dates';
 
 /**
@@ -10,16 +11,10 @@ export async function reconcileYesterday(now: Date = new Date()): Promise<Accoun
   await ensureRegisteredAccountsFromEnv();
   const yesterday = getYesterdayUtc(now);
   const accounts = await findEnabledProviderAccounts();
-  const results: AccountSyncResult[] = [];
-  for (const account of accounts) {
-    results.push(
-      await runAccountSync({
-        accountId: account.id,
-        range: { from: yesterday, to: yesterday },
-        mode: 'reconcile',
-        now,
-      }),
-    );
-  }
-  return results;
+  return runAccountSyncBatch({
+    accountIds: accounts.map((account) => account.id),
+    range: { from: yesterday, to: yesterday },
+    mode: 'reconcile',
+    now,
+  });
 }

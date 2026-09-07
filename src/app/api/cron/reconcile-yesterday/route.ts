@@ -7,7 +7,7 @@ import { logger } from '@/shared/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 /** Vercel/Next segment config must be a literal (same as CRON_MAX_DURATION_SECONDS). */
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 export async function GET(request: Request): Promise<NextResponse> {
   const auth = requireCronSecret(request);

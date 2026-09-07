@@ -42,6 +42,10 @@ const UNALLOCATED_PROJECT: VercelProjectRef = {
 
 let cachedLoad: { key: string; value: VercelDayLoad } | null = null;
 let cachedBillingCycle: { key: string; value: VercelBillingCycle | null } | null = null;
+let cachedProjects: {
+  key: string;
+  value: Awaited<ReturnType<typeof listAllVercelProjects>>;
+} | null = null;
 
 function cacheKey(accountId: string, range: DateRange, now: Date): string {
   return `${accountId}:${utcDayKey(range.from)}:${utcDayKey(range.to)}:${now.toISOString()}`;
@@ -60,12 +64,25 @@ function retryUnlessAuth(error: unknown): boolean {
   return !isVercelAuthFailure(error);
 }
 
-export async function listVercelResources(ctx: ProviderContext): Promise<ResourceSyncResult> {
-  const creds = resolveVercelCredentials(ctx.account.credentialRef);
-  const projects = await withBackoff(
+async function listProjectsCached(
+  ctx: ProviderContext,
+  creds: ReturnType<typeof resolveVercelCredentials>,
+): Promise<Awaited<ReturnType<typeof listAllVercelProjects>>> {
+  const key = `${ctx.account.id}:${ctx.now.toISOString()}`;
+  if (cachedProjects?.key === key) {
+    return cachedProjects.value;
+  }
+  const value = await withBackoff(
     () => listAllVercelProjects({ token: creds.token, teamId: creds.teamId }),
     { label: 'vercel.listProjects', shouldRetry: retryUnlessAuth },
   );
+  cachedProjects = { key, value };
+  return value;
+}
+
+export async function listVercelResources(ctx: ProviderContext): Promise<ResourceSyncResult> {
+  const creds = resolveVercelCredentials(ctx.account.credentialRef);
+  const projects = await listProjectsCached(ctx, creds);
   return {
     discovered: [
       ...projects.map((project) => ({
@@ -95,10 +112,7 @@ export async function loadVercelDay(
   }
   const creds = resolveVercelCredentials(ctx.account.credentialRef);
   const [listed, billingCycle] = await Promise.all([
-    withBackoff(() => listAllVercelProjects({ token: creds.token, teamId: creds.teamId }), {
-      label: 'vercel.listProjects',
-      shouldRetry: retryUnlessAuth,
-    }),
+    listProjectsCached(ctx, creds),
     loadBillingCycle(ctx, creds),
   ]);
   const projects: VercelProjectRef[] = [
