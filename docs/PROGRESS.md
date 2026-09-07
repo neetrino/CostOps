@@ -1,8 +1,8 @@
 # Progress — Neetrino CostOps
 
-**Phase.** 1 — dashboard UI complete; Neon history hose ready (dry-run default)  
-**Overall.** 86% (foundation + sync/alerts + dashboard + history copy script)  
-**Updated.** 2026-09-05
+**Phase.** 1 local + CI; Phase 2 Vercel adapter in progress  
+**Overall.** 86% (foundation + sync/alerts + dashboard + history script; live copy blocked on old-DB password)  
+**Updated.** 2026-09-07
 
 ---
 
@@ -60,14 +60,24 @@
 
 ## In progress
 
-- [ ] Dry-run against a real `OLD_NEON_PROJECT_DATABASE_URL` (correct key; not yet set)
+- [ ] Live Neon history dry-run/`--apply` (old DB password rejected; key is correct)
+- [ ] Phase 2 Vercel adapter
 
 ---
 
 ## Next
 
-1. Set `OLD_NEON_PROJECT_DATABASE_URL` (correct name) and review a dry-run
-2. Preview deploy + 7-day Neon parity
+1. Fresh old-Neon Connect URL, then `pnpm migrate:from-neon` → `--apply`
+2. Operator deploys CostOps when ready (no preview wait)
+
+---
+
+## Notes
+
+### 2026-09-07 — CI on main
+
+- GitHub ruleset `main` requires the **Quality checks** job (Prisma validate, format, lint, typecheck, test, build).
+- `next build` was failing: `maxDuration` must be a numeric literal, not `CRON_MAX_DURATION_SECONDS`.
 
 ---
 
