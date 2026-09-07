@@ -21,6 +21,12 @@ type MetricAccumulator = {
   serviceName: string;
 };
 
+const VERCEL_NON_USAGE_SERVICES = new Set(['Pro', 'Additional Team Seats']);
+
+export function isVercelUsageCharge(charge: VercelFocusCharge): boolean {
+  return !VERCEL_NON_USAGE_SERVICES.has(charge.ServiceName);
+}
+
 export function chargeProjectExternalId(charge: VercelFocusCharge): string {
   const projectId = charge.Tags.ProjectId?.trim();
   return projectId && projectId.length > 0 ? projectId : VERCEL_UNALLOCATED_EXTERNAL_ID;
@@ -39,6 +45,12 @@ export function vercelChargesToCosts(input: {
 }): NormalizedCost[] {
   const totals = new Map<string, CostAccumulator>();
   for (const charge of input.charges) {
+    // EffectiveCost already represents credit consumption plus overage. Adding
+    // the Pro/seat subscription accrual would count the same included credit a
+    // second time and would not match Vercel's Usage total.
+    if (!isVercelUsageCharge(charge)) {
+      continue;
+    }
     const externalId = chargeProjectExternalId(charge);
     const current = totals.get(externalId) ?? { billedUsd: 0, effectiveUsd: 0, chargeCount: 0 };
     current.billedUsd += charge.BilledCost;

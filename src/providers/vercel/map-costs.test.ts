@@ -3,6 +3,7 @@ import { VERCEL_UNALLOCATED_EXTERNAL_ID } from '@/config/constants';
 import {
   chargeProjectExternalId,
   chargesForUtcDay,
+  isVercelUsageCharge,
   placeholderVercelCosts,
   vercelChargesToCosts,
   vercelChargesToMetrics,
@@ -38,7 +39,7 @@ describe('vercel charge mapping', () => {
       charges: [
         charge({ BilledCost: 1.25, EffectiveCost: 1.3 }),
         charge({ BilledCost: 0.75, EffectiveCost: 0.8 }),
-        charge({ BilledCost: 2, EffectiveCost: 2, Tags: {}, ServiceName: 'Pro' }),
+        charge({ BilledCost: 2, EffectiveCost: 2, Tags: {}, ServiceName: 'Team usage' }),
       ],
       projects: [
         { externalId: 'prj_a', displayName: 'alpha' },
@@ -55,6 +56,21 @@ describe('vercel charge mapping', () => {
     expect(byId.prj_b?.costUsd).toBe(0);
     expect(byId.prj_b?.sourceStatus).toBe('fresh');
     expect(byId[VERCEL_UNALLOCATED_EXTERNAL_ID]?.costUsd).toBe(2);
+  });
+
+  it('does not double-count subscriptions already represented by included usage credit', () => {
+    expect(isVercelUsageCharge(charge({ ServiceName: 'Pro', Tags: {} }))).toBe(false);
+    expect(isVercelUsageCharge(charge({ ServiceName: 'Additional Team Seats', Tags: {} }))).toBe(
+      false,
+    );
+
+    const costs = vercelChargesToCosts({
+      charges: [charge({ BilledCost: 0.67, EffectiveCost: 0.67, ServiceName: 'Pro', Tags: {} })],
+      projects: [{ externalId: VERCEL_UNALLOCATED_EXTERNAL_ID, displayName: 'Team' }],
+      bucketDate: bucket,
+      isPartial: false,
+    });
+    expect(costs[0]?.costUsd).toBe(0);
   });
 
   it('keeps included-credit usage when invoice BilledCost is 0', () => {

@@ -92,7 +92,7 @@ Management API Basic auth (`UPSTASH_EMAIL` + `UPSTASH_API_KEY`). GET only. Respo
 | Endpoint | Status | Notes |
 |----------|--------|-------|
 | `GET /v2/redis/databases` | 200 | Array. 22 DBs observed (`database_id` / `database_name`). `type` is `paid`; `database_type` is `Pay as You Go`. `state` includes `archived`. Extra `read_only_rest_token` stripped. |
-| `GET /v2/redis/stats/{id}` | 200 | `dailybilling` / `dailyrequests` (~5 recent UTC days). `total_monthly_billing` is month-to-date and is **not** allocated onto missing days. |
+| `GET /v2/redis/stats/{id}?period=7d` | 200 | Seven recent UTC days. Live 2026-09-07 sum: `$0.422` vs `total_monthly_billing` `$0.423`; default five-point response undercounted the dashboard. |
 | `GET /v2/qstash/users` | 200 | Two regional users (eu-central-1, us-east-1). `token` / `read_only_token` stripped. |
 | `GET /v2/qstash/stats/{id}` | 200 | Default (no `period`) returns calendar-month `daily_billings`. `?period=30d` is **400** — unused. |
 | `GET /v2/vector/index` | 200 | Empty list. Adapter still lists when indexes appear. |
@@ -104,7 +104,7 @@ Discrepancies vs docs:
 - OpenAPI Redis `type` enum (`free`/`payg`/…) vs live `type: paid` + `database_type: Pay as You Go`.
 - OpenAPI QStash `period=30d` vs live 400.
 - Vector/Search stats expose `monthly_cost` only — daily CostOps rows stay `missing` until a daily USD series exists.
-- Redis `dailybilling` window is shorter than the month; days not in the series are `missing`, not `$0`.
+- Redis `dailybilling` uses the widest accepted window (`period=7d`); `30d` returns 400. Days outside the series are `missing`, not `$0`. Daily sync preserves days before they age out.
 
 `supportsIntraday: true`. `supportsBackfill: true` (QStash month; Redis only the observed window).
 
@@ -199,7 +199,7 @@ Discrepancies vs docs:
 - Charge periods are **America/Los_Angeles** midnight (`2026-09-04T07:00:00.000Z` PDT). A naive UTC midnight window returns the **previous** Pacific day. Adapter requests the Pacific day for CostOps UTC date D.
 - Current Pacific/incomplete day is `404 costs_not_found` — written as `missing`, not `$0`, and does **not** fail the SyncRun. Billing `403` would be `error` costs (token can still list projects). `401`/`403` on `/v10/projects` still trip credential AUTH_FAILED.
 - `supportsIntraday: false`. `supportsBackfill: true`.
-- Team-level charges (empty Tags: Pro, seats, some $0 SKUs) land on resource `_unallocated`.
+- Team-level usage charges with empty Tags land on resource `_unallocated`. Pro and seat subscription accruals are excluded because `EffectiveCost` already counts the included credit they fund; adding both would double-count usage.
 - Listed projects with no charges on a **200** day get API `$0` `fresh` (the API returned a complete charge set).
 - No ESTIMATED formula. `costUsd` is FOCUS **EffectiveCost** (usage, including included credit). `BilledCost` is metadata only.
 
