@@ -73,10 +73,10 @@ export function VpsAddProject({ onAdded }: VpsAddProjectProps) {
   };
 
   return (
-    <div className="rounded-[var(--radius)] border border-[var(--line)] bg-[var(--paper)] px-4 py-3">
+    <section className="overflow-visible rounded-[var(--radius)] border border-[var(--line-strong)] bg-[var(--paper-raised)] shadow-[var(--shadow-card)]">
       {open ? (
         <form
-          className="grid gap-3 lg:grid-cols-[minmax(16rem,2fr)_8rem_9rem_auto] lg:items-end"
+          className="grid gap-4 p-4 sm:p-5 lg:grid-cols-[minmax(16rem,2fr)_8rem_9rem_auto] lg:items-end"
           onSubmit={(event) => {
             event.preventDefault();
             void submit();
@@ -96,7 +96,7 @@ export function VpsAddProject({ onAdded }: VpsAddProjectProps) {
               step="0.01"
               value={amount}
               onChange={(event) => setAmount(event.target.value)}
-              className="mt-1 w-full rounded-[var(--radius-sm)] border border-[var(--line-strong)] bg-[var(--paper)] px-3 py-2 text-sm text-[var(--ink)]"
+              className="field-control money mt-1.5 text-sm"
               required
             />
           </label>
@@ -106,12 +106,12 @@ export function VpsAddProject({ onAdded }: VpsAddProjectProps) {
               type="month"
               value={month}
               onChange={(event) => setMonth(event.target.value)}
-              className="mt-1 w-full rounded-[var(--radius-sm)] border border-[var(--line-strong)] bg-[var(--paper)] px-3 py-2 text-sm text-[var(--ink)]"
+              className="field-control mt-1.5 text-sm"
               required
             />
           </label>
-          <div className="flex gap-2">
-            <Button type="submit" disabled={saving || loading}>
+          <div className="grid grid-cols-2 gap-2 lg:flex">
+            <Button type="submit" className="w-full" disabled={saving || loading}>
               Save
             </Button>
             <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
@@ -121,16 +121,19 @@ export function VpsAddProject({ onAdded }: VpsAddProjectProps) {
           {error ? <p className="text-xs text-[var(--danger)] lg:col-span-4">{error}</p> : null}
         </form>
       ) : (
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-xs text-[var(--muted)]">
-            Add or edit static monthly fees here. Amount changes apply to this month and later —
-            past months stay as booked. No Telegram alerts.
-          </p>
+        <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+          <div>
+            <p className="eyebrow">Fixed infrastructure</p>
+            <p className="mt-1 max-w-3xl text-xs leading-relaxed text-[var(--muted)]">
+              Add or edit static monthly fees here. Amount changes apply to this month and later —
+              past months stay as booked. No Telegram alerts.
+            </p>
+          </div>
           <Button variant="secondary" className="text-xs" onClick={() => void openForm()}>
             Add project
           </Button>
         </div>
       )}
-    </div>
+    </section>
   );
 }

@@ -9,6 +9,7 @@ import type { BudgetView } from '@/features/projects/types';
 import { useCallback, useMemo, useState } from 'react';
 import { fetchJson } from '@/features/dashboard/api-client';
 import { Button } from '@/shared/ui/button';
+import { MobileSheet } from '@/shared/ui/mobile-sheet';
 
 type BudgetInlineFieldProps = {
   savePath: string;
@@ -52,39 +53,95 @@ export function BudgetInlineField({ savePath, budget, onSaved }: BudgetInlineFie
     return escalationStepUsd(limitParsed.limitUsd, pctParsed.pct);
   }, [limit, pct]);
 
-  const save = useCallback(async () => {
-    setError(null);
-    const limitParsed = parseLimit(limit);
-    if (!limitParsed.ok) {
-      setError(limitParsed.error);
-      return;
-    }
-    const pctParsed = parsePct(pct);
-    if (!pctParsed.ok) {
-      setError(pctParsed.error);
-      return;
-    }
-    setSaving(true);
-    try {
-      await fetchJson(savePath, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          limitUsd: limitParsed.limitUsd,
-          escalationPercent: pctParsed.pct,
-        }),
-      });
-      onSaved();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Save failed');
-    } finally {
-      setSaving(false);
-    }
-  }, [limit, onSaved, pct, savePath]);
+  const save = useCallback(
+    async (afterSave?: () => void) => {
+      setError(null);
+      const limitParsed = parseLimit(limit);
+      if (!limitParsed.ok) {
+        setError(limitParsed.error);
+        return;
+      }
+      const pctParsed = parsePct(pct);
+      if (!pctParsed.ok) {
+        setError(pctParsed.error);
+        return;
+      }
+      setSaving(true);
+      try {
+        await fetchJson(savePath, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            limitUsd: limitParsed.limitUsd,
+            escalationPercent: pctParsed.pct,
+          }),
+        });
+        onSaved();
+        afterSave?.();
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Save failed');
+      } finally {
+        setSaving(false);
+      }
+    },
+    [limit, onSaved, pct, savePath],
+  );
 
   return (
     <div className="flex flex-col items-end gap-1">
-      <div className="flex flex-wrap items-center justify-end gap-1">
+      <MobileSheet
+        title="Daily budget"
+        description="Limit and Telegram escalation step"
+        triggerClassName="inline-flex min-h-11 items-center rounded-[var(--radius-sm)] border border-[var(--line-strong)] bg-[var(--paper-raised)] px-3 text-xs font-semibold text-[var(--ink)] sm:hidden"
+        trigger={
+          <span className="money">
+            ${limit} <span className="text-[var(--muted)]">· +{pct}%</span>
+          </span>
+        }
+      >
+        {(close) => (
+          <div className="space-y-5 p-5">
+            <div className="grid grid-cols-2 gap-3">
+              <label className="text-xs font-medium text-[var(--muted)]">
+                Daily limit · USD
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  value={limit}
+                  onChange={(event) => setLimit(event.target.value)}
+                  className="field-control money mt-1.5 text-base"
+                />
+              </label>
+              <label className="text-xs font-medium text-[var(--muted)]">
+                Escalation · %
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  value={pct}
+                  onChange={(event) => setPct(event.target.value)}
+                  className="field-control money mt-1.5 text-base"
+                />
+              </label>
+            </div>
+            {step !== null ? (
+              <div className="rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--sunken)] p-3 text-sm text-[var(--muted)]">
+                Telegram escalates every{' '}
+                <span className="money font-semibold text-[var(--ink)]">${step.toFixed(2)}</span>{' '}
+                above the limit.
+              </div>
+            ) : null}
+            {error ? (
+              <p className="text-sm text-[var(--danger)]" role="alert">
+                {error}
+              </p>
+            ) : null}
+            <Button className="w-full" disabled={saving} onClick={() => void save(close)}>
+              {saving ? 'Saving budget…' : 'Save budget'}
+            </Button>
+          </div>
+        )}
+      </MobileSheet>
+      <div className="hidden flex-wrap items-center justify-end gap-1.5 sm:flex">
         <span className="text-[10px] text-[var(--muted)]">$</span>
         <input
           type="text"
@@ -92,7 +149,7 @@ export function BudgetInlineField({ savePath, budget, onSaved }: BudgetInlineFie
           aria-label="Daily limit USD"
           value={limit}
           onChange={(event) => setLimit(event.target.value)}
-          className="w-16 rounded-[var(--radius-sm)] border border-[var(--line-strong)] bg-[var(--paper)] px-1.5 py-0.5 text-right font-[family-name:var(--font-mono)] text-xs"
+          className="money h-8 w-[4.5rem] rounded-[var(--radius-xs)] border border-[var(--line-strong)] bg-[var(--paper-raised)] px-2 text-right text-xs"
         />
         <span className="text-[10px] text-[var(--muted)]">%</span>
         <input
@@ -101,11 +158,11 @@ export function BudgetInlineField({ savePath, budget, onSaved }: BudgetInlineFie
           aria-label="Escalation percent"
           value={pct}
           onChange={(event) => setPct(event.target.value)}
-          className="w-12 rounded-[var(--radius-sm)] border border-[var(--line-strong)] bg-[var(--paper)] px-1 py-0.5 text-right font-[family-name:var(--font-mono)] text-xs"
+          className="money h-8 w-14 rounded-[var(--radius-xs)] border border-[var(--line-strong)] bg-[var(--paper-raised)] px-2 text-right text-xs"
         />
         <Button
           variant="secondary"
-          className="px-2 py-0.5 text-[10px] uppercase"
+          className="min-h-8 px-2.5 py-1 text-[10px] uppercase"
           disabled={saving}
           onClick={() => void save()}
         >
@@ -113,10 +170,12 @@ export function BudgetInlineField({ savePath, budget, onSaved }: BudgetInlineFie
         </Button>
       </div>
       {error ? (
-        <p className="max-w-[14rem] text-right text-[10px] text-[var(--danger)]">{error}</p>
+        <p className="hidden max-w-[14rem] text-right text-[10px] text-[var(--danger)] sm:block">
+          {error}
+        </p>
       ) : null}
       {step !== null ? (
-        <p className="text-[10px] text-[var(--muted)]">
+        <p className="hidden text-[10px] text-[var(--muted)] sm:block">
           +{pct}% ≈ ${step.toFixed(2)} step
         </p>
       ) : null}

@@ -17,3 +17,12 @@ export const CHART_COLORS = [
 export function chartColor(index: number): string {
   return CHART_COLORS[index % CHART_COLORS.length] ?? CHART_COLORS[0];
 }
+
+/** Keeps an entity's color stable when ranking or filters change. */
+export function chartColorForKey(key: string): string {
+  let hash = 0;
+  for (let index = 0; index < key.length; index += 1) {
+    hash = (hash * 31 + key.charCodeAt(index)) >>> 0;
+  }
+  return chartColor(hash);
+}

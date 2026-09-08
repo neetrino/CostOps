@@ -10,8 +10,8 @@ type CostViewDisplayProps = {
 
 const SIZE_CLASS: Record<NonNullable<CostViewDisplayProps['size']>, string> = {
   sm: 'text-sm font-semibold',
-  md: 'text-lg font-semibold',
-  lg: 'text-3xl font-semibold tracking-tight',
+  md: 'text-xl font-semibold',
+  lg: 'text-[clamp(1.8rem,4vw,2.65rem)] font-semibold leading-none tracking-[-0.055em]',
 };
 
 function missingLabel(status: CostView['sourceStatus']): string {
@@ -29,9 +29,7 @@ export function CostViewDisplay({ cost, size = 'md', showFreshness = true }: Cos
     cost.costUsd === null ? (
       <span className="text-[var(--muted)]">{missingLabel(cost.sourceStatus)}</span>
     ) : (
-      <span className="font-[family-name:var(--font-mono)] tabular-nums text-[var(--ink)]">
-        {formatUsd(cost.costUsd)}
-      </span>
+      <span className="money text-[var(--ink)]">{formatUsd(cost.costUsd)}</span>
     );
 
   return (

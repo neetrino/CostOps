@@ -5,6 +5,9 @@ import type { ProviderProjectRow } from '@/features/providers/load-provider-deta
 import { VpsLineEdit } from '@/features/providers/vps-line-edit';
 import { BudgetInlineField } from '@/features/projects/budget-inline-field';
 import { CostViewDisplay } from '@/shared/ui/cost-view-display';
+import { AppIcon } from '@/shared/ui/app-icon';
+import { BudgetMeter } from '@/shared/ui/budget-meter';
+import { motion } from 'motion/react';
 
 type ProviderProjectCardsProps = {
   projects: ProviderProjectRow[];
@@ -21,11 +24,12 @@ export function ProviderProjectCards({
     return null;
   }
   return (
-    <ul className="grid list-none gap-5 sm:grid-cols-2 2xl:grid-cols-3">
-      {projects.map((project) => (
+    <ul className="grid list-none gap-4 md:grid-cols-2 2xl:grid-cols-3">
+      {projects.map((project, index) => (
         <ProviderProjectCard
           key={project.projectProviderId}
           project={project}
+          index={index}
           hideDailyLimit={hideDailyLimit}
           onBudgetSaved={onBudgetSaved}
         />
@@ -36,10 +40,12 @@ export function ProviderProjectCards({
 
 function ProviderProjectCard({
   project,
+  index,
   hideDailyLimit,
   onBudgetSaved,
 }: {
   project: ProviderProjectRow;
+  index: number;
   hideDailyLimit: boolean;
   onBudgetSaved: () => void;
 }) {
@@ -49,23 +55,46 @@ function ProviderProjectCard({
     project.today.costUsd >= project.budget.limitUsd;
 
   return (
-    <li
-      className={`flex flex-col overflow-hidden rounded-[var(--radius)] border bg-[var(--paper)] shadow-[var(--shadow-card)] ${
-        overLimit ? 'border-[var(--danger)] bg-[var(--danger-soft)]' : 'border-[var(--line)]'
+    <motion.li
+      layout="position"
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.22, delay: Math.min(index, 8) * 0.025 }}
+      whileHover={{ y: -3 }}
+      className={`group flex flex-col overflow-hidden rounded-[var(--radius)] border bg-[var(--paper-raised)] shadow-[var(--shadow-card)] ${
+        overLimit ? 'border-[var(--danger)]' : 'border-[var(--line-strong)]'
       }`}
     >
-      <div className="border-b border-[var(--line)] bg-[var(--sidebar)] px-4 py-3.5">
-        <Link
-          href={`/projects/${project.slug}`}
-          className="block truncate text-lg font-semibold text-[var(--ink)] transition hover:text-[var(--accent)]"
-          title={project.name}
-        >
-          {project.name}
-        </Link>
-        <p className="mt-1 font-[family-name:var(--font-mono)] text-[11px] text-[var(--muted)]">
-          {project.slug}
-          {project.archived ? ' · Archived' : ''}
-        </p>
+      <div
+        className={`border-b px-4 py-4 ${
+          overLimit
+            ? 'border-[var(--danger)]/20 bg-[var(--danger-soft)]'
+            : 'border-[var(--line)] bg-[var(--sunken)]'
+        }`}
+      >
+        <div className="flex items-center gap-3">
+          <span className="money flex size-8 shrink-0 items-center justify-center rounded-lg border border-[var(--line)] bg-[var(--paper-raised)] text-[10px] text-[var(--muted)]">
+            {String(index + 1).padStart(2, '0')}
+          </span>
+          <div className="min-w-0 flex-1">
+            <Link
+              href={`/projects/${project.slug}`}
+              className="block min-h-11 content-center truncate text-lg font-semibold text-[var(--ink)] transition-colors hover:text-[var(--accent)]"
+              title={project.name}
+            >
+              {project.name}
+            </Link>
+            <p className="money -mt-1 truncate text-[10px] text-[var(--muted)]">
+              {project.slug}
+              {project.archived ? ' · Archived' : ''}
+            </p>
+          </div>
+          <AppIcon
+            name="arrow"
+            size={18}
+            className="text-[var(--faint)] transition-transform group-hover:translate-x-0.5"
+          />
+        </div>
       </div>
       <div className="flex flex-1 flex-col gap-4 p-4">
         <div className="grid grid-cols-2 gap-3">
@@ -74,12 +103,23 @@ function ProviderProjectCard({
         </div>
         {hideDailyLimit ? (
           <div className="mt-auto space-y-3 border-t border-[var(--line)] pt-3">
+            <p className="eyebrow">Monthly hosting</p>
             {project.vpsLines.length === 0 ? (
-              <p className="text-xs text-[var(--muted)]">No active VPS line.</p>
+              <p className="rounded-[var(--radius-sm)] bg-[var(--sunken)] px-3 py-3 text-xs text-[var(--muted)]">
+                No active VPS line.
+              </p>
             ) : (
               project.vpsLines.map((line) => (
-                <div key={line.id} className="space-y-1">
-                  <p className="text-xs font-medium text-[var(--ink)]">{line.displayName}</p>
+                <div
+                  key={line.id}
+                  className="space-y-2 rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--sunken)] p-3"
+                >
+                  <p
+                    className="truncate text-xs font-semibold text-[var(--ink)]"
+                    title={line.displayName}
+                  >
+                    {line.displayName}
+                  </p>
                   <VpsLineEdit
                     resourceId={line.id}
                     monthlyAmountUsd={line.monthlyAmountUsd}
@@ -90,26 +130,33 @@ function ProviderProjectCard({
             )}
           </div>
         ) : (
-          <div className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-[var(--line)] pt-3">
-            <span className="text-xs font-medium text-[var(--muted)]">Daily limit</span>
-            <BudgetInlineField
-              savePath={`/api/project-providers/${project.projectProviderId}/budget`}
-              budget={project.budget}
-              onSaved={onBudgetSaved}
-            />
+          <div className="mt-auto space-y-3 border-t border-[var(--line)] pt-3">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-xs font-medium text-[var(--muted)]">Daily budget</span>
+              <BudgetInlineField
+                savePath={`/api/project-providers/${project.projectProviderId}/budget`}
+                budget={project.budget}
+                onSaved={onBudgetSaved}
+              />
+            </div>
+            {project.budget?.enabled ? (
+              <BudgetMeter
+                spendUsd={project.today.costUsd}
+                limitUsd={project.budget.limitUsd}
+                compact
+              />
+            ) : null}
           </div>
         )}
       </div>
-    </li>
+    </motion.li>
   );
 }
 
 function Metric({ label, cost }: { label: string; cost: ProviderProjectRow['period'] }) {
   return (
-    <div className="rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--canvas)] px-3 py-2.5">
-      <p className="text-[10px] font-semibold tracking-wide text-[var(--muted)] uppercase">
-        {label}
-      </p>
+    <div className="rounded-[var(--radius-sm)] bg-[var(--sunken)] px-3 py-3">
+      <p className="eyebrow">{label}</p>
       <div className="mt-1">
         <CostViewDisplay cost={cost} size="sm" />
       </div>

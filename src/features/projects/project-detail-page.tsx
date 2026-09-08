@@ -195,7 +195,13 @@ function ProjectDetailContent() {
           />
           <ProviderStackChart points={seriesData?.points ?? []} providerKeys={providerKeys} />
           <section className="space-y-4">
-            <h2 className="text-sm font-semibold text-[var(--ink)]">Resources</h2>
+            <div className="flex items-center gap-3 border-b border-[var(--line-strong)] pb-3">
+              <h2 className="wordmark text-2xl text-[var(--ink)]">Resources</h2>
+              <span className="money rounded-full bg-[var(--sunken)] px-2 py-1 text-[10px] text-[var(--muted)]">
+                {detail.providers.reduce((count, provider) => count + provider.resources.length, 0)}{' '}
+                linked
+              </span>
+            </div>
             {detail.providers.length === 0 ? (
               <EmptyPanel title="No provider links" detail="Map resources or run sync." />
             ) : (
@@ -232,22 +238,29 @@ function ProjectDetailHeader({
   onArchive: () => void;
 }) {
   return (
-    <header className="flex flex-wrap items-start justify-between gap-4">
-      <div className="min-w-0 flex-1">
-        <p className="text-xs text-[var(--muted)]">
-          <Link href="/" className="hover:text-[var(--accent)]">
-            Projects
-          </Link>
-          {' · '}
-          {detail.range.from} → {detail.range.to}
-        </p>
+    <header className="surface-ledger overflow-hidden">
+      <div className="p-5 sm:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="eyebrow">
+            <Link href="/" className="hover:text-[var(--accent)]">
+              Projects
+            </Link>
+            {' · '}
+            {detail.range.from} → {detail.range.to}
+          </p>
+          {!detail.project.archived ? (
+            <Button variant="secondary" className="text-xs" onClick={onArchive}>
+              Archive
+            </Button>
+          ) : null}
+        </div>
         {editingName ? (
-          <div className="mt-2 flex flex-wrap items-center gap-2">
+          <div className="mt-6 flex flex-wrap items-center gap-2">
             <input
               type="text"
               value={nameDraft}
               onChange={(event) => onNameDraft(event.target.value)}
-              className="rounded-[var(--radius-sm)] border border-[var(--line-strong)] bg-[var(--paper)] px-3 py-2 text-xl font-semibold"
+              className="field-control max-w-xl text-xl font-semibold"
               aria-label="Project name"
             />
             <Button variant="secondary" disabled={savingName} onClick={onSaveName}>
@@ -258,8 +271,10 @@ function ProjectDetailHeader({
             </Button>
           </div>
         ) : (
-          <div className="mt-1 flex flex-wrap items-center gap-3">
-            <h1 className="wordmark text-3xl text-[var(--ink)]">{detail.project.name}</h1>
+          <div className="mt-6 flex flex-wrap items-end gap-3">
+            <h1 className="wordmark min-w-0 text-4xl leading-none text-[var(--ink)] sm:text-5xl">
+              {detail.project.name}
+            </h1>
             {!detail.project.archived ? (
               <Button variant="ghost" className="text-xs" onClick={onStartEdit}>
                 Rename
@@ -267,16 +282,15 @@ function ProjectDetailHeader({
             ) : null}
           </div>
         )}
-        <p className="mt-1 font-[family-name:var(--font-mono)] text-xs text-[var(--muted)]">
+        <p className="money mt-2 text-xs text-[var(--muted)]">
           {detail.project.slug}
           {detail.project.archived ? ' · Archived' : ''}
         </p>
       </div>
-      {!detail.project.archived ? (
-        <Button variant="secondary" className="text-xs" onClick={onArchive}>
-          Archive
-        </Button>
-      ) : null}
+      <div className="flex items-center gap-3 border-t border-[var(--line)] bg-[var(--sunken)] px-5 py-3 text-xs text-[var(--muted)]">
+        <span className="size-2 rounded-full bg-[var(--ok)]" />
+        Mapped provider costs only · missing days remain gaps
+      </div>
     </header>
   );
 }

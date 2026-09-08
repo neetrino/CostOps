@@ -15,12 +15,11 @@ import type { CompareBarDatum } from '@/features/projects/chart-data';
 import { formatChartUsd } from '@/features/projects/chart-data';
 import { formatChartAxisUsd, formatChartBarLabel } from '@/features/projects/chart-format';
 import { ChartPanel } from '@/features/projects/chart-panel';
-import { chartColor } from '@/shared/ui/chart-colors';
+import { chartColorForKey } from '@/shared/ui/chart-colors';
 import { EmptyPanel } from '@/shared/ui/state-panels';
 
-const BAR_SLOT_PX = 88;
-const CHART_HEIGHT_PX = 400;
-const CHART_MIN_WIDTH_PX = 520;
+const BAR_SLOT_PX = 46;
+const CHART_MIN_HEIGHT_PX = 300;
 const GRID = 'var(--chart-grid)';
 const AXIS = 'var(--chart-axis)';
 
@@ -41,38 +40,40 @@ export function ProjectCompareChart({
     return <EmptyPanel title={emptyTitle} detail="Costs may be missing in this range." />;
   }
 
-  const innerWidth = Math.max(CHART_MIN_WIDTH_PX, data.length * BAR_SLOT_PX);
+  const innerHeight = Math.max(CHART_MIN_HEIGHT_PX, data.length * BAR_SLOT_PX + 44);
 
   return (
     <ChartPanel title={title} subtitle={`${subtitle} · ${data.length} with cost`}>
-      <div className="overflow-x-auto pb-1">
-        <div style={{ width: innerWidth, minWidth: '100%', height: CHART_HEIGHT_PX }}>
+      <div className="max-h-[44rem] overflow-y-auto pr-1">
+        <div style={{ width: '100%', height: innerHeight }}>
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data} margin={{ top: 28, right: 12, left: 4, bottom: 48 }}>
-              <CartesianGrid stroke={GRID} vertical={false} />
+            <BarChart
+              data={data}
+              layout="vertical"
+              margin={{ top: 8, right: 54, left: 8, bottom: 16 }}
+            >
+              <CartesianGrid stroke={GRID} horizontal={false} />
               <XAxis
-                dataKey="label"
+                type="number"
                 tick={{ fill: 'var(--muted)', fontSize: 10 }}
                 axisLine={{ stroke: AXIS }}
                 tickLine={false}
-                interval={0}
-                angle={-32}
-                textAnchor="end"
-                height={52}
-              />
-              <YAxis
-                tick={{ fill: 'var(--muted)', fontSize: 11 }}
-                axisLine={false}
-                tickLine={false}
-                width={48}
                 tickFormatter={formatChartAxisUsd}
                 label={{
                   value: 'USD',
-                  angle: -90,
-                  position: 'insideLeft',
+                  position: 'insideBottomRight',
+                  offset: -8,
                   fill: 'var(--muted)',
-                  fontSize: 11,
+                  fontSize: 10,
                 }}
+              />
+              <YAxis
+                type="category"
+                dataKey="label"
+                tick={{ fill: 'var(--muted)', fontSize: 11 }}
+                axisLine={false}
+                tickLine={false}
+                width={112}
               />
               <Tooltip
                 cursor={{ fill: 'rgba(28, 25, 23, 0.04)' }}
@@ -84,7 +85,7 @@ export function ProjectCompareChart({
                   return (
                     <div className="rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--paper)] px-3 py-2 text-xs shadow-[var(--shadow-card)]">
                       <p className="font-semibold text-[var(--ink)]">{row.fullName}</p>
-                      <p className="mt-1 font-[family-name:var(--font-mono)] tabular-nums">
+                      <p className="money mt-1">
                         {row.costUsd === null ? '—' : formatChartUsd(row.costUsd)}
                       </p>
                     </div>
@@ -93,16 +94,17 @@ export function ProjectCompareChart({
               />
               <Bar
                 dataKey="costUsd"
-                radius={[6, 6, 0, 0]}
-                maxBarSize={BAR_SLOT_PX - 18}
-                isAnimationActive={false}
+                radius={[0, 6, 6, 0]}
+                maxBarSize={20}
+                isAnimationActive
+                animationDuration={420}
               >
-                {data.map((row, index) => (
-                  <Cell key={row.projectId} fill={chartColor(index)} />
+                {data.map((row) => (
+                  <Cell key={row.projectId} fill={chartColorForKey(row.projectId)} />
                 ))}
                 <LabelList
                   dataKey="costUsd"
-                  position="top"
+                  position="right"
                   fill="var(--muted)"
                   fontSize={10}
                   formatter={(value) =>

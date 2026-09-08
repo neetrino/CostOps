@@ -67,7 +67,7 @@ export function VpsLineEdit({ resourceId, monthlyAmountUsd, onChanged }: VpsLine
           value={amount}
           onChange={(event) => setAmount(event.target.value)}
           aria-label="Monthly VPS amount"
-          className="w-24 rounded-[var(--radius-sm)] border border-[var(--line-strong)] bg-[var(--paper)] px-2 py-1 text-xs"
+          className="field-control money w-28 text-xs"
         />
         <Button
           variant="secondary"

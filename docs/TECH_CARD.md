@@ -30,14 +30,14 @@
 |---|-----------|----------|--------|-------|
 | 2.1 | Framework | Next.js 16.x (App Router) | ✅ | Port Neon 15 UI |
 | 2.2 | Styles | Tailwind CSS 4.x | ✅ | |
-| 2.3 | UI kit | Custom (Neon dashboard) | ✅ | Every screen designed per `docs/DESIGN.md` |
+| 2.3 | UI kit | Custom (Neon dashboard) + React Aria behavior primitives | ✅ | Every screen designed per `docs/DESIGN.md`; React Aria supplies accessible interaction behavior, never the visual language |
 | 2.4 | State | URL + local prefs + React state | ✅ | |
 | 2.5 | Forms | Server Actions + Zod | ✅ | |
 | 2.6 | Data fetching | Server Components + Route Handlers | ✅ | |
 | 2.7 | i18n | not needed | ➖ | |
 | 2.8 | SEO | not needed | ➖ | |
 | 2.9 | Dark theme | Follow Neon dashboard | ✅ | |
-| 2.10 | Animations | CSS transitions | ✅ | |
+| 2.10 | Animations | CSS transitions + selective Motion | ✅ | Motion only for purposeful layout/sheet transitions; respect reduced motion |
 | 2.11 | PWA | not needed | ➖ | |
 
 ---

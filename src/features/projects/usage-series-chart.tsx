@@ -15,11 +15,10 @@ import { buildUsageSeriesModel, formatChartUsd } from '@/features/projects/chart
 import { formatChartAxisUsd } from '@/features/projects/chart-format';
 import { ChartPanel } from '@/features/projects/chart-panel';
 import { UsageSeriesLegend } from '@/features/projects/usage-series-legend';
-import { chartColor } from '@/shared/ui/chart-colors';
+import { chartColorForKey } from '@/shared/ui/chart-colors';
 import { Button } from '@/shared/ui/button';
 import { EmptyPanel } from '@/shared/ui/state-panels';
 
-const CHART_HEIGHT_PX = 380;
 const LINE_DIM = 0.2;
 const LINE_NORMAL = 0.95;
 
@@ -59,7 +58,7 @@ export function UsageSeriesChart({ points, projectNames, visibleIds }: UsageSeri
       }
     >
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_20rem]">
-        <div className="h-[300px] w-full sm:h-[380px]" style={{ minHeight: CHART_HEIGHT_PX }}>
+        <div className="h-[280px] min-h-[280px] w-full sm:h-[380px] sm:min-h-[380px]">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartRows} margin={{ top: 12, right: 16, left: 4, bottom: 4 }}>
               <CartesianGrid stroke="var(--chart-grid)" vertical={false} />
@@ -81,7 +80,7 @@ export function UsageSeriesChart({ points, projectNames, visibleIds }: UsageSeri
                   renderSeriesTooltip(Boolean(active), label, payload as unknown, series)
                 }
               />
-              {series.map((item, index) => {
+              {series.map((item) => {
                 const isFocused = focusedId === item.projectId;
                 const isDimmed = Boolean(focusedId) && !isFocused;
                 return (
@@ -90,12 +89,13 @@ export function UsageSeriesChart({ points, projectNames, visibleIds }: UsageSeri
                     type="monotone"
                     dataKey={item.projectId}
                     name={item.name}
-                    stroke={chartColor(index)}
+                    stroke={chartColorForKey(item.projectId)}
                     strokeWidth={isFocused ? 3.5 : 2}
                     strokeOpacity={isDimmed ? LINE_DIM : LINE_NORMAL}
                     dot={false}
                     connectNulls={false}
-                    isAnimationActive={false}
+                    isAnimationActive
+                    animationDuration={420}
                     activeDot={{ r: 5, strokeWidth: 2, stroke: 'var(--paper)' }}
                     onMouseEnter={() => setHoveredId(item.projectId)}
                     onMouseLeave={() => setHoveredId(null)}
@@ -146,7 +146,7 @@ function renderSeriesTooltip(
     valueById.set(entry.dataKey, entry.value);
   }
   return (
-    <div className="w-[18rem] rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--paper)] p-3 text-xs shadow-[var(--shadow-card)]">
+    <div className="w-[min(18rem,calc(100vw-3rem))] rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--paper-raised)] p-3 text-xs shadow-[var(--shadow-popover)]">
       <p className="font-semibold text-[var(--ink)]">{label}</p>
       <p className="mt-0.5 text-[11px] text-[var(--muted)]">Same rank as the legend</p>
       <ul className="mt-2 max-h-[16rem] space-y-1 overflow-y-auto">
@@ -155,7 +155,7 @@ function renderSeriesTooltip(
           return (
             <li key={item.projectId} className="flex justify-between gap-3">
               <span className="truncate text-[var(--muted)]">{item.name}</span>
-              <span className="shrink-0 font-[family-name:var(--font-mono)] tabular-nums">
+              <span className="money shrink-0">
                 {value === undefined ? '—' : formatChartUsd(value)}
               </span>
             </li>

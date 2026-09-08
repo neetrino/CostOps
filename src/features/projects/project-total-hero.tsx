@@ -14,17 +14,17 @@ type ProjectTotalHeroProps = {
 export function ProjectTotalHero({ slug, detail, onBudgetSaved }: ProjectTotalHeroProps) {
   return (
     <section className="space-y-4">
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid overflow-hidden rounded-[var(--radius)] border border-[var(--line-strong)] bg-[var(--paper-raised)] shadow-[var(--shadow-card)] sm:grid-cols-2">
         <HeroMetric label="Total today" cost={detail.today} accent />
         <HeroMetric label="Total period" cost={detail.period} />
       </div>
-      <article className="overflow-hidden rounded-[var(--radius)] border border-[var(--line)] bg-[var(--paper)] shadow-[var(--shadow-card)]">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--line)] bg-[var(--sidebar)] px-4 py-3">
+      <article className="overflow-hidden rounded-[var(--radius)] border border-[var(--line-strong)] bg-[var(--paper-raised)] shadow-[var(--shadow-card)]">
+        <div className="flex flex-col gap-4 border-b border-[var(--line)] bg-[var(--sunken)] px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-[10px] font-semibold tracking-wide text-[var(--muted)] uppercase">
-              Project total
-            </p>
-            <h2 className="text-sm font-semibold text-[var(--ink)]">Mapped providers only</h2>
+            <p className="eyebrow">Project budget</p>
+            <h2 className="mt-1 text-base font-semibold text-[var(--ink)]">
+              Mapped providers only
+            </h2>
             <p className="mt-1 text-xs text-[var(--muted)]">
               Unmapped spend stays on the provider board — not inside this total.
             </p>
@@ -42,17 +42,19 @@ export function ProjectTotalHero({ slug, detail, onBudgetSaved }: ProjectTotalHe
             detail.providers.map((provider) => (
               <li
                 key={provider.projectProviderId}
-                className="flex flex-wrap items-center justify-between gap-3 px-4 py-3"
+                className="grid gap-3 px-4 py-4 sm:grid-cols-[minmax(8rem,1fr)_auto] sm:items-center"
               >
                 <p className="font-medium text-[var(--ink)]">
                   {providerUiLabel(provider.providerKey)}
                 </p>
-                <div className="flex flex-wrap items-center gap-4">
-                  <span className="text-xs">
-                    Period <CostViewDisplay cost={provider.period} size="sm" />
+                <div className="grid grid-cols-2 items-center gap-3 sm:flex sm:flex-wrap sm:gap-4">
+                  <span className="text-xs text-[var(--muted)]">
+                    <span className="block text-[10px]">Period</span>
+                    <CostViewDisplay cost={provider.period} size="sm" />
                   </span>
-                  <span className="text-xs">
-                    Today <CostViewDisplay cost={provider.today} size="sm" />
+                  <span className="text-xs text-[var(--muted)]">
+                    <span className="block text-[10px]">Today</span>
+                    <CostViewDisplay cost={provider.today} size="sm" />
                   </span>
                   {isFixedVpsProvider(provider.providerKey) ? (
                     <span className="text-[10px] text-[var(--muted)]">No daily alert</span>
@@ -67,7 +69,7 @@ export function ProjectTotalHero({ slug, detail, onBudgetSaved }: ProjectTotalHe
               </li>
             ))
           )}
-          <li className="flex flex-wrap items-center justify-between gap-3 bg-[var(--accent-soft)] px-4 py-3">
+          <li className="flex flex-wrap items-center justify-between gap-3 bg-[var(--accent-soft)] px-4 py-4">
             <p className="font-semibold text-[var(--ink)]">Total</p>
             <div className="flex flex-wrap gap-4 text-xs">
               <span>
@@ -95,14 +97,10 @@ function HeroMetric({
 }) {
   return (
     <div
-      className={`rounded-[var(--radius)] border px-5 py-4 shadow-[var(--shadow-card)] ${
-        accent
-          ? 'border-[var(--accent-soft)] bg-[var(--accent-soft)]'
-          : 'border-[var(--line)] bg-[var(--paper)]'
-      }`}
+      className={`min-h-36 border-b border-[var(--line)] px-5 py-5 last:border-b-0 sm:border-r sm:border-b-0 sm:last:border-r-0 ${accent ? 'bg-[var(--inverse)] text-[var(--inverse-ink)]' : ''}`}
     >
-      <p className="text-xs font-medium text-[var(--muted)]">{label}</p>
-      <div className="mt-2">
+      <p className={`eyebrow ${accent ? '!text-[color:rgba(247,246,241,.58)]' : ''}`}>{label}</p>
+      <div className={`mt-7 ${accent ? '[&_*]:!text-[var(--inverse-ink)]' : ''}`}>
         <CostViewDisplay cost={cost} size="lg" />
       </div>
     </div>

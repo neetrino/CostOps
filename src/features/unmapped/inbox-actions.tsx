@@ -2,6 +2,7 @@
 
 import { ProjectPicker } from '@/features/unmapped/project-picker';
 import type { InboxProjectOption, InboxResourceRow } from '@/features/unmapped/types';
+import { AppIcon } from '@/shared/ui/app-icon';
 import { Button } from '@/shared/ui/button';
 
 export function InboxActions({
@@ -40,27 +41,36 @@ export function InboxActions({
     />
   );
   if (!onSaveAsProject) {
-    return (
-      <div className="mt-4 flex flex-wrap items-end gap-2 border-t border-[var(--line)] pt-4">
-        {archive}
-      </div>
-    );
+    return <div className="grid gap-2 sm:flex sm:justify-end">{archive}</div>;
   }
   return (
-    <div className="mt-4 flex flex-wrap items-end gap-2 border-t border-[var(--line)] pt-4">
+    <div className="grid gap-3 lg:grid-cols-[minmax(16rem,1fr)_auto] lg:items-end">
       <ProjectPicker
         projects={projects}
         value={projectId}
         suggestedProjectId={resource.suggestion?.projectId ?? null}
         onChange={onProjectId}
       />
-      <Button variant="secondary" disabled={saving || !projectId} onClick={onMap}>
-        {saving ? 'Saving…' : 'Map'}
-      </Button>
-      <Button variant="secondary" disabled={saving} onClick={onSaveAsProject}>
-        {saving ? 'Saving…' : 'Save as project'}
-      </Button>
-      {archive}
+      <div className="grid grid-cols-2 gap-2 sm:flex sm:justify-end">
+        <Button
+          className="w-full sm:w-auto"
+          variant="primary"
+          disabled={saving || !projectId}
+          onClick={onMap}
+        >
+          <AppIcon name="check" size={16} />
+          {saving ? 'Saving…' : 'Map resource'}
+        </Button>
+        <Button
+          className="w-full sm:w-auto"
+          variant="secondary"
+          disabled={saving}
+          onClick={onSaveAsProject}
+        >
+          {saving ? 'Saving…' : 'New project'}
+        </Button>
+        {archive}
+      </div>
     </div>
   );
 }
@@ -82,19 +92,36 @@ function ArchiveButtons({
 }) {
   if (confirmArchive) {
     return (
-      <>
-        <Button variant="ghost" disabled={saving} onClick={onCancelArchive}>
+      <div className="col-span-2 grid grid-cols-2 gap-2 sm:flex">
+        <Button
+          className="w-full sm:w-auto"
+          variant="ghost"
+          disabled={saving}
+          onClick={onCancelArchive}
+        >
           Cancel
         </Button>
-        <Button variant="secondary" disabled={saving} onClick={onConfirmArchive}>
+        <Button
+          className="w-full sm:w-auto"
+          variant="secondary"
+          disabled={saving}
+          onClick={onConfirmArchive}
+        >
           Confirm archive
         </Button>
-      </>
+      </div>
     );
   }
   return (
-    <Button variant={leftover ? 'secondary' : 'ghost'} disabled={saving} onClick={onAskArchive}>
-      {leftover ? 'Archive leftover' : 'Archive'}
-    </Button>
+    <div className="col-span-2 sm:col-span-1">
+      <Button
+        className="w-full sm:w-auto"
+        variant={leftover ? 'secondary' : 'ghost'}
+        disabled={saving}
+        onClick={onAskArchive}
+      >
+        {leftover ? 'Archive leftover' : 'Archive'}
+      </Button>
+    </div>
   );
 }
