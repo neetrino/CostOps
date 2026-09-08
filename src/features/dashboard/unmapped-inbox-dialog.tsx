@@ -1,8 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useRef } from 'react';
+import { Dialog, Heading, Modal, ModalOverlay } from 'react-aria-components';
+import { motion } from 'motion/react';
 import type { InboxStatusPreview } from '@/features/unmapped/types';
+import { AppIcon } from '@/shared/ui/app-icon';
 import { Button } from '@/shared/ui/button';
 
 export function UnmappedInboxDialog({
@@ -14,95 +16,101 @@ export function UnmappedInboxDialog({
   preview: InboxStatusPreview[];
   onDismiss: () => void;
 }) {
-  const closeRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    closeRef.current?.focus();
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        onDismiss();
-      }
-    };
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.body.style.overflow = previous;
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [onDismiss]);
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <button
-        type="button"
-        className="absolute inset-0 bg-[var(--ink)]/45"
-        aria-label="Dismiss inbox reminder"
-        onClick={onDismiss}
-      />
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="unmapped-inbox-title"
-        className="relative z-10 flex max-h-[90vh] w-full max-w-lg flex-col rounded-[var(--radius)] border border-[var(--line-strong)] bg-[var(--paper)] p-6 shadow-[var(--shadow-card)]"
-      >
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-[10px] font-semibold tracking-[0.18em] text-[var(--muted)] uppercase">
-              Inbox
-            </p>
-            <h2 id="unmapped-inbox-title" className="wordmark mt-1 text-2xl text-[var(--ink)]">
-              Unmapped resources
-            </h2>
-          </div>
-          <button
-            ref={closeRef}
-            type="button"
-            onClick={onDismiss}
-            className="rounded-[var(--radius-sm)] px-2 py-1 text-sm font-semibold text-[var(--muted)] hover:bg-[var(--canvas)] hover:text-[var(--ink)]"
-            aria-label="Close"
-          >
-            ×
-          </button>
-        </div>
-        <p className="mt-3 text-sm text-[var(--muted)]">
-          {count} {count === 1 ? 'item needs' : 'items need'} a decision. Map to an existing
-          project, Save as project for a single-provider app, or Archive leftovers.
-        </p>
-        <ul className="mt-4 max-h-[40vh] space-y-2 overflow-auto">
-          {preview.map((row) => (
-            <li
-              key={row.id}
-              className="rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--canvas)] px-3 py-2"
+    <ModalOverlay
+      isOpen
+      isDismissable
+      onOpenChange={(open) => {
+        if (!open) onDismiss();
+      }}
+      className="fixed inset-0 z-[70] flex items-end justify-center bg-[var(--ink)]/55 p-0 sm:items-center sm:p-4"
+    >
+      <Modal className="max-h-[90dvh] w-full overflow-hidden rounded-t-[1.25rem] border border-[var(--line-strong)] bg-[var(--paper)] shadow-[var(--shadow-popover)] sm:max-w-lg sm:rounded-[var(--radius)]">
+        <Dialog className="outline-none">
+          {({ close }) => (
+            <motion.div
+              initial={{ y: 24, opacity: 0.9 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}
+              className="flex max-h-[90dvh] flex-col"
             >
-              <p className="text-sm font-medium text-[var(--ink)]">{row.displayName}</p>
-              <p className="mt-0.5 text-xs text-[var(--muted)]">
-                {row.providerKey}
-                {row.suggestion
-                  ? ` · suggested ${row.suggestion.projectName}`
-                  : ' · no confident match'}
-              </p>
-            </li>
-          ))}
-          {count > preview.length ? (
-            <li className="text-xs text-[var(--muted)]">
-              +{count - preview.length} more in the inbox
-            </li>
-          ) : null}
-        </ul>
-        <div className="mt-6 flex flex-wrap items-center justify-end gap-2">
-          <Button variant="ghost" onClick={onDismiss}>
-            Not now
-          </Button>
-          <Link
-            href="/unmapped"
-            onClick={onDismiss}
-            className="inline-flex items-center justify-center rounded-[var(--radius-sm)] border border-transparent bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-[var(--accent-ink)] hover:opacity-90"
-          >
-            Open Unmapped
-          </Link>
-        </div>
-      </div>
-    </div>
+              <div className="mx-auto mt-2 h-1 w-10 rounded-full bg-[var(--line-strong)] sm:hidden" />
+              <header className="flex items-start justify-between gap-4 border-b border-[var(--line)] px-5 py-5 sm:px-6">
+                <div className="flex min-w-0 gap-3">
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--warning-soft)] text-[var(--warning)]">
+                    <AppIcon name="inbox" size={20} />
+                  </span>
+                  <div>
+                    <p className="eyebrow">Decision needed</p>
+                    <Heading slot="title" className="wordmark mt-1 text-2xl text-[var(--ink)]">
+                      {count} unmapped {count === 1 ? 'resource' : 'resources'}
+                    </Heading>
+                  </div>
+                </div>
+                <Button
+                  autoFocus
+                  variant="ghost"
+                  className="size-11 shrink-0 rounded-full p-0"
+                  aria-label="Close unmapped resources reminder"
+                  onClick={close}
+                >
+                  <AppIcon name="close" />
+                </Button>
+              </header>
+              <div className="overflow-y-auto px-5 py-4 sm:px-6">
+                <p className="text-sm leading-6 text-[var(--muted)]">
+                  Assign each resource to a project, keep a standalone app as its own project, or
+                  archive a team-level charge. Cost history is preserved.
+                </p>
+                <ul className="mt-4 space-y-2">
+                  {preview.map((row) => (
+                    <li
+                      key={row.id}
+                      className="flex items-start gap-3 rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--sunken)] px-3 py-3"
+                    >
+                      <span
+                        className="mt-1 size-2 shrink-0 rounded-full bg-[var(--warning)]"
+                        aria-hidden
+                      />
+                      <div className="min-w-0">
+                        <p
+                          className="truncate text-sm font-semibold text-[var(--ink)]"
+                          title={row.displayName}
+                        >
+                          {row.displayName}
+                        </p>
+                        <p className="mt-1 text-xs text-[var(--muted)]">
+                          {row.providerKey}
+                          {row.suggestion
+                            ? ` · Suggested ${row.suggestion.projectName}`
+                            : ' · No confident match'}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                  {count > preview.length ? (
+                    <li className="px-3 py-2 text-xs font-medium text-[var(--muted)]">
+                      +{count - preview.length} more waiting in the inbox
+                    </li>
+                  ) : null}
+                </ul>
+              </div>
+              <footer className="grid grid-cols-2 gap-2 border-t border-[var(--line)] bg-[var(--sunken)] px-5 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6 sm:pb-4">
+                <Button variant="ghost" className="w-full" onClick={close}>
+                  Later
+                </Button>
+                <Link
+                  href="/unmapped"
+                  onClick={onDismiss}
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-sm)] bg-[var(--accent)] px-3 text-sm font-semibold text-[var(--accent-ink)] transition-colors hover:bg-[var(--accent-hover)] sm:min-h-10"
+                >
+                  Review inbox <AppIcon name="arrow" size={16} />
+                </Link>
+              </footer>
+            </motion.div>
+          )}
+        </Dialog>
+      </Modal>
+    </ModalOverlay>
   );
 }

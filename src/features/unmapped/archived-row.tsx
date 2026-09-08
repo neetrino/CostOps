@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { fetchJson } from '@/features/dashboard/api-client';
 import { ResourceMeta } from '@/features/unmapped/resource-meta';
 import type { InboxResourceRow } from '@/features/unmapped/types';
+import { AppIcon } from '@/shared/ui/app-icon';
 import { Button } from '@/shared/ui/button';
 
 export function ArchivedRow({
@@ -34,18 +35,32 @@ export function ArchivedRow({
   };
 
   return (
-    <li className="rounded-[var(--radius)] border border-[var(--line)] bg-[var(--paper)] p-4 shadow-[var(--shadow-card)]">
-      <ResourceMeta
-        resource={resource}
-        extra={resource.archivedAt ? `Archived ${resource.archivedAt.slice(0, 10)}` : 'Archived'}
-      />
-      <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-[var(--line)] pt-4">
-        <Button variant="secondary" disabled={saving} onClick={() => void restore()}>
+    <li className="surface-panel overflow-hidden opacity-90 transition-opacity hover:opacity-100">
+      <div className="p-4 sm:p-5">
+        <ResourceMeta
+          resource={resource}
+          extra={resource.archivedAt ? `Archived ${resource.archivedAt.slice(0, 10)}` : 'Archived'}
+        />
+      </div>
+      <div className="grid gap-2 border-t border-[var(--line)] bg-[var(--sunken)] p-4 sm:flex sm:items-center sm:justify-between sm:px-5">
+        <p className="text-xs leading-5 text-[var(--muted)]">
+          Returns to the decision inbox with history intact.
+        </p>
+        <Button
+          className="w-full sm:w-auto"
+          variant="secondary"
+          disabled={saving}
+          onClick={() => void restore()}
+        >
+          <AppIcon name="inbox" size={16} />
           {saving ? 'Restoring…' : 'Restore to inbox'}
         </Button>
-        <p className="text-xs text-[var(--muted)]">Returns to Unmapped. Mapping is unchanged.</p>
       </div>
-      {error ? <p className="mt-2 text-xs text-[var(--danger)]">{error}</p> : null}
+      {error ? (
+        <p className="px-4 pb-4 text-xs text-[var(--danger)] sm:px-5" role="alert">
+          {error}
+        </p>
+      ) : null}
     </li>
   );
 }

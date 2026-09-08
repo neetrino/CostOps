@@ -20,10 +20,8 @@ import {
 import { formatChartAxisUsd } from '@/features/projects/chart-format';
 import { ChartPanel } from '@/features/projects/chart-panel';
 import { providerUiLabel } from '@/shared/provider-label';
-import { chartColor } from '@/shared/ui/chart-colors';
+import { chartColorForKey } from '@/shared/ui/chart-colors';
 import { EmptyPanel } from '@/shared/ui/state-panels';
-
-const CHART_HEIGHT_PX = 380;
 
 type ProviderStackChartProps = {
   points: CostSeriesPoint[];
@@ -53,7 +51,7 @@ export function ProviderStackChart({ points, providerKeys }: ProviderStackChartP
       title="Cost over time"
       subtitle="Mapped providers stacked (USD). Missing series are omitted — not $0."
     >
-      <div style={{ height: CHART_HEIGHT_PX }}>
+      <div className="h-[280px] sm:h-[380px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={rows} margin={{ top: 8, right: 16, left: 4, bottom: 8 }}>
             <CartesianGrid stroke="var(--chart-grid)" vertical={false} />
@@ -82,7 +80,7 @@ export function ProviderStackChart({ points, providerKeys }: ProviderStackChartP
                       {payload.map((entry) => (
                         <li key={String(entry.dataKey)} className="flex justify-between gap-4">
                           <span className="text-[var(--muted)]">{entry.name}</span>
-                          <span className="font-[family-name:var(--font-mono)] tabular-nums">
+                          <span className="money">
                             {typeof entry.value === 'number' ? formatChartUsd(entry.value) : '—'}
                           </span>
                         </li>
@@ -96,15 +94,16 @@ export function ProviderStackChart({ points, providerKeys }: ProviderStackChartP
               wrapperStyle={{ fontSize: 11, paddingTop: 12 }}
               formatter={(value: string) => <span className="text-[var(--muted)]">{value}</span>}
             />
-            {keys.map((key, index) => (
+            {keys.map((key) => (
               <Bar
                 key={key}
                 dataKey={key}
                 name={providerUiLabel(key)}
                 stackId="providers"
-                fill={chartColor(index)}
+                fill={chartColorForKey(key)}
                 maxBarSize={36}
-                isAnimationActive={false}
+                isAnimationActive
+                animationDuration={420}
               />
             ))}
           </BarChart>

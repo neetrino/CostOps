@@ -17,9 +17,11 @@ import { ProjectCompareChart } from '@/features/projects/project-compare-chart';
 import { ProjectListView } from '@/features/projects/project-list-view';
 import { UsageSeriesChart } from '@/features/projects/usage-series-chart';
 import { sortByPeriodCostDesc } from '@/features/projects/sort-projects-by-cost';
-import { ViewToggle, type BoardViewMode } from '@/features/projects/view-toggle';
+import { ViewToggle } from '@/features/projects/view-toggle';
+import { useBoardViewMode } from '@/features/projects/use-board-view-mode';
 import type { ProjectListResponse } from '@/features/projects/types';
 import { CostViewDisplay } from '@/shared/ui/cost-view-display';
+import { SearchField } from '@/shared/ui/search-field';
 import { CardSkeleton, EmptyPanel, ErrorPanel } from '@/shared/ui/state-panels';
 
 type UsageTotalsResponse = {
@@ -46,7 +48,7 @@ function ProjectsContent() {
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [viewMode, setViewMode] = useState<BoardViewMode>('cards');
+  const [viewMode, setViewMode] = useBoardViewMode();
   useUnauthorizedRedirect(error);
 
   const load = useCallback(async () => {
@@ -156,30 +158,32 @@ function ProjectsContent() {
         />
       }
     >
-      <header className="flex flex-wrap items-end justify-between gap-4">
-        <div className="flex min-w-0 flex-wrap items-end gap-x-8 gap-y-3">
-          <div>
-            <h1 className="wordmark text-3xl text-[var(--ink)]">Projects</h1>
+      <header className="surface-ledger overflow-hidden">
+        <div className="grid md:grid-cols-[minmax(0,1fr)_minmax(17rem,34%)]">
+          <div className="flex min-h-36 flex-col justify-between p-5 sm:p-6">
+            <div className="flex items-center gap-3">
+              <span className="money text-xs text-[var(--accent)]">01 / COMMAND</span>
+              <span className="h-px flex-1 bg-[var(--line)]" />
+            </div>
+            <div className="mt-8">
+              <h1 className="wordmark text-4xl leading-none text-[var(--ink)] sm:text-5xl">
+                Projects
+              </h1>
+              <p className="mt-2 max-w-xl text-sm text-[var(--muted)]">
+                Spend intelligence across every product and infrastructure provider.
+              </p>
+            </div>
           </div>
-          <div>
-            <p className="text-[11px] font-semibold tracking-wide text-[var(--muted)] uppercase">
-              Period total
-            </p>
-            <div className="mt-1">
+          <div className="flex flex-col justify-between border-t border-[var(--line)] bg-[var(--inverse)] p-5 text-[var(--inverse-ink)] md:border-t-0 md:border-l">
+            <p className="eyebrow !text-[color:rgba(247,246,241,.58)]">Selected period</p>
+            <div className="mt-8 [&_*]:!text-[var(--inverse-ink)]">
               <CostViewDisplay cost={totalsData?.total ?? emptyCost()} size="lg" />
             </div>
           </div>
         </div>
-        <label className="min-w-[12rem] flex-1 text-xs font-medium text-[var(--muted)] sm:max-w-xs">
-          Search
-          <input
-            type="search"
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Filter by name…"
-            className="mt-1 w-full rounded-[var(--radius-sm)] border border-[var(--line-strong)] bg-[var(--paper)] px-3 py-2 text-sm text-[var(--ink)]"
-          />
-        </label>
+        <div className="border-t border-[var(--line)] bg-[var(--sunken)] p-3 sm:p-4">
+          <SearchField value={search} onChange={setSearch} placeholder="Search projects by name…" />
+        </div>
       </header>
 
       {error && !projectsData ? (
@@ -198,8 +202,8 @@ function ProjectsContent() {
             visibleIds={visibleIds}
           />
 
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm text-[var(--muted)]">
+          <div className="flex items-center justify-between gap-3 border-b border-[var(--line-strong)] pb-3">
+            <p className="eyebrow">
               {filteredProjects.length} project{filteredProjects.length === 1 ? '' : 's'}
             </p>
             <ViewToggle mode={viewMode} onChange={setViewMode} />

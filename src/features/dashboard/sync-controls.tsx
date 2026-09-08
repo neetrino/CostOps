@@ -4,13 +4,15 @@ import { useCallback, useEffect, useState } from 'react';
 import type { SyncStatusView } from '@/core/sync/load-status';
 import { fetchJson } from '@/features/dashboard/api-client';
 import { REGISTERED_PROVIDER_KEYS } from '@/shared/registered-providers';
+import { AppIcon } from '@/shared/ui/app-icon';
 import { Button } from '@/shared/ui/button';
 
 type SyncNowButtonProps = {
   onComplete?: () => void;
+  compact?: boolean;
 };
 
-export function SyncNowButton({ onComplete }: SyncNowButtonProps) {
+export function SyncNowButton({ onComplete, compact = false }: SyncNowButtonProps) {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,8 +46,22 @@ export function SyncNowButton({ onComplete }: SyncNowButtonProps) {
 
   return (
     <div className="flex flex-col items-end gap-1">
-      <Button variant="primary" onClick={() => void syncNow()} disabled={pending}>
-        {pending ? 'Syncing…' : 'Sync now'}
+      <Button
+        variant="primary"
+        className={compact ? 'size-11 rounded-full px-0' : ''}
+        onClick={() => void syncNow()}
+        disabled={pending}
+        aria-label={
+          compact ? (pending ? 'Syncing provider data' : 'Sync provider data now') : undefined
+        }
+      >
+        {compact ? (
+          <AppIcon name="sync" className={pending ? 'animate-spin' : ''} />
+        ) : pending ? (
+          'Syncing…'
+        ) : (
+          'Sync now'
+        )}
       </Button>
       {error ? (
         <p className="max-w-[12rem] text-right text-[10px] text-[var(--danger)]" role="alert">

@@ -35,55 +35,63 @@ export function UnmappedRow({
   };
 
   return (
-    <li className="rounded-[var(--radius)] border border-[var(--line)] bg-[var(--paper)] p-4 shadow-[var(--shadow-card)]">
-      <ResourceMeta resource={resource} />
-      <SuggestionHint resource={resource} />
-      <InboxActions
-        resource={resource}
-        projects={projects}
-        projectId={projectId}
-        saving={saving}
-        confirmArchive={confirmArchive}
-        onProjectId={setProjectId}
-        onMap={() => {
-          if (!projectId) {
-            return;
+    <li className="surface-ledger overflow-hidden">
+      <div className="p-4 sm:p-5">
+        <ResourceMeta resource={resource} />
+        <SuggestionHint resource={resource} />
+      </div>
+      <div className="border-t border-[var(--line)] bg-[var(--sunken)] p-4 sm:px-5">
+        <InboxActions
+          resource={resource}
+          projects={projects}
+          projectId={projectId}
+          saving={saving}
+          confirmArchive={confirmArchive}
+          onProjectId={setProjectId}
+          onMap={() => {
+            if (!projectId) {
+              return;
+            }
+            void run(async () => {
+              await fetchJson(`/api/resources/${resource.id}/mapping`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ projectId }),
+              });
+            });
+          }}
+          onSaveAsProject={
+            isUnallocatedResource(resource)
+              ? null
+              : () => {
+                  void run(async () => {
+                    await fetchJson(`/api/resources/${resource.id}/project`, { method: 'POST' });
+                  });
+                }
           }
-          void run(async () => {
-            await fetchJson(`/api/resources/${resource.id}/mapping`, {
-              method: 'PATCH',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ projectId }),
+          onAskArchive={() => setConfirmArchive(true)}
+          onCancelArchive={() => setConfirmArchive(false)}
+          onConfirmArchive={() => {
+            void run(async () => {
+              await fetchJson(`/api/resources/${resource.id}/archive`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ archived: true }),
+              });
             });
-          });
-        }}
-        onSaveAsProject={
-          isUnallocatedResource(resource)
-            ? null
-            : () => {
-                void run(async () => {
-                  await fetchJson(`/api/resources/${resource.id}/project`, { method: 'POST' });
-                });
-              }
-        }
-        onAskArchive={() => setConfirmArchive(true)}
-        onCancelArchive={() => setConfirmArchive(false)}
-        onConfirmArchive={() => {
-          void run(async () => {
-            await fetchJson(`/api/resources/${resource.id}/archive`, {
-              method: 'PATCH',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ archived: true }),
-            });
-          });
-        }}
-      />
-      {confirmArchive ? (
-        <p className="mt-2 text-xs text-[var(--muted)]">
-          Hides this row. History stays. Restore anytime from Archived.
-        </p>
-      ) : null}
-      {error ? <p className="mt-2 text-xs text-[var(--danger)]">{error}</p> : null}
+          }}
+        />
+        {confirmArchive ? (
+          <p className="mt-3 text-xs leading-5 text-[var(--muted)]">
+            Hides this row. History stays and the resource can be restored at any time.
+          </p>
+        ) : null}
+        {error ? (
+          <p className="mt-3 text-xs text-[var(--danger)]" role="alert">
+            {error}
+          </p>
+        ) : null}
+      </div>
     </li>
   );
 }
@@ -92,22 +100,21 @@ function SuggestionHint({ resource }: { resource: InboxResourceRow }) {
   if (resource.suggestion) {
     return (
       <p className="mt-3 text-xs text-[var(--warning)]">
-        Suggested: {resource.suggestion.projectName}. Confirm in the list — same names can exist
-        twice (check slug and Neon/Vercel/Upstash chips). A project does not need all three.
+        Suggested match: <span className="font-semibold">{resource.suggestion.projectName}</span>.
+        Confirm its slug and provider chips before mapping.
       </p>
     );
   }
   if (isUnallocatedResource(resource)) {
     return (
-      <p className="mt-3 text-xs text-[var(--muted)]">
-        Vercel team leftovers (seats, Pro, untagged charges) — not an app. Archive, do not save as a
-        project.
+      <p className="mt-3 text-xs leading-5 text-[var(--muted)]">
+        Team-level charge, not an application. Archive it if it should stay outside project totals.
       </p>
     );
   }
   return (
-    <p className="mt-3 text-xs text-[var(--muted)]">
-      No Neon/Upstash needed. Save as project creates a CostOps project with only this resource.
+    <p className="mt-3 text-xs leading-5 text-[var(--muted)]">
+      Standalone provider resource. Save as project to start a new single-provider CostOps project.
     </p>
   );
 }

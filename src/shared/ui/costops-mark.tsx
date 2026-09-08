@@ -9,8 +9,8 @@ const DOLLAR_S =
   'M20.5 11.15c0-1.8-1.95-3-4.5-3s-4.5 1.15-4.5 2.85c0 3.7 9 2.15 9 6.6 0 1.9-2.05 3.25-4.5 3.25s-4.55-1.25-4.55-3.05';
 
 /**
- * CostOps pictogram: spend-down arrow with a dollar mark.
- * Flat Flaticon geometry, Vercel-simple paths — no gradients.
+ * CostOps pictogram: a compact ledger tile with a spend-down signal.
+ * Uses the product tokens and remains legible at app-icon scale.
  */
 export function CostOpsMark({ size = 32, className }: CostOpsMarkProps) {
   return (
@@ -22,8 +22,16 @@ export function CostOpsMark({ size = 32, className }: CostOpsMarkProps) {
       aria-hidden="true"
       focusable="false"
     >
-      <path d={ARROW} fill="#4CAF50" />
-      <g fill="none" stroke="#fff" strokeWidth="2.35" strokeLinecap="round" strokeLinejoin="round">
+      <rect width="32" height="32" rx="9" fill="currentColor" />
+      <path d={ARROW} fill="var(--accent-mid)" transform="translate(4 4) scale(.75)" />
+      <g
+        fill="none"
+        stroke="var(--ink)"
+        strokeWidth="2.35"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        transform="translate(4 4) scale(.75)"
+      >
         <path d={DOLLAR_SPINE} />
         <path d={DOLLAR_S} />
       </g>

@@ -26,11 +26,12 @@ type FreshnessBadgeProps = {
 export function FreshnessBadge({ status, compact = false }: FreshnessBadgeProps) {
   return (
     <span
-      className={`inline-flex shrink-0 items-center rounded-[var(--radius-sm)] font-medium tracking-wide uppercase ${TONE[status]} ${
+      className={`inline-flex shrink-0 items-center gap-1.5 rounded-full font-semibold tracking-[0.08em] uppercase ${TONE[status]} ${
         compact ? 'px-1.5 py-0.5 text-[10px]' : 'px-2 py-0.5 text-[11px]'
       }`}
       title={`Data status: ${LABELS[status]}`}
     >
+      <span className="size-1.5 rounded-full bg-current opacity-70" aria-hidden="true" />
       {LABELS[status]}
     </span>
   );

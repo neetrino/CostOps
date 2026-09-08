@@ -13,6 +13,8 @@ import type {
 } from '@/features/unmapped/types';
 import { DashboardBoard } from '@/features/projects/dashboard-board';
 import { FilterRail } from '@/features/projects/filter-rail';
+import { AppIcon } from '@/shared/ui/app-icon';
+import { SearchField } from '@/shared/ui/search-field';
 import { CardSkeleton, EmptyPanel, ErrorPanel } from '@/shared/ui/state-panels';
 
 type InboxTab = InboxResourcesResponse['inbox'];
@@ -177,56 +179,84 @@ function InboxHeader({
   onSearch: (value: string) => void;
 }) {
   return (
-    <header className="flex flex-wrap items-end justify-between gap-4">
-      <div>
-        <h1 className="wordmark text-3xl text-[var(--ink)]">Unmapped</h1>
-        <p className="mt-1 text-sm text-[var(--muted)]">
-          Resources without a project · {rangeLabel}. Mapping is optional. A project can have only
-          Neon, only Vercel, or only Upstash.
-        </p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          <TabButton active={tab === 'open'} onClick={() => onTab('open')}>
-            Inbox {openCount}
-          </TabButton>
-          <TabButton active={tab === 'archived'} onClick={() => onTab('archived')}>
-            Archived {archivedCount}
-          </TabButton>
+    <header className="surface-ledger overflow-hidden">
+      <div className="grid gap-5 p-5 sm:p-7 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-end">
+        <div className="min-w-0 max-w-3xl">
+          <div className="mb-4 flex size-11 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--warning-soft)] text-[var(--warning)]">
+            <AppIcon name="inbox" size={22} />
+          </div>
+          <p className="eyebrow">Allocation inbox</p>
+          <h1 className="wordmark mt-2 text-3xl text-[var(--ink)] sm:text-4xl">Unmapped spend</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">
+            Decide where newly discovered resources belong. Mapping is optional, and every action
+            preserves cost history.
+          </p>
+        </div>
+        <div className="space-y-3">
+          <SearchField
+            value={search}
+            onChange={onSearch}
+            placeholder="Name, ID, or provider…"
+            label="Search unmapped resources"
+          />
+          <p className="truncate text-[11px] text-[var(--muted)]" title={rangeLabel}>
+            Cost window · {rangeLabel}
+          </p>
         </div>
       </div>
-      <label className="min-w-[12rem] flex-1 text-xs font-medium text-[var(--muted)] sm:max-w-xs">
-        Search
-        <input
-          type="search"
-          value={search}
-          onChange={(event) => onSearch(event.target.value)}
-          placeholder="Name, id, provider…"
-          className="mt-1 w-full rounded-[var(--radius-sm)] border border-[var(--line-strong)] bg-[var(--paper)] px-3 py-2 text-sm text-[var(--ink)]"
-        />
-      </label>
+      <div
+        className="grid grid-cols-2 border-t border-[var(--line)] bg-[var(--sunken)] p-1.5 sm:flex sm:w-full sm:justify-start sm:gap-1"
+        role="tablist"
+        aria-label="Inbox view"
+      >
+        <TabButton active={tab === 'open'} count={openCount} onClick={() => onTab('open')}>
+          Needs decision
+        </TabButton>
+        <TabButton
+          active={tab === 'archived'}
+          count={archivedCount}
+          onClick={() => onTab('archived')}
+        >
+          Archived
+        </TabButton>
+      </div>
     </header>
   );
 }
 
 function TabButton({
   active,
+  count,
   onClick,
   children,
 }: {
   active: boolean;
+  count: number;
   onClick: () => void;
   children: ReactNode;
 }) {
   return (
     <button
       type="button"
+      role="tab"
+      aria-selected={active}
       onClick={onClick}
-      className={`rounded-[var(--radius-sm)] px-3 py-1.5 text-sm font-medium ${
+      className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-sm)] px-3.5 py-2 text-xs font-semibold transition-colors sm:min-h-10 ${
         active
-          ? 'bg-[var(--accent)] text-[var(--accent-ink)]'
-          : 'bg-[var(--paper)] text-[var(--muted)] border border-[var(--line)] hover:text-[var(--ink)]'
+          ? 'bg-[var(--paper-raised)] text-[var(--ink)] shadow-[var(--shadow)]'
+          : 'text-[var(--muted)] hover:bg-[var(--paper)] hover:text-[var(--ink)]'
       }`}
     >
       {children}
+      <span
+        className={`money rounded-full px-2 py-0.5 text-[10px] ${
+          active
+            ? 'bg-[var(--accent)] text-[var(--accent-ink)]'
+            : 'bg-[var(--line)] text-[var(--muted)]'
+        }`}
+      >
+        {count}
+      </span>
     </button>
   );
 }

@@ -7,6 +7,9 @@ import { CostViewDisplay } from '@/shared/ui/cost-view-display';
 import { firstAlertableProvider } from '@/features/projects/alertable-provider';
 import { providerUiLabel } from '@/shared/provider-label';
 import { formatUsd } from '@/shared/money';
+import { motion } from 'motion/react';
+import { AppIcon } from '@/shared/ui/app-icon';
+import { BudgetMeter } from '@/shared/ui/budget-meter';
 
 type ProjectCardsProps = {
   projects: ProjectListRow[];
@@ -18,9 +21,14 @@ export function ProjectCards({ projects, onBudgetSaved }: ProjectCardsProps) {
     return null;
   }
   return (
-    <ul className="grid list-none gap-5 sm:grid-cols-2 2xl:grid-cols-3">
-      {projects.map((project) => (
-        <ProjectCard key={project.id} project={project} onBudgetSaved={onBudgetSaved} />
+    <ul className="grid list-none gap-4 sm:grid-cols-2 2xl:grid-cols-3">
+      {projects.map((project, index) => (
+        <ProjectCard
+          key={project.id}
+          project={project}
+          index={index}
+          onBudgetSaved={onBudgetSaved}
+        />
       ))}
     </ul>
   );
@@ -28,9 +36,11 @@ export function ProjectCards({ projects, onBudgetSaved }: ProjectCardsProps) {
 
 function ProjectCard({
   project,
+  index,
   onBudgetSaved,
 }: {
   project: ProjectListRow;
+  index: number;
   onBudgetSaved: () => void;
 }) {
   const primaryProvider = firstAlertableProvider(project.providers);
@@ -40,22 +50,39 @@ function ProjectCard({
     project.today.costUsd >= primaryProvider.budget.limitUsd;
 
   return (
-    <li
-      className={`flex flex-col overflow-hidden rounded-[var(--radius)] border bg-[var(--paper)] shadow-[var(--shadow-card)] ${
-        overLimit ? 'border-[var(--danger)] bg-[var(--danger-soft)]' : 'border-[var(--line)]'
+    <motion.li
+      layout="position"
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.22, delay: Math.min(index, 8) * 0.025 }}
+      whileHover={{ y: -3 }}
+      className={`group flex flex-col overflow-hidden rounded-[var(--radius)] border bg-[var(--paper-raised)] shadow-[var(--shadow-card)] ${
+        overLimit ? 'border-[var(--danger)]' : 'border-[var(--line-strong)]'
       }`}
     >
-      <div className="border-b border-[var(--line)] bg-[var(--sidebar)] px-4 py-3.5">
-        <Link
-          href={`/projects/${project.slug}`}
-          className="block truncate text-lg font-semibold text-[var(--ink)] transition hover:text-[var(--accent)]"
-          title={project.name}
-        >
-          {project.name}
-        </Link>
-        <p className="mt-1 font-[family-name:var(--font-mono)] text-[11px] text-[var(--muted)]">
-          {project.slug}
-        </p>
+      <div
+        className={`border-b px-4 py-4 ${overLimit ? 'border-[var(--danger)]/20 bg-[var(--danger-soft)]' : 'border-[var(--line)] bg-[var(--sunken)]'}`}
+      >
+        <div className="flex items-center gap-3">
+          <span className="money flex size-8 shrink-0 items-center justify-center rounded-lg border border-[var(--line)] bg-[var(--paper-raised)] text-[10px] text-[var(--muted)]">
+            {String(index + 1).padStart(2, '0')}
+          </span>
+          <div className="min-w-0 flex-1">
+            <Link
+              href={`/projects/${project.slug}`}
+              className="block truncate text-lg font-semibold text-[var(--ink)] transition-colors hover:text-[var(--accent)]"
+              title={project.name}
+            >
+              {project.name}
+            </Link>
+            <p className="money mt-0.5 truncate text-[10px] text-[var(--muted)]">{project.slug}</p>
+          </div>
+          <AppIcon
+            name="arrow"
+            size={18}
+            className="text-[var(--faint)] transition-transform group-hover:translate-x-0.5"
+          />
+        </div>
       </div>
       <div className="flex flex-1 flex-col gap-4 p-4">
         <div className="grid grid-cols-2 gap-3">
@@ -63,15 +90,13 @@ function ProjectCard({
           <Metric label="Today" cost={project.today} />
         </div>
         {project.providers.length > 0 ? (
-          <div className="rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--canvas)] px-3 py-2">
-            <p className="text-[10px] font-semibold tracking-wide text-[var(--muted)] uppercase">
-              Providers
-            </p>
+          <div className="rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--sunken)] px-3.5 py-3">
+            <p className="eyebrow">Providers</p>
             <ul className="mt-2 space-y-1 text-xs">
               {project.providers.map((link) => (
                 <li key={link.projectProviderId} className="flex justify-between gap-2">
                   <span className="text-[var(--ink)]">{providerUiLabel(link.providerKey)}</span>
-                  <span className="font-[family-name:var(--font-mono)] tabular-nums text-[var(--muted)]">
+                  <span className="money text-[var(--muted)]">
                     {link.period.costUsd === null ? '—' : formatUsd(link.period.costUsd)}
                   </span>
                 </li>
@@ -80,26 +105,33 @@ function ProjectCard({
           </div>
         ) : null}
         {primaryProvider ? (
-          <div className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-[var(--line)] pt-3">
-            <span className="text-xs font-medium text-[var(--muted)]">Daily limit</span>
-            <BudgetInlineField
-              savePath={`/api/project-providers/${primaryProvider.projectProviderId}/budget`}
-              budget={primaryProvider.budget}
-              onSaved={onBudgetSaved}
-            />
+          <div className="mt-auto space-y-3 border-t border-[var(--line)] pt-3">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-xs font-medium text-[var(--muted)]">Daily limit</span>
+              <BudgetInlineField
+                savePath={`/api/project-providers/${primaryProvider.projectProviderId}/budget`}
+                budget={primaryProvider.budget}
+                onSaved={onBudgetSaved}
+              />
+            </div>
+            {primaryProvider.budget?.enabled ? (
+              <BudgetMeter
+                spendUsd={project.today.costUsd}
+                limitUsd={primaryProvider.budget.limitUsd}
+                compact
+              />
+            ) : null}
           </div>
         ) : null}
       </div>
-    </li>
+    </motion.li>
   );
 }
 
 function Metric({ label, cost }: { label: string; cost: ProjectListRow['period'] }) {
   return (
-    <div className="rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--canvas)] px-3 py-2.5">
-      <p className="text-[10px] font-semibold tracking-wide text-[var(--muted)] uppercase">
-        {label}
-      </p>
+    <div className="rounded-[var(--radius-sm)] bg-[var(--sunken)] px-3 py-3">
+      <p className="eyebrow">{label}</p>
       <div className="mt-1">
         <CostViewDisplay cost={cost} size="sm" />
       </div>
