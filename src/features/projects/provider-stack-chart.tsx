@@ -50,6 +50,8 @@ export function ProviderStackChart({ points, providerKeys }: ProviderStackChartP
     <ChartPanel
       title="Cost over time"
       subtitle="Mapped providers stacked (USD). Missing series are omitted — not $0."
+      index="06"
+      accent="coral"
     >
       <div className="h-[280px] sm:h-[380px]">
         <ResponsiveContainer width="100%" height="100%">

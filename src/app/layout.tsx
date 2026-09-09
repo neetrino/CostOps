@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { IBM_Plex_Mono, IBM_Plex_Sans, Source_Serif_4 } from 'next/font/google';
+import { Bricolage_Grotesque, IBM_Plex_Mono, IBM_Plex_Sans } from 'next/font/google';
 import { APP_NAME } from '@/config/constants';
 import './globals.css';
 
@@ -10,10 +10,10 @@ const sans = IBM_Plex_Sans({
   display: 'swap',
 });
 
-const display = Source_Serif_4({
+const display = Bricolage_Grotesque({
   subsets: ['latin'],
-  weight: ['600'],
-  variable: '--font-source-serif',
+  weight: ['600', '700', '800'],
+  variable: '--font-bricolage',
   display: 'swap',
 });
 

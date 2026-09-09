@@ -15,20 +15,26 @@ export function NearLimitStrip({ rows }: NearLimitStripProps) {
     return null;
   }
   return (
-    <section className="overflow-hidden rounded-[var(--radius)] border border-[var(--warning)]/35 bg-[var(--warning-soft)] shadow-[var(--shadow-card)]">
-      <div className="flex items-center gap-2 border-b border-[var(--warning)]/15 px-4 py-3">
-        <AppIcon name="alert" size={17} className="text-[var(--warning)]" />
+    <section className="dark-stage overflow-hidden rounded-[var(--radius)] border border-white/10 shadow-[var(--shadow-card)]">
+      <div className="h-1.5 bg-[var(--accent)]" />
+      <div className="flex items-center gap-3 border-b border-white/10 px-5 py-4">
+        <span className="flex size-9 items-center justify-center rounded-full bg-[var(--accent)] text-[var(--accent-ink)]">
+          <AppIcon name="alert" size={17} />
+        </span>
         <div>
-          <h2 className="text-xs font-semibold text-[var(--ink)]">Budget watch</h2>
-          <p className="text-[11px] text-[var(--warning)]">Projects approaching a daily limit</p>
+          <p className="eyebrow !text-white/40">Priority signal</p>
+          <h2 className="wordmark mt-0.5 text-xl text-[var(--ink)]">Budget watch</h2>
         </div>
+        <p className="ml-auto hidden text-xs text-[var(--muted)] sm:block">
+          Projects approaching a daily limit
+        </p>
       </div>
-      <ul className="scrollbar-none flex snap-x gap-2 overflow-x-auto p-3">
+      <ul className="scrollbar-none flex snap-x gap-3 overflow-x-auto p-4">
         {rows.map((row) => (
           <li key={row.key} className="min-w-[82vw] snap-start sm:min-w-[20rem]">
             <Link
               href={`/projects/${row.projectSlug}`}
-              className="block rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--paper-raised)] px-3.5 py-3 text-xs transition-[border-color,transform] hover:-translate-y-0.5 hover:border-[var(--warning)]/50"
+              className="light-stage block rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--paper-raised)] px-4 py-3.5 text-xs shadow-[var(--shadow)] transition-[border-color,transform] hover:-translate-y-1 hover:border-[var(--accent)]"
             >
               <span className="flex items-center justify-between gap-3">
                 <span className="min-w-0">

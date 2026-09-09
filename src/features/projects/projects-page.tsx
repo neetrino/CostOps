@@ -1,6 +1,7 @@
 'use client';
 
 import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import { motion } from 'motion/react';
 import type { CostSeriesPoint } from '@/core/cost/build-series';
 import type { CostView } from '@/core/cost/types';
 import { fetchJson, UnauthorizedError } from '@/features/dashboard/api-client';
@@ -158,33 +159,55 @@ function ProjectsContent() {
         />
       }
     >
-      <header className="surface-ledger overflow-hidden">
-        <div className="grid md:grid-cols-[minmax(0,1fr)_minmax(17rem,34%)]">
-          <div className="flex min-h-36 flex-col justify-between p-5 sm:p-6">
-            <div className="flex items-center gap-3">
-              <span className="money text-xs text-[var(--accent)]">01 / COMMAND</span>
-              <span className="h-px flex-1 bg-[var(--line)]" />
+      <motion.header
+        initial={{ opacity: 0, scale: 0.992 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.42, ease: [0.2, 0.8, 0.2, 1] }}
+        className="kinetic-panel overflow-hidden"
+      >
+        <div className="grid xl:grid-cols-[minmax(0,1.3fr)_minmax(22rem,0.7fr)]">
+          <div className="relative flex min-h-[17rem] flex-col justify-between overflow-hidden bg-[var(--accent)] p-6 text-[var(--accent-ink)] sm:p-8 lg:min-h-[21rem] lg:p-10">
+            <span className="absolute top-8 right-8 size-24 rounded-full border border-[var(--accent-ink)]/15 sm:size-36" />
+            <span className="absolute top-16 right-16 size-10 rounded-full bg-[var(--signal)] sm:size-14" />
+            <div className="relative flex items-center gap-3">
+              <span className="money text-xs font-semibold">01 / PORTFOLIO ORBIT</span>
+              <span className="h-px flex-1 bg-[var(--accent-ink)]/25" />
             </div>
-            <div className="mt-8">
-              <h1 className="wordmark text-4xl leading-none text-[var(--ink)] sm:text-5xl">
-                Projects
+            <div className="relative mt-12">
+              <p className="eyebrow !text-[var(--accent-ink)]/55">Spend command center</p>
+              <h1 className="wordmark mt-3 text-[clamp(3.7rem,7.5vw,7.4rem)] leading-[0.78] text-[var(--accent-ink)]">
+                Project
+                <span className="block pl-[0.58em]">universe.</span>
               </h1>
-              <p className="mt-2 max-w-xl text-sm text-[var(--muted)]">
-                Spend intelligence across every product and infrastructure provider.
-              </p>
+              <div className="mt-7 flex flex-wrap items-center gap-3">
+                <p className="max-w-md text-sm leading-6 text-[var(--accent-ink)]/70">
+                  Every product, provider and budget signal in one living financial map.
+                </p>
+                <span className="money ml-auto inline-flex min-h-9 items-center rounded-full border border-[var(--accent-ink)]/20 bg-[var(--paper-raised)] px-4 text-xs font-semibold text-[var(--ink)]">
+                  {filteredProjects.length} ACTIVE ORBITS
+                </span>
+              </div>
             </div>
           </div>
-          <div className="flex flex-col justify-between border-t border-[var(--line)] bg-[var(--inverse)] p-5 text-[var(--inverse-ink)] md:border-t-0 md:border-l">
-            <p className="eyebrow !text-[color:rgba(247,246,241,.58)]">Selected period</p>
-            <div className="mt-8 [&_*]:!text-[var(--inverse-ink)]">
+          <div className="signal-grid dark-stage relative flex min-h-[16rem] flex-col justify-between overflow-hidden p-6 sm:p-8 lg:p-10">
+            <CostOrbitGraphic />
+            <div className="relative z-10 flex items-center justify-between gap-3">
+              <p className="eyebrow !text-white/45">Selected period</p>
+              <span className="rounded-full border border-white/15 px-3 py-1 font-[family-name:var(--font-mono)] text-[9px] tracking-[0.12em] text-white/55 uppercase">
+                Live ledger
+              </span>
+            </div>
+            <div className="relative z-10 mt-16 [&_*]:!text-[var(--inverse-ink)]">
+              <p className="mb-3 text-xs text-white/45">TOTAL OBSERVED SPEND</p>
               <CostViewDisplay cost={totalsData?.total ?? emptyCost()} size="lg" />
             </div>
           </div>
         </div>
-        <div className="border-t border-[var(--line)] bg-[var(--sunken)] p-3 sm:p-4">
+        <div className="grid gap-3 border-t border-[var(--line-strong)] bg-[var(--violet-soft)] p-3 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-center sm:p-4">
+          <span className="eyebrow hidden px-2 !text-[var(--violet)] sm:block">Find an orbit</span>
           <SearchField value={search} onChange={setSearch} placeholder="Search projects by name…" />
         </div>
-      </header>
+      </motion.header>
 
       {error && !projectsData ? (
         <ErrorPanel
@@ -245,5 +268,42 @@ export function ProjectsPage() {
     <Suspense fallback={<CardSkeleton />}>
       <ProjectsContent />
     </Suspense>
+  );
+}
+
+function CostOrbitGraphic() {
+  return (
+    <div
+      className="pointer-events-none absolute top-1/2 left-1/2 aspect-[18/13] w-[115%] -translate-x-1/2 -translate-y-1/2 opacity-70"
+      aria-hidden="true"
+    >
+      <div className="orbit-spin size-full">
+        <svg viewBox="0 0 360 260" className="size-full" fill="none">
+          <ellipse cx="180" cy="130" rx="142" ry="67" stroke="var(--signal)" strokeWidth="1" />
+          <ellipse
+            cx="180"
+            cy="130"
+            rx="105"
+            ry="105"
+            stroke="var(--accent)"
+            strokeWidth="1.5"
+            strokeDasharray="7 10"
+          />
+          <circle cx="180" cy="25" r="6" fill="var(--signal)" />
+          <circle cx="38" cy="130" r="4" fill="var(--accent)" />
+        </svg>
+      </div>
+      <svg viewBox="0 0 360 260" className="absolute inset-0 size-full" fill="none">
+        <circle
+          cx="180"
+          cy="130"
+          r="42"
+          fill="var(--inverse-2)"
+          stroke="white"
+          strokeOpacity=".18"
+        />
+        <path d="M160 130h40M180 110v40" stroke="white" strokeOpacity=".5" />
+      </svg>
+    </div>
   );
 }

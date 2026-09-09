@@ -31,7 +31,7 @@ function activeFor(href: string, pathname: string) {
 export function MobileBrand() {
   return (
     <Link href="/" className="flex min-w-0 items-center gap-2.5" aria-label={`${APP_NAME} home`}>
-      <CostOpsMark size={34} className="shrink-0 text-[var(--accent)]" />
+      <CostOpsMark size={36} className="shrink-0 text-[var(--accent)]" />
       <span className="min-w-0">
         <span className="block text-[9px] font-semibold tracking-[0.18em] text-[var(--muted)] uppercase">
           Neetrino
@@ -50,7 +50,7 @@ export function MobileBottomNavigation() {
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--line-strong)] bg-[var(--paper)] px-2 pt-1.5 pb-[max(.45rem,env(safe-area-inset-bottom))] lg:hidden"
+      className="dark-stage fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-[var(--inverse)] px-2 pt-1.5 pb-[max(.45rem,env(safe-area-inset-bottom))] shadow-[0_-16px_50px_rgba(23,24,42,.18)] lg:hidden"
       aria-label="Primary navigation"
     >
       <div className="mx-auto grid max-w-lg grid-cols-4">
@@ -59,13 +59,11 @@ export function MobileBottomNavigation() {
           title="Provider boards"
           description="Open spend by infrastructure provider"
           triggerClassName={`flex min-h-[3.65rem] flex-col items-center justify-center gap-1 rounded-xl px-2 text-[10px] font-semibold transition-colors ${
-            providersActive ? 'text-[var(--accent)]' : 'text-[var(--muted)]'
+            providersActive ? 'text-[var(--signal)]' : 'text-white/48'
           }`}
           trigger={
             <>
-              <span
-                className={providersActive ? 'rounded-lg bg-[var(--accent-soft)] p-1.5' : 'p-1.5'}
-              >
+              <span className={providersActive ? 'rounded-lg bg-white/10 p-1.5' : 'p-1.5'}>
                 <AppIcon name="provider" size={20} />
               </span>
               Providers
@@ -117,7 +115,7 @@ export function MobileWorkspaceMenu() {
     <MobileSheet
       title="Workspace"
       description="CostOps operator controls"
-      triggerClassName="inline-flex size-11 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--paper-raised)] text-[var(--muted)]"
+      triggerClassName="inline-flex size-11 items-center justify-center rounded-full border border-[var(--ink)] bg-[var(--signal)] text-[var(--signal-ink)] shadow-[var(--shadow)]"
       trigger={
         <>
           <AppIcon name="menu" />
@@ -163,10 +161,10 @@ function MobileNavLink({ item, pathname }: { item: (typeof ROOT_NAV)[number]; pa
       href={item.href}
       aria-current={active ? 'page' : undefined}
       className={`flex min-h-[3.65rem] flex-col items-center justify-center gap-1 rounded-xl px-2 text-[10px] font-semibold transition-colors ${
-        active ? 'text-[var(--accent)]' : 'text-[var(--muted)]'
+        active ? 'text-[var(--signal)]' : 'text-white/48'
       }`}
     >
-      <span className={active ? 'rounded-lg bg-[var(--accent-soft)] p-1.5' : 'p-1.5'}>
+      <span className={active ? 'rounded-lg bg-white/10 p-1.5' : 'p-1.5'}>
         <AppIcon name={item.icon} size={20} />
       </span>
       {item.label}

@@ -45,6 +45,8 @@ export function UsageSeriesChart({ points, projectNames, visibleIds }: UsageSeri
     <ChartPanel
       title="Cost over time"
       subtitle="USD by project · missing days are gaps, not $0"
+      index="05"
+      accent="violet"
       action={
         selectedId ? (
           <Button

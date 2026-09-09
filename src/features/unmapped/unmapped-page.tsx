@@ -179,20 +179,28 @@ function InboxHeader({
   onSearch: (value: string) => void;
 }) {
   return (
-    <header className="surface-ledger overflow-hidden">
-      <div className="grid gap-5 p-5 sm:p-7 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-end">
-        <div className="min-w-0 max-w-3xl">
-          <div className="mb-4 flex size-11 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--warning-soft)] text-[var(--warning)]">
+    <header className="kinetic-panel overflow-hidden">
+      <div className="grid xl:grid-cols-[minmax(0,1fr)_22rem]">
+        <div className="tone-signal relative min-w-0 overflow-hidden p-6 sm:p-8 lg:p-10">
+          <span className="absolute -top-10 right-10 size-40 rounded-full border border-[var(--signal-ink)]/15" />
+          <div className="mb-8 flex size-12 items-center justify-center rounded-full bg-[var(--inverse)] text-[var(--signal)]">
             <AppIcon name="inbox" size={22} />
           </div>
-          <p className="eyebrow">Allocation inbox</p>
-          <h1 className="wordmark mt-2 text-3xl text-[var(--ink)] sm:text-4xl">Unmapped spend</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">
+          <p className="eyebrow relative">Allocation inbox</p>
+          <h1 className="wordmark relative mt-3 text-[clamp(3.4rem,7vw,6.3rem)] leading-[0.82] text-[var(--ink)]">
+            Unmapped.
+            <span className="block pl-[0.52em]">Decision queue.</span>
+          </h1>
+          <p className="relative mt-7 max-w-2xl text-sm leading-6 text-[var(--muted)]">
             Decide where newly discovered resources belong. Mapping is optional, and every action
             preserves cost history.
           </p>
         </div>
-        <div className="space-y-3">
+        <div className="dark-stage signal-grid flex flex-col justify-between gap-10 p-6 sm:p-8">
+          <div>
+            <p className="eyebrow !text-white/40">Find a signal</p>
+            <p className="wordmark mt-3 text-3xl leading-none">Resolve what needs a home.</p>
+          </div>
           <SearchField
             value={search}
             onChange={onSearch}
@@ -205,7 +213,7 @@ function InboxHeader({
         </div>
       </div>
       <div
-        className="grid grid-cols-2 border-t border-[var(--line)] bg-[var(--sunken)] p-1.5 sm:flex sm:w-full sm:justify-start sm:gap-1"
+        className="grid grid-cols-2 border-t border-[var(--line)] bg-[var(--violet-soft)] p-1.5 sm:flex sm:w-full sm:justify-start sm:gap-1"
         role="tablist"
         aria-label="Inbox view"
       >
@@ -243,7 +251,7 @@ function TabButton({
       onClick={onClick}
       className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-sm)] px-3.5 py-2 text-xs font-semibold transition-colors sm:min-h-10 ${
         active
-          ? 'bg-[var(--paper-raised)] text-[var(--ink)] shadow-[var(--shadow)]'
+          ? 'bg-[var(--inverse)] text-[var(--inverse-ink)] shadow-[var(--shadow)]'
           : 'text-[var(--muted)] hover:bg-[var(--paper)] hover:text-[var(--ink)]'
       }`}
     >
@@ -251,7 +259,7 @@ function TabButton({
       <span
         className={`money rounded-full px-2 py-0.5 text-[10px] ${
           active
-            ? 'bg-[var(--accent)] text-[var(--accent-ink)]'
+            ? 'bg-[var(--signal)] text-[var(--signal-ink)]'
             : 'bg-[var(--line)] text-[var(--muted)]'
         }`}
       >

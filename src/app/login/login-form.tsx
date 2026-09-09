@@ -39,8 +39,8 @@ export function LoginForm() {
   };
 
   return (
-    <main className="flex min-h-[100dvh] items-center bg-[var(--canvas)] px-4 py-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:px-6 lg:px-8">
-      <div className="mx-auto grid w-full max-w-6xl overflow-hidden rounded-[1.25rem] border border-[var(--line-strong)] bg-[var(--paper-raised)] shadow-[var(--shadow-popover)] lg:min-h-[42rem] lg:grid-cols-[1.08fr_0.92fr]">
+    <main className="signal-grid flex min-h-[100dvh] items-center bg-[var(--inverse)] px-4 py-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:px-6 lg:px-8">
+      <div className="mx-auto grid w-full max-w-6xl overflow-hidden rounded-[2rem] border border-white/15 bg-[var(--paper-raised)] shadow-[16px_16px_0_rgba(201,255,74,.22)] lg:min-h-[44rem] lg:grid-cols-[1.08fr_0.92fr]">
         <LoginEditorialPanel />
 
         <section className="flex min-h-[calc(100dvh-3rem)] flex-col justify-between p-5 sm:min-h-0 sm:p-10 lg:justify-center lg:p-14">
@@ -53,10 +53,10 @@ export function LoginForm() {
           </div>
 
           <div className="my-auto w-full py-10 lg:my-0 lg:py-0">
-            <p className="eyebrow">Operator access</p>
-            <h1 className="wordmark mt-3 max-w-md text-[2.5rem] leading-[0.96] text-[var(--ink)] sm:text-5xl">
-              The cost ledger,
-              <span className="block text-[var(--accent)]">ready for review.</span>
+            <p className="eyebrow !text-[var(--violet)]">Operator access / 01</p>
+            <h1 className="wordmark mt-4 max-w-md text-[3rem] leading-[0.85] text-[var(--ink)] sm:text-6xl">
+              Enter the
+              <span className="block pl-[0.5em] text-[var(--accent)]">spend orbit.</span>
             </h1>
             <p className="mt-5 max-w-sm text-sm leading-6 text-[var(--muted)]">
               Sign in to inspect spend, freshness and budget pressure across every connected
@@ -116,7 +116,7 @@ export function LoginForm() {
               <button
                 type="submit"
                 disabled={pending}
-                className="mt-5 inline-flex min-h-12 w-full items-center justify-between rounded-[var(--radius-sm)] border border-transparent bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--accent-ink)] shadow-[var(--shadow)] transition-[background-color,transform,opacity] duration-[var(--duration-ui)] ease-[var(--ease-ui)] hover:bg-[var(--accent-hover)] active:translate-y-px disabled:cursor-wait disabled:opacity-60"
+                className="mt-5 inline-flex min-h-13 w-full items-center justify-between rounded-full border border-[var(--ink)] bg-[var(--signal)] px-5 text-sm font-semibold text-[var(--signal-ink)] shadow-[var(--shadow-color)] transition-[background-color,transform,opacity] duration-[var(--duration-ui)] ease-[var(--ease-ui)] hover:-translate-y-1 hover:bg-[var(--accent)] active:translate-y-px disabled:cursor-wait disabled:opacity-60"
               >
                 <span>{pending ? 'Opening ledger…' : 'Open cost ledger'}</span>
                 <AppIcon
@@ -145,11 +145,13 @@ const LEDGER_ROWS = [
 
 function LoginEditorialPanel() {
   return (
-    <aside className="relative hidden overflow-hidden bg-[var(--inverse)] p-10 text-[var(--inverse-ink)] lg:flex lg:flex-col lg:justify-between">
+    <aside className="tone-violet signal-grid relative hidden overflow-hidden p-10 lg:flex lg:flex-col lg:justify-between">
+      <span className="float-slow absolute top-20 right-16 size-32 rounded-full border border-white/20" />
+      <span className="absolute top-36 right-28 size-10 rounded-full bg-[var(--signal)]" />
       <div className="flex items-center gap-3">
-        <CostOpsMark size={44} className="text-[var(--paper-raised)]" />
+        <CostOpsMark size={44} className="text-[var(--signal)]" />
         <div>
-          <p className="text-[10px] font-semibold tracking-[0.18em] text-[var(--accent-mid)] uppercase">
+          <p className="text-[10px] font-semibold tracking-[0.18em] text-white/45 uppercase">
             Neetrino
           </p>
           <p className="wordmark text-2xl leading-none">{APP_NAME}</p>
@@ -157,26 +159,27 @@ function LoginEditorialPanel() {
       </div>
 
       <div className="max-w-md py-14">
-        <p className="text-[11px] font-semibold tracking-[0.16em] text-[var(--accent-mid)] uppercase">
-          FinOps command ledger
+        <p className="text-[11px] font-semibold tracking-[0.16em] text-white/45 uppercase">
+          Kinetic FinOps studio
         </p>
-        <h2 className="wordmark mt-5 text-6xl leading-[0.93] tracking-[-0.05em]">
-          Every dollar has a place.
+        <h2 className="wordmark relative mt-5 text-7xl leading-[0.82]">
+          Make cost
+          <span className="block pl-[0.52em] text-[var(--signal)]">visible.</span>
         </h2>
-        <p className="mt-6 max-w-sm text-sm leading-6 text-[var(--accent-mid)]">
-          A calm operational view of spend, limits and source health—without hiding uncertainty.
+        <p className="mt-7 max-w-sm text-sm leading-6 text-white/60">
+          A living map of spend, limits and provider health—built for decisive operators.
         </p>
       </div>
 
-      <dl className="border-y border-[var(--paper)]/15">
+      <dl className="border-y border-white/15">
         {LEDGER_ROWS.map((row, index) => (
           <div
             key={row.label}
-            className="grid grid-cols-[2rem_1fr_auto] items-center gap-4 border-b border-[var(--paper)]/15 py-4 last:border-b-0"
+            className="grid grid-cols-[2rem_1fr_auto] items-center gap-4 border-b border-white/15 py-4 last:border-b-0"
           >
             <dt className="contents">
-              <span className="money text-xs text-[var(--accent-mid)]">0{index + 1}</span>
-              <span className="text-xs text-[var(--accent-mid)]">{row.label}</span>
+              <span className="money text-xs text-[var(--signal)]">0{index + 1}</span>
+              <span className="text-xs text-white/55">{row.label}</span>
             </dt>
             <dd className="text-sm font-medium text-[var(--inverse-ink)]">{row.value}</dd>
           </div>

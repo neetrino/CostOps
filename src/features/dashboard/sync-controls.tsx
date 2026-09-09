@@ -48,7 +48,11 @@ export function SyncNowButton({ onComplete, compact = false }: SyncNowButtonProp
     <div className="flex flex-col items-end gap-1">
       <Button
         variant="primary"
-        className={compact ? 'size-11 rounded-full px-0' : ''}
+        className={
+          compact
+            ? 'size-11 rounded-full bg-[var(--inverse)] px-0 text-[var(--signal)] hover:bg-[var(--inverse-2)]'
+            : 'rounded-full bg-[var(--inverse)] px-5 text-[var(--inverse-ink)] shadow-[var(--shadow-color)] hover:bg-[var(--inverse-2)]'
+        }
         onClick={() => void syncNow()}
         disabled={pending}
         aria-label={
@@ -57,10 +61,12 @@ export function SyncNowButton({ onComplete, compact = false }: SyncNowButtonProp
       >
         {compact ? (
           <AppIcon name="sync" className={pending ? 'animate-spin' : ''} />
-        ) : pending ? (
-          'Syncing…'
         ) : (
-          'Sync now'
+          <>
+            <span className="size-1.5 rounded-full bg-[var(--signal)]" />
+            {pending ? 'Syncing…' : 'Sync now'}
+            <AppIcon name="sync" size={16} className={pending ? 'animate-spin' : ''} />
+          </>
         )}
       </Button>
       {error ? (
@@ -105,7 +111,7 @@ export function SyncStatusChip({ refreshKey = 0 }: SyncStatusChipProps) {
 
   return (
     <div
-      className="hidden rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--paper)] px-3 py-1.5 text-xs text-[var(--muted)] sm:block"
+      className="hidden rounded-full border border-[var(--violet)]/15 bg-[var(--violet-soft)] px-4 py-2 text-xs text-[var(--muted)] sm:block"
       title={latestRun ? `Latest run ${latestRun.status}` : undefined}
     >
       <span className="font-medium text-[var(--ink)]">Sync</span>
