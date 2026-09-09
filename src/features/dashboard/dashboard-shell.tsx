@@ -101,7 +101,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
 
 function DesktopControlRail({ pathname }: { pathname: string }) {
   return (
-    <aside className="sticky top-3 hidden h-[calc(100dvh-1.5rem)] flex-col items-center text-[var(--inverse-ink)] lg:flex">
+    <aside className="sticky top-3 z-40 hidden h-[calc(100dvh-1.5rem)] flex-col items-center text-[var(--inverse-ink)] lg:flex">
       <Link
         href="/"
         className="flex w-full flex-col items-center gap-2 py-2"
@@ -172,7 +172,7 @@ function DesktopProviderMenu({ pathname }: { pathname: string }) {
         className={`relative flex min-h-[4.35rem] cursor-pointer list-none flex-col items-center justify-center gap-1.5 overflow-hidden rounded-[1.2rem] text-[10px] font-semibold transition-colors marker:hidden ${
           active
             ? 'bg-[var(--signal)] text-[var(--signal-ink)]'
-            : 'text-white/55 hover:bg-white/8 hover:text-white'
+            : 'text-white/55 hover:bg-white/8 hover:text-white group-open:bg-white/10 group-open:text-white'
         }`}
       >
         <AppIcon name="provider" size={22} />
