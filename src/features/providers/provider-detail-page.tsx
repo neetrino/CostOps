@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import { motion } from 'motion/react';
 import type { CostSeriesPoint } from '@/core/cost/build-series';
 import type { CostView } from '@/core/cost/types';
 import { fetchJson, UnauthorizedError } from '@/features/dashboard/api-client';
@@ -155,45 +156,56 @@ function ProviderDetailContent() {
         <EmptyPanel title="Provider not found" detail="Unknown provider key." />
       ) : (
         <>
-          <header className="surface-ledger overflow-hidden">
-            <div className="flex flex-col gap-5 p-5 sm:flex-row sm:items-end sm:justify-between sm:p-6">
-              <div className="min-w-0">
-                <div className="flex items-center gap-3">
-                  <span className="money text-xs text-[var(--accent)]">
-                    PROVIDER / {detail.provider.key}
-                  </span>
-                  <span className="h-px w-12 bg-[var(--accent-mid)]" />
+          <motion.header
+            initial={{ opacity: 0, scale: 0.992 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="kinetic-panel overflow-hidden"
+          >
+            <div className="grid xl:grid-cols-[minmax(0,1fr)_20rem]">
+              <div className="tone-violet relative overflow-hidden p-6 sm:p-8 lg:p-10">
+                <span className="absolute top-6 right-8 size-28 rounded-full border border-white/15" />
+                <span className="absolute top-16 right-16 size-8 rounded-full bg-[var(--signal)]" />
+                <div className="relative flex items-center gap-3">
+                  <span className="money text-xs">PROVIDER / {detail.provider.key}</span>
+                  <span className="h-px flex-1 bg-white/25" />
                 </div>
-                <h1 className="wordmark mt-6 text-4xl leading-none text-[var(--ink)] sm:text-5xl">
+                <p className="eyebrow relative mt-12 !text-white/45">Cost stream</p>
+                <h1 className="wordmark relative mt-3 text-[clamp(3.7rem,7vw,6.8rem)] leading-[0.82] text-[var(--ink)]">
                   {detail.provider.displayName}
                 </h1>
-                <p className="mt-2 text-sm text-[var(--muted)]">
+                <p className="relative mt-6 text-sm text-[var(--muted)]">
                   {detail.range.from} → {detail.range.to} · Sync now refreshes today
                 </p>
               </div>
-              <BackfillPeriodButton
-                providerKey={detail.provider.key}
-                from={detail.range.from}
-                to={detail.range.to}
-                onComplete={() => void load()}
-              />
+              <div className="dark-stage signal-grid flex flex-col justify-between gap-12 p-6 sm:p-8">
+                <div>
+                  <p className="eyebrow !text-white/40">Historical lens</p>
+                  <p className="wordmark mt-3 text-3xl leading-none">Repair the timeline.</p>
+                </div>
+                <BackfillPeriodButton
+                  providerKey={detail.provider.key}
+                  from={detail.range.from}
+                  to={detail.range.to}
+                  onComplete={() => void load()}
+                />
+              </div>
             </div>
-            <div className="border-t border-[var(--line)] bg-[var(--sunken)] p-3 sm:p-4">
+            <div className="border-t border-[var(--line)] bg-[var(--violet-soft)] p-3 sm:p-4">
               <SearchField
                 value={search}
                 onChange={setSearch}
                 placeholder="Search this provider's projects…"
               />
             </div>
-          </header>
+          </motion.header>
 
           {isFixedVpsProvider(detail.provider.key) ? (
             <VpsAddProject onAdded={() => void load()} />
           ) : null}
 
-          <div className="grid overflow-hidden rounded-[var(--radius)] border border-[var(--line-strong)] bg-[var(--paper-raised)] shadow-[var(--shadow-card)] sm:grid-cols-3">
-            <HeroMetric label="Today" cost={detail.today} accent />
-            <HeroMetric label="Selected period" cost={detail.period} />
+          <div className="grid gap-3 sm:grid-cols-3">
+            <HeroMetric label="Today" cost={detail.today} tone="signal" />
+            <HeroMetric label="Selected period" cost={detail.period} tone="dark" />
             <UnmappedTile unmapped={detail.unmapped} />
           </div>
 
@@ -244,18 +256,18 @@ function ProviderDetailContent() {
 function HeroMetric({
   label,
   cost,
-  accent = false,
+  tone,
 }: {
   label: string;
   cost: CostView;
-  accent?: boolean;
+  tone: 'dark' | 'signal';
 }) {
   return (
     <div
-      className={`min-h-32 border-b border-[var(--line)] px-5 py-5 last:border-b-0 sm:border-r sm:border-b-0 sm:last:border-r-0 ${accent ? 'bg-[var(--inverse)] text-[var(--inverse-ink)]' : ''}`}
+      className={`min-h-36 rounded-[var(--radius)] border border-[var(--line)] px-5 py-5 shadow-[var(--shadow-card)] ${tone === 'dark' ? 'dark-stage' : 'tone-signal'}`}
     >
-      <p className={`eyebrow ${accent ? '!text-[color:rgba(247,246,241,.58)]' : ''}`}>{label}</p>
-      <div className={`mt-5 ${accent ? '[&_*]:!text-[var(--inverse-ink)]' : ''}`}>
+      <p className="eyebrow">{label}</p>
+      <div className="mt-7">
         <CostViewDisplay cost={cost} size="lg" />
       </div>
     </div>
@@ -264,7 +276,7 @@ function HeroMetric({
 
 function UnmappedTile({ unmapped }: { unmapped: ProviderDetailResponse['unmapped'] }) {
   return (
-    <div className="min-h-32 bg-[var(--warning-soft)] px-5 py-5">
+    <div className="tone-accent min-h-36 rounded-[var(--radius)] border border-[var(--line)] px-5 py-5 shadow-[var(--shadow-card)]">
       <p className="eyebrow">Unmapped spend</p>
       <p className="money mt-4 text-3xl font-semibold text-[var(--ink)]">{unmapped.count}</p>
       <div className="mt-2 flex flex-wrap gap-4 text-xs">

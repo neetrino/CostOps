@@ -1,6 +1,7 @@
 'use client';
 
 import { Suspense, useCallback, useEffect, useState } from 'react';
+import { motion } from 'motion/react';
 import type { loadIntegrations } from '@/features/integrations/load-integrations';
 import { fetchJson, UnauthorizedError } from '@/features/dashboard/api-client';
 import { useUnauthorizedRedirect } from '@/features/dashboard/use-unauthorized-redirect';
@@ -85,32 +86,43 @@ function IntegrationsContent() {
 
   return (
     <div className="space-y-5 sm:space-y-7">
-      <header className="surface-ledger overflow-hidden">
-        <div className="grid gap-6 p-5 sm:p-7 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-          <div className="max-w-2xl">
-            <div className="mb-4 flex size-11 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--accent)] text-[var(--accent-ink)]">
+      <header className="kinetic-panel overflow-hidden">
+        <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(24rem,0.65fr)]">
+          <div className="tone-accent relative overflow-hidden p-6 sm:p-8 lg:p-10">
+            <span className="absolute top-7 right-10 size-32 rounded-full border border-[var(--accent-ink)]/15" />
+            <div className="mb-8 flex size-12 items-center justify-center rounded-full bg-[var(--inverse)] text-[var(--signal)]">
               <AppIcon name="integrations" size={22} />
             </div>
-            <p className="eyebrow">Provider operations</p>
-            <h1 className="wordmark mt-2 text-3xl text-[var(--ink)] sm:text-4xl">Integrations</h1>
-            <p className="mt-2 max-w-xl text-sm leading-6 text-[var(--muted)]">
+            <p className="eyebrow relative">Provider operations</p>
+            <h1 className="wordmark relative mt-3 text-[clamp(3.5rem,7vw,6.5rem)] leading-[0.82] text-[var(--ink)]">
+              Integrations.
+              <span className="block pl-[0.65em]">Signal room.</span>
+            </h1>
+            <p className="relative mt-7 max-w-xl text-sm leading-6 text-[var(--muted)]">
               One place to verify connection health, spot failed credentials, and rotate access
               without exposing a secret.
             </p>
           </div>
-          <IntegrationSummary accounts={data.accounts} />
+          <div className="dark-stage signal-grid flex flex-col justify-between gap-8 p-6 sm:p-8 lg:p-10">
+            <div>
+              <p className="eyebrow !text-white/40">Network pulse</p>
+              <p className="wordmark mt-3 text-3xl leading-none">Every source. One heartbeat.</p>
+            </div>
+            <IntegrationSummary accounts={data.accounts} />
+          </div>
         </div>
-        <div className="border-t border-[var(--line)] bg-[var(--sunken)] px-5 py-3 sm:px-7">
+        <div className="border-t border-[var(--line)] bg-[var(--signal)] px-5 py-3 sm:px-7">
           <p className="text-xs leading-5 text-[var(--muted)]">
             Health reflects the latest provider request. Expiry dates are not stored.
           </p>
         </div>
       </header>
       <ul className="grid gap-4 xl:grid-cols-2">
-        {data.accounts.map((account) => (
+        {data.accounts.map((account, index) => (
           <IntegrationAccountCard
             key={account.id}
             account={account}
+            index={index}
             onUpdated={() => void load()}
           />
         ))}
@@ -121,9 +133,11 @@ function IntegrationsContent() {
 
 function IntegrationAccountCard({
   account,
+  index,
   onUpdated,
 }: {
   account: IntegrationAccount;
+  index: number;
   onUpdated: () => void;
 }) {
   const [saving, setSaving] = useState(false);
@@ -152,7 +166,14 @@ function IntegrationAccountCard({
   const health = credentialHealthPresentation(account.credentialHealth);
 
   return (
-    <li className="surface-ledger flex min-w-0 flex-col overflow-hidden">
+    <motion.li
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.06 }}
+      whileHover={{ y: -5 }}
+      className="surface-ledger flex min-w-0 flex-col overflow-hidden shadow-[var(--shadow-color)]"
+    >
+      <div className={index % 2 === 0 ? 'h-2 bg-[var(--violet)]' : 'h-2 bg-[var(--signal)]'} />
       <div className="border-b border-[var(--line)] px-4 py-4 sm:px-5">
         <div className="flex items-start justify-between gap-4">
           <div className="flex min-w-0 items-center gap-3">
@@ -259,7 +280,7 @@ function IntegrationAccountCard({
         </div>
         {error ? <p className="text-xs text-[var(--danger)]">{error}</p> : null}
       </div>
-    </li>
+    </motion.li>
   );
 }
 

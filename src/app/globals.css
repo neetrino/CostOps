@@ -2,67 +2,76 @@
 
 :root {
   color-scheme: light;
-  --canvas: #eeece6;
-  --paper: #fbfaf6;
-  --paper-raised: #ffffff;
-  --sidebar: #e7e4dc;
-  --sunken: #f2f0ea;
-  --ink: #17211d;
-  --muted: #686e69;
-  --faint: #8b908c;
-  --line: rgba(23, 33, 29, 0.1);
-  --line-strong: rgba(23, 33, 29, 0.2);
-  --accent: #164434;
-  --accent-hover: #10382a;
-  --accent-ink: #f7f6f1;
-  --accent-soft: #e2ebe6;
-  --accent-mid: #b5ccbf;
-  --danger: #8f2d2d;
-  --danger-soft: #f4e5e2;
-  --warning: #7d5100;
-  --warning-soft: #f2ead8;
-  --ok: #1d5b43;
-  --ok-soft: #e2eee8;
-  --stale: #705d3f;
-  --stale-soft: #ece7dd;
-  --inverse: #17211d;
-  --inverse-ink: #f7f6f1;
-  --shadow: 0 1px 2px rgba(23, 33, 29, 0.06);
-  --shadow-card: 0 8px 24px rgba(23, 33, 29, 0.055);
-  --shadow-popover: 0 24px 72px rgba(23, 33, 29, 0.18);
-  --radius: 1rem;
-  --radius-sm: 0.625rem;
-  --radius-xs: 0.4rem;
+  --canvas: #ebe9f0;
+  --paper: #f8f6ef;
+  --paper-raised: #fffefa;
+  --sidebar: #dedce5;
+  --sunken: #eeebf2;
+  --ink: #17182a;
+  --muted: #69697a;
+  --faint: #9291a1;
+  --line: rgba(23, 24, 42, 0.11);
+  --line-strong: rgba(23, 24, 42, 0.22);
+  --accent: #ff5b36;
+  --accent-hover: #e94724;
+  --accent-ink: #17182a;
+  --accent-soft: #ffe1d8;
+  --accent-mid: #ffaf9b;
+  --signal: #c9ff4a;
+  --signal-ink: #17182a;
+  --violet: #7668ff;
+  --violet-soft: #e8e4ff;
+  --sky: #65d8ff;
+  --danger: #bd263f;
+  --danger-soft: #ffe0e5;
+  --warning: #8d5700;
+  --warning-soft: #fff0c8;
+  --ok: #12614f;
+  --ok-soft: #dff5ed;
+  --stale: #6f5b47;
+  --stale-soft: #eee7de;
+  --inverse: #17182a;
+  --inverse-2: #22243c;
+  --inverse-ink: #fffdf5;
+  --shadow: 0 2px 0 rgba(23, 24, 42, 0.14);
+  --shadow-card: 0 2px 0 rgba(23, 24, 42, 0.1), 0 18px 42px rgba(34, 28, 74, 0.08);
+  --shadow-popover: 0 30px 90px rgba(23, 24, 42, 0.28);
+  --shadow-color: 8px 8px 0 rgba(118, 104, 255, 0.18);
+  --radius: 1.5rem;
+  --radius-sm: 0.8rem;
+  --radius-xs: 0.5rem;
   --control-height: 2.5rem;
   --touch-target: 2.75rem;
-  --focus: #397d62;
+  --focus: #7668ff;
   --duration-fast: 120ms;
   --duration-ui: 180ms;
   --duration-layout: 280ms;
   --ease-ui: cubic-bezier(0.2, 0.8, 0.2, 1);
   --mobile-nav-height: 4.5rem;
   --font-sans: var(--font-ibm-plex-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-source-serif), ui-serif, Georgia, serif;
+  --font-display:
+    var(--font-bricolage), var(--font-ibm-plex-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-ibm-plex-mono), ui-monospace, monospace;
-  --chart-1: #1f4d3a;
-  --chart-2: #28578a;
-  --chart-3: #91651b;
-  --chart-4: #6d4e82;
-  --chart-5: #9f2a2a;
-  --chart-6: #2c7783;
-  --chart-7: #994a69;
-  --chart-8: #796528;
-  --chart-9: #505e9b;
-  --chart-10: #24766c;
-  --chart-11: #9c532d;
-  --chart-12: #7c4f79;
-  --chart-grid: rgba(23, 33, 29, 0.075);
-  --chart-axis: rgba(23, 33, 29, 0.14);
+  --chart-1: #ff5b36;
+  --chart-2: #7668ff;
+  --chart-3: #00a985;
+  --chart-4: #f3af18;
+  --chart-5: #ef3974;
+  --chart-6: #209cc8;
+  --chart-7: #a77bff;
+  --chart-8: #ff8a32;
+  --chart-9: #4b6cf6;
+  --chart-10: #82d173;
+  --chart-11: #ff7a6b;
+  --chart-12: #e9a565;
+  --chart-grid: rgba(255, 253, 245, 0.1);
+  --chart-axis: rgba(255, 253, 245, 0.22);
 }
 
 @theme inline {
   --font-sans: var(--font-ibm-plex-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-source-serif), ui-serif, Georgia, serif;
+  --font-display:
+    var(--font-bricolage), var(--font-ibm-plex-sans), ui-sans-serif, system-ui, sans-serif;
   --color-canvas: var(--canvas);
   --color-paper: var(--paper);
   --color-sidebar: var(--sidebar);
@@ -76,7 +85,7 @@
 
 body {
   font-family: var(--font-sans);
-  background: var(--canvas);
+  background: var(--inverse);
   color: var(--ink);
   min-height: 100vh;
   text-rendering: optimizeLegibility;
@@ -119,6 +128,24 @@ textarea {
   display: none;
 }
 
+.chart-scroll {
+  scrollbar-color: var(--accent) rgba(255, 253, 245, 0.08);
+  scrollbar-width: thin;
+}
+
+.chart-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.chart-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 253, 245, 0.08);
+}
+
+.chart-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: var(--accent);
+}
+
 .surface-panel {
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -133,10 +160,97 @@ textarea {
   box-shadow: var(--shadow-card);
 }
 
+.workspace-frame {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-color: var(--canvas);
+}
+
+.workspace-frame::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: url('/costops-topography.svg');
+  background-position: top right;
+  background-repeat: no-repeat;
+  background-size: min(74rem, 82vw) auto;
+  content: '';
+  opacity: 0.34;
+  pointer-events: none;
+}
+
+.kinetic-panel {
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--paper-raised);
+  box-shadow: var(--shadow-color);
+}
+
+.dark-stage {
+  --ink: #fffdf5;
+  --muted: #b7b6c9;
+  --faint: #85859a;
+  --line: rgba(255, 253, 245, 0.12);
+  --line-strong: rgba(255, 253, 245, 0.24);
+  --paper: #22243c;
+  --paper-raised: #282a46;
+  --sunken: #1d1f35;
+  color: var(--inverse-ink);
+  background-color: var(--inverse);
+}
+
+.light-stage {
+  --ink: #17182a;
+  --muted: #69697a;
+  --faint: #9291a1;
+  --line: rgba(23, 24, 42, 0.11);
+  --line-strong: rgba(23, 24, 42, 0.22);
+  --paper: #f8f6ef;
+  --paper-raised: #fffefa;
+  --sunken: #eeebf2;
+  color: var(--ink);
+}
+
+.tone-violet {
+  --ink: #fffdf5;
+  --muted: rgba(255, 253, 245, 0.68);
+  --faint: rgba(255, 253, 245, 0.46);
+  --line: rgba(255, 253, 245, 0.16);
+  color: #fffdf5;
+  background-color: var(--violet);
+}
+
+.tone-signal {
+  --ink: #17182a;
+  --muted: rgba(23, 24, 42, 0.66);
+  --faint: rgba(23, 24, 42, 0.46);
+  --line: rgba(23, 24, 42, 0.14);
+  color: var(--signal-ink);
+  background-color: var(--signal);
+}
+
+.tone-accent {
+  --ink: #17182a;
+  --muted: rgba(23, 24, 42, 0.64);
+  --faint: rgba(23, 24, 42, 0.46);
+  --line: rgba(23, 24, 42, 0.14);
+  color: var(--accent-ink);
+  background-color: var(--accent);
+}
+
+.signal-grid {
+  background-image: url('/costops-signal-grid.svg');
+  background-position: center;
+  background-repeat: repeat;
+  background-size: 96px 96px;
+}
+
 .eyebrow {
   font-size: 0.6875rem;
+  font-family: var(--font-mono);
   font-weight: 600;
-  letter-spacing: 0.13em;
+  letter-spacing: 0.16em;
   line-height: 1.2;
   text-transform: uppercase;
   color: var(--muted);
@@ -167,7 +281,7 @@ textarea {
 }
 
 .field-control:hover {
-  border-color: rgba(23, 33, 29, 0.34);
+  border-color: rgba(23, 24, 42, 0.42);
 }
 
 .field-control:focus {
@@ -183,7 +297,7 @@ textarea {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  background: rgba(23, 33, 29, 0.52);
+  background: rgba(23, 24, 42, 0.66);
 }
 
 .sheet-modal {
@@ -210,13 +324,61 @@ textarea {
 
 .wordmark {
   font-family: var(--font-display);
-  font-weight: 600;
-  letter-spacing: -0.04em;
+  font-weight: 700;
+  letter-spacing: -0.055em;
+}
+
+.signal-pulse {
+  animation: signal-pulse 1.8s var(--ease-ui) infinite;
+}
+
+.orbit-spin {
+  animation: orbit-spin 24s linear infinite;
+  transform-origin: center;
+}
+
+.float-slow {
+  animation: float-slow 7s var(--ease-ui) infinite;
+}
+
+@keyframes signal-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(0.82);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes orbit-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
 }
 
 @media (min-width: 1024px) {
   .app-bottom-safe {
     padding-bottom: 0;
+  }
+
+  .workspace-frame {
+    min-height: calc(100dvh - 1.5rem);
+    border: 1px solid rgba(255, 253, 245, 0.16);
+    border-radius: 2rem 0 0 2rem;
+    box-shadow: -18px 0 60px rgba(0, 0, 0, 0.14);
   }
 }
 

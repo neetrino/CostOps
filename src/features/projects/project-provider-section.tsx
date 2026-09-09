@@ -11,8 +11,9 @@ type ProjectProviderSectionProps = {
 export function ProjectProviderSection({ provider }: ProjectProviderSectionProps) {
   const isVps = isFixedVpsProvider(provider.providerKey);
   return (
-    <article className="overflow-hidden rounded-[var(--radius)] border border-[var(--line-strong)] bg-[var(--paper-raised)] shadow-[var(--shadow-card)]">
-      <div className="border-b border-[var(--line)] bg-[var(--sunken)] px-4 py-4">
+    <article className="overflow-hidden rounded-[var(--radius)] border border-[var(--line-strong)] bg-[var(--paper-raised)] shadow-[var(--shadow-color)]">
+      <div className="h-2 bg-[var(--violet)]" />
+      <div className="border-b border-[var(--line)] bg-[var(--violet-soft)] px-5 py-5">
         <p className="eyebrow">Provider resources</p>
         <h3 className="mt-1 font-semibold text-[var(--ink)]">
           {providerUiLabel(provider.providerKey)}

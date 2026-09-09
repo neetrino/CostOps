@@ -23,7 +23,7 @@ export function SignOutButton() {
       type="button"
       onClick={() => void signOut()}
       disabled={pending}
-      className="min-h-10 rounded-[var(--radius-sm)] border border-[var(--line-strong)] bg-[var(--paper-raised)] px-3 py-2 text-sm font-medium text-[var(--ink)] transition-colors hover:border-[var(--ink)] hover:bg-[var(--sunken)] disabled:opacity-50"
+      className="min-h-10 rounded-full border border-[var(--line-strong)] bg-[var(--paper-raised)] px-4 py-2 text-sm font-semibold text-[var(--ink)] transition-[background-color,border-color,transform] hover:-translate-y-0.5 hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] disabled:opacity-50"
     >
       {pending ? 'Signing out…' : 'Sign out'}
     </button>

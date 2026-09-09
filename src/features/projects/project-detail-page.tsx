@@ -238,29 +238,35 @@ function ProjectDetailHeader({
   onArchive: () => void;
 }) {
   return (
-    <header className="surface-ledger overflow-hidden">
-      <div className="p-5 sm:p-6">
+    <header className="kinetic-panel overflow-hidden">
+      <div className="tone-violet signal-grid relative overflow-hidden p-6 sm:p-8 lg:p-10">
+        <span className="absolute -top-12 right-12 size-44 rounded-full border border-white/15" />
+        <span className="absolute top-10 right-24 size-12 rounded-full bg-[var(--signal)]" />
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="eyebrow">
-            <Link href="/" className="hover:text-[var(--accent)]">
+          <p className="eyebrow !text-white/55">
+            <Link href="/" className="hover:text-[var(--signal)]">
               Projects
             </Link>
             {' · '}
             {detail.range.from} → {detail.range.to}
           </p>
           {!detail.project.archived ? (
-            <Button variant="secondary" className="text-xs" onClick={onArchive}>
+            <Button
+              variant="secondary"
+              className="border-white/20 bg-white/10 text-xs text-white hover:border-white/40 hover:bg-white/15"
+              onClick={onArchive}
+            >
               Archive
             </Button>
           ) : null}
         </div>
         {editingName ? (
-          <div className="mt-6 flex flex-wrap items-center gap-2">
+          <div className="relative mt-10 flex flex-wrap items-center gap-2">
             <input
               type="text"
               value={nameDraft}
               onChange={(event) => onNameDraft(event.target.value)}
-              className="field-control max-w-xl text-xl font-semibold"
+              className="field-control light-stage max-w-xl text-xl font-semibold"
               aria-label="Project name"
             />
             <Button variant="secondary" disabled={savingName} onClick={onSaveName}>
@@ -271,24 +277,28 @@ function ProjectDetailHeader({
             </Button>
           </div>
         ) : (
-          <div className="mt-6 flex flex-wrap items-end gap-3">
-            <h1 className="wordmark min-w-0 text-4xl leading-none text-[var(--ink)] sm:text-5xl">
+          <div className="relative mt-10 flex flex-wrap items-end gap-3">
+            <h1 className="wordmark min-w-0 text-[clamp(3.5rem,7vw,6.7rem)] leading-[0.82] text-[var(--ink)]">
               {detail.project.name}
             </h1>
             {!detail.project.archived ? (
-              <Button variant="ghost" className="text-xs" onClick={onStartEdit}>
+              <Button
+                variant="ghost"
+                className="border border-white/15 bg-white/8 text-xs text-white hover:bg-white/15"
+                onClick={onStartEdit}
+              >
                 Rename
               </Button>
             ) : null}
           </div>
         )}
-        <p className="money mt-2 text-xs text-[var(--muted)]">
+        <p className="money relative mt-4 text-xs text-[var(--muted)]">
           {detail.project.slug}
           {detail.project.archived ? ' · Archived' : ''}
         </p>
       </div>
-      <div className="flex items-center gap-3 border-t border-[var(--line)] bg-[var(--sunken)] px-5 py-3 text-xs text-[var(--muted)]">
-        <span className="size-2 rounded-full bg-[var(--ok)]" />
+      <div className="tone-signal flex items-center gap-3 border-t border-[var(--line)] px-5 py-3 text-xs text-[var(--muted)]">
+        <span className="signal-pulse size-2 rounded-full bg-[var(--accent)]" />
         Mapped provider costs only · missing days remain gaps
       </div>
     </header>

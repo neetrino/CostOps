@@ -14,12 +14,12 @@ type ProjectTotalHeroProps = {
 export function ProjectTotalHero({ slug, detail, onBudgetSaved }: ProjectTotalHeroProps) {
   return (
     <section className="space-y-4">
-      <div className="grid overflow-hidden rounded-[var(--radius)] border border-[var(--line-strong)] bg-[var(--paper-raised)] shadow-[var(--shadow-card)] sm:grid-cols-2">
-        <HeroMetric label="Total today" cost={detail.today} accent />
-        <HeroMetric label="Total period" cost={detail.period} />
+      <div className="grid gap-3 sm:grid-cols-2">
+        <HeroMetric label="Total today" cost={detail.today} tone="signal" />
+        <HeroMetric label="Total period" cost={detail.period} tone="dark" />
       </div>
-      <article className="overflow-hidden rounded-[var(--radius)] border border-[var(--line-strong)] bg-[var(--paper-raised)] shadow-[var(--shadow-card)]">
-        <div className="flex flex-col gap-4 border-b border-[var(--line)] bg-[var(--sunken)] px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+      <article className="overflow-hidden rounded-[var(--radius)] border border-[var(--line-strong)] bg-[var(--paper-raised)] shadow-[var(--shadow-color)]">
+        <div className="tone-accent flex flex-col gap-4 border-b border-[var(--line)] px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="eyebrow">Project budget</p>
             <h2 className="mt-1 text-base font-semibold text-[var(--ink)]">
@@ -89,18 +89,18 @@ export function ProjectTotalHero({ slug, detail, onBudgetSaved }: ProjectTotalHe
 function HeroMetric({
   label,
   cost,
-  accent = false,
+  tone,
 }: {
   label: string;
   cost: ProjectDetailResponse['today'];
-  accent?: boolean;
+  tone: 'dark' | 'signal';
 }) {
   return (
     <div
-      className={`min-h-36 border-b border-[var(--line)] px-5 py-5 last:border-b-0 sm:border-r sm:border-b-0 sm:last:border-r-0 ${accent ? 'bg-[var(--inverse)] text-[var(--inverse-ink)]' : ''}`}
+      className={`min-h-40 rounded-[var(--radius)] border border-[var(--line)] px-5 py-5 shadow-[var(--shadow-card)] ${tone === 'dark' ? 'dark-stage' : 'tone-signal'}`}
     >
-      <p className={`eyebrow ${accent ? '!text-[color:rgba(247,246,241,.58)]' : ''}`}>{label}</p>
-      <div className={`mt-7 ${accent ? '[&_*]:!text-[var(--inverse-ink)]' : ''}`}>
+      <p className="eyebrow">{label}</p>
+      <div className="mt-8">
         <CostViewDisplay cost={cost} size="lg" />
       </div>
     </div>

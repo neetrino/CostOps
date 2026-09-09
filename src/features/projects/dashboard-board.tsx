@@ -8,9 +8,9 @@ type DashboardBoardProps = {
 /** Filter rail + remaining viewport width — same density as the Neon board. */
 export function DashboardBoard({ rail, children }: DashboardBoardProps) {
   return (
-    <div className="flex flex-col lg:flex-row">
+    <div className="flex flex-col lg:min-h-[calc(100dvh-4.75rem)] lg:flex-row">
       {rail}
-      <div className="min-w-0 flex-1 space-y-5 px-3 py-4 sm:px-4 lg:max-w-[calc(100vw-17.5rem)] lg:space-y-6 lg:p-6 xl:p-8">
+      <div className="min-w-0 flex-1 space-y-5 px-3 py-4 sm:px-4 lg:space-y-7 lg:p-7 xl:p-9">
         {children}
       </div>
     </div>

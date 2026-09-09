@@ -1,6 +1,7 @@
 'use client';
 
 import type { CostView } from '@/core/cost/types';
+import { motion } from 'motion/react';
 import { providerUiLabel } from '@/shared/provider-label';
 import { compareProviderNavOrder } from '@/shared/registered-providers';
 import { CostViewDisplay } from '@/shared/ui/cost-view-display';
@@ -26,11 +27,11 @@ function periodCostHint(sourceType: CostView['sourceType'], providerKey?: string
 export function KpiStrip({ byProvider, loading }: KpiStripProps) {
   if (loading) {
     return (
-      <div className="scrollbar-none flex snap-x gap-3 overflow-x-auto pb-1 sm:grid sm:grid-cols-2 sm:overflow-visible lg:grid-cols-4">
+      <div className="scrollbar-none flex snap-x gap-3 overflow-x-auto pb-1 sm:grid sm:grid-cols-2 sm:overflow-visible xl:grid-cols-4">
         {Array.from({ length: 4 }).map((_, index) => (
           <div
             key={index}
-            className="h-28 min-w-[76vw] snap-start animate-pulse rounded-[var(--radius)] border border-[var(--line)] bg-[var(--paper)] sm:min-w-0"
+            className="h-36 min-w-[76vw] snap-start animate-pulse rounded-[var(--radius)] border border-[var(--line)] bg-[var(--paper)] sm:min-w-0"
           />
         ))}
       </div>
@@ -42,16 +43,23 @@ export function KpiStrip({ byProvider, loading }: KpiStripProps) {
   );
 
   return (
-    <section className="overflow-hidden rounded-[var(--radius)] border border-[var(--line-strong)] bg-[var(--paper-raised)] shadow-[var(--shadow-card)]">
-      <div className="scrollbar-none flex snap-x overflow-x-auto sm:grid sm:grid-cols-2 sm:overflow-visible lg:grid-cols-4">
+    <section>
+      <div className="scrollbar-none flex snap-x gap-3 overflow-x-auto pb-2 sm:grid sm:grid-cols-2 sm:overflow-visible xl:grid-cols-4">
         {tiles.map((tile, index) => (
-          <div
+          <motion.div
             key={tile.providerKey}
-            className="min-w-[76vw] snap-start border-r border-[var(--line)] px-5 py-5 last:border-r-0 sm:min-w-0 sm:border-b sm:[&:nth-child(2n)]:border-r-0 sm:[&:nth-last-child(-n+2)]:border-b-0 lg:border-b-0 lg:[&:nth-child(2n)]:border-r"
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.34, delay: index * 0.055 }}
+            whileHover={{ y: -5, rotate: index % 2 === 0 ? -0.35 : 0.35 }}
+            className={`relative min-h-36 min-w-[76vw] snap-start overflow-hidden rounded-[var(--radius)] border border-[var(--line)] p-5 shadow-[var(--shadow-card)] sm:min-w-0 ${tileTone(index)}`}
           >
+            <span className="absolute -right-5 -bottom-9 font-[family-name:var(--font-display)] text-[7rem] leading-none font-extrabold text-[var(--ink)] opacity-[0.055]">
+              {String(index + 1).padStart(2, '0')}
+            </span>
             <div className="flex items-center justify-between gap-3">
               <p className="eyebrow">{providerUiLabel(tile.providerKey) || tile.displayName}</p>
-              <span className="money flex size-7 items-center justify-center rounded-md bg-[var(--sunken)] text-[10px] text-[var(--muted)]">
+              <span className="money flex size-7 items-center justify-center rounded-full border border-[var(--line)] bg-white/15 text-[10px] text-[var(--muted)]">
                 {String(index + 1).padStart(2, '0')}
               </span>
             </div>
@@ -61,9 +69,14 @@ export function KpiStrip({ byProvider, loading }: KpiStripProps) {
             <p className="mt-3 text-[11px] leading-relaxed text-[var(--muted)]">
               {periodCostHint(tile.cost.sourceType, tile.providerKey)}
             </p>
-          </div>
+          </motion.div>
         ))}
       </div>
     </section>
   );
+}
+
+function tileTone(index: number): string {
+  const tones = ['dark-stage', 'tone-signal', 'tone-violet', 'tone-accent'] as const;
+  return tones[index % tones.length];
 }

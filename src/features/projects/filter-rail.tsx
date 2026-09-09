@@ -80,9 +80,23 @@ export function FilterRail({ state, onChange, onRefresh, loading }: FilterRailPr
           <div className="p-5">{fields}</div>
         </MobileSheet>
       </div>
-      <aside className="hidden w-[17.5rem] shrink-0 border-r border-[var(--line-strong)] bg-[var(--sidebar)] lg:block">
+      <aside className="hidden w-[18rem] shrink-0 border-r border-[var(--line-strong)] bg-[var(--paper)]/88 lg:block">
         <div className="sticky top-[4.75rem] max-h-[calc(100vh-4.75rem)] overflow-y-auto p-5">
-          <p className="eyebrow mb-5">Range & grouping</p>
+          <div className="mb-6 overflow-hidden rounded-[1.3rem] bg-[var(--inverse)] p-4 text-[var(--inverse-ink)] shadow-[var(--shadow-color)]">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="eyebrow !text-white/45">03 / Time lens</p>
+                <p className="wordmark mt-3 text-2xl leading-none">Shape the signal.</p>
+              </div>
+              <span className="money flex size-9 shrink-0 items-center justify-center rounded-full bg-[var(--signal)] text-[10px] text-[var(--signal-ink)]">
+                UTC
+              </span>
+            </div>
+            <div className="mt-5 flex items-center gap-2 text-[10px] text-white/50">
+              <span className="h-px flex-1 bg-white/15" />
+              RANGE + RHYTHM
+            </div>
+          </div>
           {fields}
         </div>
       </aside>
@@ -181,9 +195,9 @@ function PresetButton({
     <button
       type="button"
       onClick={onClick}
-      className={`min-h-11 rounded-[var(--radius-sm)] px-3 py-2 text-left text-sm font-medium transition-colors ${
+      className={`relative min-h-11 overflow-hidden rounded-[var(--radius-sm)] px-3 py-2 text-left text-sm font-semibold transition-[color,background-color,transform] hover:-translate-y-0.5 ${
         active
-          ? 'bg-[var(--accent)] text-[var(--accent-ink)]'
+          ? 'bg-[var(--inverse)] text-[var(--inverse-ink)] shadow-[var(--shadow)]'
           : 'border border-[var(--line)] bg-[var(--paper)] text-[var(--ink)] hover:border-[var(--line-strong)]'
       }`}
     >

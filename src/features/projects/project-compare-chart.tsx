@@ -18,8 +18,9 @@ import { ChartPanel } from '@/features/projects/chart-panel';
 import { chartColorForKey } from '@/shared/ui/chart-colors';
 import { EmptyPanel } from '@/shared/ui/state-panels';
 
-const BAR_SLOT_PX = 46;
-const CHART_MIN_HEIGHT_PX = 300;
+const BAR_SLOT_PX = 92;
+const CHART_MIN_WIDTH_PX = 760;
+const CHART_HEIGHT_PX = 410;
 const GRID = 'var(--chart-grid)';
 const AXIS = 'var(--chart-axis)';
 
@@ -40,43 +41,49 @@ export function ProjectCompareChart({
     return <EmptyPanel title={emptyTitle} detail="Costs may be missing in this range." />;
   }
 
-  const innerHeight = Math.max(CHART_MIN_HEIGHT_PX, data.length * BAR_SLOT_PX + 44);
+  const rankedData = [...data].sort(
+    (left, right) =>
+      (right.costUsd ?? Number.NEGATIVE_INFINITY) - (left.costUsd ?? Number.NEGATIVE_INFINITY),
+  );
+  const innerWidth = Math.max(CHART_MIN_WIDTH_PX, rankedData.length * BAR_SLOT_PX + 72);
 
   return (
-    <ChartPanel title={title} subtitle={`${subtitle} · ${data.length} with cost`}>
-      <div className="max-h-[44rem] overflow-y-auto pr-1">
-        <div style={{ width: '100%', height: innerHeight }}>
+    <ChartPanel
+      title={title}
+      subtitle={`${subtitle} · top spenders first · scroll right for all ${data.length}`}
+      index="04"
+      accent="signal"
+    >
+      <div className="chart-scroll overflow-x-auto overflow-y-hidden pb-2">
+        <div style={{ width: innerWidth, height: CHART_HEIGHT_PX }}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
-              data={data}
-              layout="vertical"
-              margin={{ top: 8, right: 54, left: 8, bottom: 16 }}
+              data={rankedData}
+              margin={{ top: 38, right: 20, left: 4, bottom: 70 }}
+              barCategoryGap="24%"
             >
-              <CartesianGrid stroke={GRID} horizontal={false} />
+              <CartesianGrid stroke={GRID} vertical={false} strokeDasharray="4 8" />
               <XAxis
-                type="number"
+                type="category"
+                dataKey="label"
                 tick={{ fill: 'var(--muted)', fontSize: 10 }}
                 axisLine={{ stroke: AXIS }}
                 tickLine={false}
-                tickFormatter={formatChartAxisUsd}
-                label={{
-                  value: 'USD',
-                  position: 'insideBottomRight',
-                  offset: -8,
-                  fill: 'var(--muted)',
-                  fontSize: 10,
-                }}
+                interval={0}
+                angle={-34}
+                textAnchor="end"
+                height={72}
               />
               <YAxis
-                type="category"
-                dataKey="label"
-                tick={{ fill: 'var(--muted)', fontSize: 11 }}
+                type="number"
+                tick={{ fill: 'var(--muted)', fontSize: 10 }}
                 axisLine={false}
                 tickLine={false}
-                width={112}
+                width={52}
+                tickFormatter={formatChartAxisUsd}
               />
               <Tooltip
-                cursor={{ fill: 'rgba(28, 25, 23, 0.04)' }}
+                cursor={{ fill: 'rgba(255, 253, 245, 0.055)', radius: 12 }}
                 content={({ active, payload }) => {
                   if (!active || !payload?.[0]?.payload) {
                     return null;
@@ -84,6 +91,7 @@ export function ProjectCompareChart({
                   const row = payload[0].payload as CompareBarDatum;
                   return (
                     <div className="rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--paper)] px-3 py-2 text-xs shadow-[var(--shadow-card)]">
+                      <p className="eyebrow mb-1 !text-[var(--accent)]">Spend rank</p>
                       <p className="font-semibold text-[var(--ink)]">{row.fullName}</p>
                       <p className="money mt-1">
                         {row.costUsd === null ? '—' : formatChartUsd(row.costUsd)}
@@ -94,19 +102,22 @@ export function ProjectCompareChart({
               />
               <Bar
                 dataKey="costUsd"
-                radius={[0, 6, 6, 0]}
-                maxBarSize={20}
+                radius={[12, 12, 3, 3]}
+                maxBarSize={48}
                 isAnimationActive
-                animationDuration={420}
+                animationBegin={100}
+                animationDuration={820}
+                animationEasing="ease-out"
               >
-                {data.map((row) => (
+                {rankedData.map((row) => (
                   <Cell key={row.projectId} fill={chartColorForKey(row.projectId)} />
                 ))}
                 <LabelList
                   dataKey="costUsd"
-                  position="right"
-                  fill="var(--muted)"
-                  fontSize={10}
+                  position="top"
+                  fill="var(--ink)"
+                  fontSize={11}
+                  fontWeight={600}
                   formatter={(value) =>
                     typeof value === 'number' ? formatChartBarLabel(value) : ''
                   }
@@ -115,6 +126,14 @@ export function ProjectCompareChart({
             </BarChart>
           </ResponsiveContainer>
         </div>
+      </div>
+      <div className="mt-1 flex items-center justify-between gap-4 border-t border-white/10 px-2 pt-4 text-[10px] text-[var(--muted)]">
+        <span className="flex items-center gap-2">
+          <span className="size-2 rounded-full bg-[var(--signal)]" /> Ranked by selected period
+        </span>
+        <span className="font-[family-name:var(--font-mono)] tracking-[0.12em] uppercase">
+          Horizontal browse →
+        </span>
       </div>
     </ChartPanel>
   );
