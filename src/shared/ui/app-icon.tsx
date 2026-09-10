@@ -3,7 +3,10 @@ import type { SVGProps } from 'react';
 export type AppIconName =
   | 'alert'
   | 'arrow'
+  | 'calendar'
   | 'check'
+  | 'chevron-left'
+  | 'chevron-right'
   | 'close'
   | 'filter'
   | 'inbox'
@@ -107,6 +110,17 @@ function IconPaths({ name }: { name: AppIconName }) {
           <path d="M5 12h14M14 7l5 5-5 5" />
         </>
       );
+    case 'calendar':
+      return (
+        <>
+          <rect x="3.5" y="5" width="17" height="15.5" rx="2.5" />
+          <path d="M8 3.5v3M16 3.5v3M3.5 10h17" />
+        </>
+      );
+    case 'chevron-left':
+      return <path d="m14 6-6 6 6 6" />;
+    case 'chevron-right':
+      return <path d="m10 6 6 6-6 6" />;
     case 'check':
       return (
         <>

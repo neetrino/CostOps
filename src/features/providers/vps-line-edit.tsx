@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { fetchJson } from '@/features/dashboard/api-client';
 import { Button } from '@/shared/ui/button';
+import { DateField } from '@/shared/ui/date-field';
 
 type VpsLineEditProps = {
   resourceId: string;
@@ -80,12 +81,13 @@ export function VpsLineEdit({
           aria-label="Monthly VPS amount"
           className="field-control money w-28 text-xs"
         />
-        <input
-          type="date"
+        <DateField
           value={startDate}
-          onChange={(event) => setStartDate(event.target.value)}
+          onChange={setStartDate}
           aria-label="VPS start date"
-          className="field-control w-36 text-xs"
+          allowClear={false}
+          className="w-36"
+          triggerClassName="text-xs"
         />
         <Button
           variant="secondary"

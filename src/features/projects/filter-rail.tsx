@@ -5,6 +5,7 @@ import type { GroupBy } from '@/shared/dashboard-query';
 import type { DashboardUrlState } from '@/features/dashboard/dashboard-url';
 import { Button } from '@/shared/ui/button';
 import { AppIcon } from '@/shared/ui/app-icon';
+import { DateField } from '@/shared/ui/date-field';
 import { MobileSheet } from '@/shared/ui/mobile-sheet';
 
 const PRESET_BUTTONS: Array<{ preset: DatePreset; label: string }> = [
@@ -141,24 +142,16 @@ function FilterFields({
       </div>
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-1">
-        <label className="text-xs font-medium text-[var(--muted)]">
-          UTC From
-          <input
-            type="date"
-            value={from}
-            onChange={(event) => onCustomRange(event.target.value, to || event.target.value)}
-            className="field-control mt-1.5 text-sm"
-          />
-        </label>
-        <label className="text-xs font-medium text-[var(--muted)]">
-          UTC To
-          <input
-            type="date"
-            value={to}
-            onChange={(event) => onCustomRange(from || event.target.value, event.target.value)}
-            className="field-control mt-1.5 text-sm"
-          />
-        </label>
+        <DateField
+          label="UTC From"
+          value={from}
+          onChange={(next) => onCustomRange(next, to || next)}
+        />
+        <DateField
+          label="UTC To"
+          value={to}
+          onChange={(next) => onCustomRange(from || next, next)}
+        />
       </div>
 
       <label className="text-xs font-medium text-[var(--muted)]">

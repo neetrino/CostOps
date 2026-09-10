@@ -6,6 +6,7 @@ import { VpsProjectPicker } from '@/features/providers/vps-project-picker';
 import type { InboxProjectOption, ProjectOptionsResponse } from '@/features/unmapped/types';
 import { utcDayKey } from '@/shared/dates';
 import { Button } from '@/shared/ui/button';
+import { DateField } from '@/shared/ui/date-field';
 
 type VpsAddProjectProps = {
   onAdded: () => void;
@@ -93,16 +94,13 @@ export function VpsAddProject({ onAdded }: VpsAddProjectProps) {
               required
             />
           </label>
-          <label className="text-xs font-medium text-[var(--muted)]">
-            Starts
-            <input
-              type="date"
-              value={startDate}
-              onChange={(event) => setStartDate(event.target.value)}
-              className="field-control mt-1.5 text-sm"
-              required
-            />
-          </label>
+          <DateField
+            label="Starts"
+            value={startDate}
+            onChange={setStartDate}
+            required
+            allowClear={false}
+          />
           <div className="grid grid-cols-2 gap-2 lg:flex">
             <Button type="submit" className="w-full" disabled={saving || loading}>
               Save
