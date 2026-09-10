@@ -63,7 +63,7 @@ Goal: CostOps can replace the Neon dashboard for Neon-only use.
 
 - [x] Upstash Management API adapter (Redis + QStash; Vector/Search discovered when present)
 - [ ] GCP — postponed (billing quota on project `neetrino`; no SA JSON)
-- [x] Hetzner / VPS — FIXED monthly lines, no API token
+- [x] Hetzner / VPS — FIXED monthly lines, no API token; fee split across UTC days
 
 Each adapter must include `credentialCreateUrl` and auth-failure detection. If core must change, write an ADR first.
 

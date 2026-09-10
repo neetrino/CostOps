@@ -51,6 +51,21 @@ export function startOfUtcMonth(date: Date): Date {
   return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1));
 }
 
+/** Last UTC calendar day of the month that contains `date`. */
+export function endOfUtcMonth(date: Date): Date {
+  return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0));
+}
+
+/** Number of UTC calendar days in the month that contains `date`. */
+export function utcDaysInMonth(date: Date): number {
+  return endOfUtcMonth(date).getUTCDate();
+}
+
+/** `YYYY-MM` for the UTC month that contains `date`. */
+export function utcMonthKey(date: Date): string {
+  return utcDayKey(date).slice(0, 7);
+}
+
 /** First-of-month UTC dates whose months overlap the inclusive range. */
 export function utcMonthsOverlapping(from: Date, to: Date): Date[] {
   const start = startOfUtcMonth(from);

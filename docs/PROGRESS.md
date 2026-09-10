@@ -2,7 +2,7 @@
 
 **Phase.** 4 — Upstash + VPS FIXED  
 **Overall.** 96% (Neon + Vercel + project totals + Upstash + Hetzner/VPS fixed lines; operator mapping still open)  
-**Updated.** 2026-09-07 (VPS static monthly costs)
+**Updated.** 2026-09-10 (VPS monthly fee split across UTC days)
 
 ---
 
@@ -65,7 +65,7 @@
 - [x] Upstash `CostProviderAdapter` (`src/providers/upstash/`): Management API Redis + QStash, Zod, credential meta (`supportsExpiryDate: false`)
 - [x] Seed + cron ensure Provider `UPSTASH` + ProviderAccount from `UPSTASH_EMAIL`
 - [x] `/providers/upstash` nav + generic provider board + unmapped `upstash_redis` / `upstash_qstash`
-- [x] Hetzner/VPS FIXED: `Resource.fixedMonthlyUsd` + `fixedEffectiveOn`, adapter without API, add/update/stop only on `/providers/hetzner`, daily alerts skip FIXED
+- [x] Hetzner/VPS FIXED: `Resource.fixedMonthlyUsd` + `fixedEffectiveOn`, adapter without API, add/update/stop only on `/providers/hetzner`, daily alerts skip FIXED, monthly fee split across UTC days
 
 ---
 
@@ -233,6 +233,11 @@ The `404 costs_not_found` was observed on a short UTC `from=today 00:00Z&to=now`
 - Operator decision: every Neon / Vercel / Upstash Project × Provider rule is `$1` **and enabled**. No Set / Sync now to arm Telegram. VPS stays analytics-only.
 - `ensureProjectProviderBudgetRule` creates `enabled: true`. One-shot `pnpm exec tsx src/scripts/enable-project-provider-rules.ts` turns on existing disabled live-provider rules. `pnpm exec tsx src/scripts/run-stored-alert-pass.ts` evaluates stored today without a provider pull.
 - Near daily limit only lists **enabled** rules (same gate as Telegram). Disabled leftover rules no longer appear as if they were watching.
+
+### 2026-09-10 — VPS monthly fee split across UTC days
+
+- Operator-entered `$ / month` is still the source of truth. CostOps now writes one FIXED row per UTC day (`$fee / days_in_month`, last day absorbs remainder) so charts stay flat instead of dumping the whole fee on the 1st.
+- Amount edits still rewrite the current UTC month only. A leftover 1st-of-month lump is rewritten as daily rows using that booked month amount (`pnpm exec tsx src/scripts/rewrite-vps-daily-costs.ts`).
 
 ### 2026-09-07 — home = projects board
 

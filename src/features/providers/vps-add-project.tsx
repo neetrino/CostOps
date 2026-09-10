@@ -125,8 +125,9 @@ export function VpsAddProject({ onAdded }: VpsAddProjectProps) {
           <div>
             <p className="eyebrow">Fixed infrastructure</p>
             <p className="mt-1 max-w-3xl text-xs leading-relaxed text-[var(--muted)]">
-              Add or edit static monthly fees here. Amount changes apply to this month and later —
-              past months stay as booked. No Telegram alerts.
+              Add or edit static monthly fees here. The fee is split across UTC days so charts stay
+              flat. Amount changes apply to this month and later — past months stay as booked. No
+              Telegram alerts.
             </p>
           </div>
           <Button variant="secondary" className="text-xs" onClick={() => void openForm()}>

@@ -98,7 +98,7 @@ Exact type names may live in `src/core` once Phase 1 starts. The split of respon
 7. Credentials are read via `credentialRef` → env. No secrets in adapter source.
 8. Every adapter **must** ship `credentials` metadata (create URL, docs, auth-failure detector). See [CREDENTIAL_ROTATION.md](./CREDENTIAL_ROTATION.md).
 9. `requiresCredentials: false` skips rotate-token URLs and env vars (Hetzner/VPS FIXED). `isAuthFailure` still required and returns false.
-10. FIXED Hetzner: for each UTC month that **overlaps** the fetch range and is on/after `fixedEffectiveOn`, emit one row on the 1st (`sourceType=FIXED`). Do not write `$fee / days`. Amount edits rewrite the current month only; existing past month rows stay.
+10. FIXED Hetzner: for each UTC month that **overlaps** the fetch range and is on/after `fixedEffectiveOn`, emit one `sourceType=FIXED` row **per UTC day**. Split `$fee` across days in that month (last day absorbs remainder so the month still sums to the operator amount). Do not dump the whole fee on the 1st. Amount edits rewrite the current month only. A leftover 1st-of-month lump is rewritten as daily rows using that booked month amount.
 11. If docs disagree with a live response, record it in `docs/PROGRESS.md` and adapter comments. Observed API wins for implementation, documented as a discrepancy.
 
 ---

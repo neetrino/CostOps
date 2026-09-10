@@ -174,6 +174,17 @@ Paid models: not used. Fable 5: orchestrator only.
 
 ---
 
+## 2026-09-10 — VPS monthly fee is daily, not a 1st-of-month lump
+
+| Decision | Why |
+|----------|-----|
+| Split `$ / month` across UTC days | Hetzner-like VPS is used all month. A single 1st-of-month row spiked charts and made later days look like spend dropped. Daily rows keep the month total and a flat series. |
+| Last day absorbs remainder | `Decimal(14, 6)` integer micros so `$10` in a 30-day month still sums to `$10`. |
+| CostEntry stays daily | Hourly buckets would need a schema change. Daily is enough for the chart. |
+| Convert leftover 1st-of-month lumps | Redistribute the booked month amount across UTC days. Already-spread past months stay. |
+
+---
+
 ## 2026-09-07 — home is the projects board
 
 | Decision | Why |
