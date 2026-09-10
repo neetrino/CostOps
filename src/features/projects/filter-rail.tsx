@@ -145,12 +145,24 @@ function FilterFields({
         <DateField
           label="UTC From"
           value={from}
-          onChange={(next) => onCustomRange(next, to || next)}
+          onChange={(next) => {
+            if (!next) {
+              onCustomRange('', to);
+              return;
+            }
+            onCustomRange(next, !to || next > to ? next : to);
+          }}
         />
         <DateField
           label="UTC To"
           value={to}
-          onChange={(next) => onCustomRange(from || next, next)}
+          onChange={(next) => {
+            if (!next) {
+              onCustomRange(from, '');
+              return;
+            }
+            onCustomRange(!from || next < from ? next : from, next);
+          }}
         />
       </div>
 
