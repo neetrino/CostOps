@@ -124,6 +124,7 @@ function ProviderProjectCard({
                   <VpsLineEdit
                     resourceId={line.id}
                     monthlyAmountUsd={line.monthlyAmountUsd}
+                    effectiveOn={line.effectiveOn}
                     onChanged={onBudgetSaved}
                   />
                 </div>

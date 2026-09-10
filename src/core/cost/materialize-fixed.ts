@@ -1,17 +1,18 @@
 import { upsertCostEntries } from '@/core/cost/upsert';
 import { prisma } from '@/shared/db';
-import { startOfUtcMonth, utcMonthsOverlapping } from '@/shared/dates';
+import { startOfUtcMonth, toUtcDateOnly, utcMonthsOverlapping } from '@/shared/dates';
 import { decimalToNumber } from '@/shared/money';
 import {
+  classifyPastFixedMonths,
   filterFixedCostsForRewrite,
-  fixedMonthKey,
   fixedResourcesToCosts,
 } from '@/providers/hetzner/map-costs';
 import type { DateRange } from '@/providers/types';
 
 /**
- * Writes FIXED month-start rows. Current and future months always upsert.
- * Past months are created only when missing, so an amount edit does not rewrite history.
+ * Writes FIXED daily rows for the monthly fee from `fixedEffectiveOn`.
+ * Current and future months always upsert. Days before the start date in the
+ * current month are removed so a mid-month purchase does not bill the 1st.
  */
 export async function materializeFixedVpsCosts(input: {
   providerAccountId: string;
@@ -35,31 +36,55 @@ export async function materializeFixedVpsCosts(input: {
   if (!resource || resource.archivedAt || !resource.fixedMonthlyUsd || !resource.fixedEffectiveOn) {
     return 0;
   }
+  const monthlyAmountUsd = decimalToNumber(resource.fixedMonthlyUsd);
+  const monthStarts = utcMonthsOverlapping(input.range.from, input.range.to);
+  const firstMonth = monthStarts[0];
+  const lastMonth = monthStarts[monthStarts.length - 1];
+  const existing =
+    firstMonth && lastMonth
+      ? await prisma.costEntry.findMany({
+          where: {
+            resourceId: resource.id,
+            sourceType: 'FIXED',
+            bucketDate: {
+              gte: firstMonth,
+              lt: new Date(Date.UTC(lastMonth.getUTCFullYear(), lastMonth.getUTCMonth() + 1, 1)),
+            },
+          },
+          select: { bucketDate: true, costUsd: true },
+        })
+      : [];
+  const past = classifyPastFixedMonths(
+    existing.map((row) => ({
+      externalId: resource.externalId,
+      bucketDate: row.bucketDate,
+      costUsd: decimalToNumber(row.costUsd),
+    })),
+    now,
+  );
   const allCosts = fixedResourcesToCosts(
     [
       {
         externalId: resource.externalId,
-        monthlyAmountUsd: decimalToNumber(resource.fixedMonthlyUsd),
+        monthlyAmountUsd,
         effectiveOn: resource.fixedEffectiveOn,
       },
     ],
     input.range,
+    past.lumpAmounts,
   );
-  const currentMonth = startOfUtcMonth(now);
-  const monthStarts = utcMonthsOverlapping(input.range.from, input.range.to);
-  const existing = await prisma.costEntry.findMany({
+  const costs = filterFixedCostsForRewrite(allCosts, past.skipKeys, now);
+  const effectiveOn = toUtcDateOnly(resource.fixedEffectiveOn);
+  await prisma.costEntry.deleteMany({
     where: {
       resourceId: resource.id,
-      bucketDate: { in: monthStarts },
+      sourceType: 'FIXED',
+      bucketDate: {
+        gte: startOfUtcMonth(now),
+        lt: effectiveOn,
+      },
     },
-    select: { bucketDate: true },
   });
-  const existingPast = new Set(
-    existing
-      .filter((row) => row.bucketDate.getTime() < currentMonth.getTime())
-      .map((row) => fixedMonthKey(resource.externalId, row.bucketDate)),
-  );
-  const costs = filterFixedCostsForRewrite(allCosts, existingPast, now);
   if (costs.length === 0) {
     return 0;
   }

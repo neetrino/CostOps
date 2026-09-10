@@ -4,33 +4,27 @@ import { useState } from 'react';
 import { fetchJson } from '@/features/dashboard/api-client';
 import { VpsProjectPicker } from '@/features/providers/vps-project-picker';
 import type { InboxProjectOption, ProjectOptionsResponse } from '@/features/unmapped/types';
-import { startOfUtcMonth, utcDayKey } from '@/shared/dates';
+import { utcDayKey } from '@/shared/dates';
 import { Button } from '@/shared/ui/button';
+import { DateField } from '@/shared/ui/date-field';
 
 type VpsAddProjectProps = {
   onAdded: () => void;
 };
-
-function currentUtcMonthValue(now = new Date()): string {
-  return utcDayKey(startOfUtcMonth(now)).slice(0, 7);
-}
-
-function monthValueToDate(value: string): string {
-  return `${value}-01`;
-}
 
 export function VpsAddProject({ onAdded }: VpsAddProjectProps) {
   const [open, setOpen] = useState(false);
   const [projects, setProjects] = useState<InboxProjectOption[]>([]);
   const [projectId, setProjectId] = useState('');
   const [amount, setAmount] = useState('14');
-  const [month, setMonth] = useState(currentUtcMonthValue);
+  const [startDate, setStartDate] = useState(utcDayKey(new Date()));
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const openForm = async () => {
     setOpen(true);
+    setStartDate(utcDayKey(new Date()));
     setLoading(true);
     setError(null);
     try {
@@ -59,7 +53,7 @@ export function VpsAddProject({ onAdded }: VpsAddProjectProps) {
         body: JSON.stringify({
           displayName: `${selected.name} VPS`,
           monthlyAmountUsd,
-          effectiveOn: monthValueToDate(month),
+          effectiveOn: startDate,
         }),
       });
       setOpen(false);
@@ -76,7 +70,7 @@ export function VpsAddProject({ onAdded }: VpsAddProjectProps) {
     <section className="overflow-visible rounded-[var(--radius)] border border-[var(--line-strong)] bg-[var(--paper-raised)] shadow-[var(--shadow-card)]">
       {open ? (
         <form
-          className="grid gap-4 p-4 sm:p-5 lg:grid-cols-[minmax(16rem,2fr)_8rem_9rem_auto] lg:items-end"
+          className="grid gap-4 p-4 sm:p-5 lg:grid-cols-[minmax(16rem,2fr)_8rem_11rem_auto] lg:items-end"
           onSubmit={(event) => {
             event.preventDefault();
             void submit();
@@ -100,16 +94,13 @@ export function VpsAddProject({ onAdded }: VpsAddProjectProps) {
               required
             />
           </label>
-          <label className="text-xs font-medium text-[var(--muted)]">
-            Starts
-            <input
-              type="month"
-              value={month}
-              onChange={(event) => setMonth(event.target.value)}
-              className="field-control mt-1.5 text-sm"
-              required
-            />
-          </label>
+          <DateField
+            label="Starts"
+            value={startDate}
+            onChange={setStartDate}
+            required
+            allowClear={false}
+          />
           <div className="grid grid-cols-2 gap-2 lg:flex">
             <Button type="submit" className="w-full" disabled={saving || loading}>
               Save
@@ -125,8 +116,9 @@ export function VpsAddProject({ onAdded }: VpsAddProjectProps) {
           <div>
             <p className="eyebrow">Fixed infrastructure</p>
             <p className="mt-1 max-w-3xl text-xs leading-relaxed text-[var(--muted)]">
-              Add or edit static monthly fees here. Amount changes apply to this month and later —
-              past months stay as booked. No Telegram alerts.
+              Add a monthly fee and the UTC start day. Cost starts that day at $fee / days in the
+              month, so a mid-month purchase is less than a full month. Pick the 1st to bill the
+              whole month. No Telegram alerts.
             </p>
           </div>
           <Button variant="secondary" className="text-xs" onClick={() => void openForm()}>

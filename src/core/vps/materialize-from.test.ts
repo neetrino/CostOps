@@ -13,6 +13,15 @@ describe('vpsMaterializeFrom', () => {
     expect(from.toISOString().slice(0, 10)).toBe('2026-09-01');
   });
 
+  it('does not walk back before a mid-month start date', () => {
+    const from = vpsMaterializeFrom({
+      now,
+      effectiveOn: new Date('2026-09-10T00:00:00.000Z'),
+      amountChanged: true,
+    });
+    expect(from.toISOString().slice(0, 10)).toBe('2026-09-10');
+  });
+
   it('does not walk back before effectiveOn', () => {
     const from = vpsMaterializeFrom({
       now,

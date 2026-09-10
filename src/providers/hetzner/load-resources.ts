@@ -1,7 +1,11 @@
 import { prisma } from '@/shared/db';
 import { startOfUtcMonth } from '@/shared/dates';
 import { decimalToNumber } from '@/shared/money';
-import { fixedMonthKey, type FixedVpsResource } from '@/providers/hetzner/map-costs';
+import {
+  classifyPastFixedMonths,
+  type FixedVpsResource,
+  type PastFixedMonthRewrite,
+} from '@/providers/hetzner/map-costs';
 
 export async function loadActiveFixedVpsResources(accountId: string): Promise<FixedVpsResource[]> {
   const rows = await prisma.resource.findMany({
@@ -32,10 +36,10 @@ export async function loadActiveFixedVpsResources(accountId: string): Promise<Fi
   });
 }
 
-export async function loadExistingPastFixedMonthKeys(
+export async function loadPastFixedMonthRewrite(
   accountId: string,
   now: Date,
-): Promise<Set<string>> {
+): Promise<PastFixedMonthRewrite> {
   const currentMonth = startOfUtcMonth(now);
   const rows = await prisma.costEntry.findMany({
     where: {
@@ -44,14 +48,25 @@ export async function loadExistingPastFixedMonthKeys(
       sourceType: 'FIXED',
       bucketDate: { lt: currentMonth },
     },
-    select: { resource: { select: { externalId: true } }, bucketDate: true },
+    select: {
+      bucketDate: true,
+      costUsd: true,
+      resource: { select: { externalId: true } },
+    },
   });
-  return new Set(
+  return classifyPastFixedMonths(
     rows.flatMap((row) => {
       if (!row.resource) {
         return [];
       }
-      return [fixedMonthKey(row.resource.externalId, row.bucketDate)];
+      return [
+        {
+          externalId: row.resource.externalId,
+          bucketDate: row.bucketDate,
+          costUsd: decimalToNumber(row.costUsd),
+        },
+      ];
     }),
+    now,
   );
 }

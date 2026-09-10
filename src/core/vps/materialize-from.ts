@@ -2,7 +2,7 @@ import { startOfUtcMonth } from '@/shared/dates';
 
 /**
  * Amount edits rewrite the current UTC month and later.
- * Past booked months stay as written.
+ * Never walk back before the line start date.
  */
 export function vpsMaterializeFrom(input: {
   now: Date;
