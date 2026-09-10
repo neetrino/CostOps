@@ -3,7 +3,7 @@ import type { VpsLineView } from '@/core/vps/create-vps-line';
 import { vpsMaterializeFrom } from '@/core/vps/materialize-from';
 import type { PatchVpsLineBody } from '@/core/vps/schemas';
 import { prisma } from '@/shared/db';
-import { parseIsoDateOnly, startOfUtcMonth, toUtcDateOnly, utcDayKey } from '@/shared/dates';
+import { parseIsoDateOnly, toUtcDateOnly, utcDayKey } from '@/shared/dates';
 import { decimalToNumber, toFixedUsd } from '@/shared/money';
 
 export type PatchVpsLineResult =
@@ -19,7 +19,7 @@ export async function patchVpsLine(
     return { ok: false, code: 'NOT_FOUND', message: 'VPS line not found' };
   }
   const nextEffectiveOn = body.effectiveOn
-    ? startOfUtcMonth(parseIsoDateOnly(body.effectiveOn))
+    ? toUtcDateOnly(parseIsoDateOnly(body.effectiveOn))
     : resource.fixedEffectiveOn;
   const nextArchivedAt =
     body.archived === undefined
@@ -39,7 +39,7 @@ export async function patchVpsLine(
       archivedAt: nextArchivedAt,
     },
   });
-  const effectiveOn = updated.fixedEffectiveOn ?? startOfUtcMonth(now);
+  const effectiveOn = updated.fixedEffectiveOn ?? toUtcDateOnly(now);
   if (!updated.archivedAt && updated.fixedMonthlyUsd) {
     const from = vpsMaterializeFrom({
       now,

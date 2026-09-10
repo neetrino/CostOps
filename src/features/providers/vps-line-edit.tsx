@@ -7,18 +7,29 @@ import { Button } from '@/shared/ui/button';
 type VpsLineEditProps = {
   resourceId: string;
   monthlyAmountUsd: number | null;
+  effectiveOn: string | null;
   onChanged: () => void;
 };
 
-export function VpsLineEdit({ resourceId, monthlyAmountUsd, onChanged }: VpsLineEditProps) {
+export function VpsLineEdit({
+  resourceId,
+  monthlyAmountUsd,
+  effectiveOn,
+  onChanged,
+}: VpsLineEditProps) {
   const [amount, setAmount] = useState(String(monthlyAmountUsd ?? ''));
+  const [startDate, setStartDate] = useState(effectiveOn ?? '');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const saveAmount = async () => {
+  const save = async () => {
     const nextAmount = Number(amount);
     if (!Number.isFinite(nextAmount) || nextAmount <= 0) {
       setError('Enter a positive monthly amount');
+      return;
+    }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(startDate)) {
+      setError('Enter a start date');
       return;
     }
     setSaving(true);
@@ -27,7 +38,7 @@ export function VpsLineEdit({ resourceId, monthlyAmountUsd, onChanged }: VpsLine
       await fetchJson(`/api/resources/${resourceId}/vps-line`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ monthlyAmountUsd: nextAmount }),
+        body: JSON.stringify({ monthlyAmountUsd: nextAmount, effectiveOn: startDate }),
       });
       onChanged();
     } catch (err) {
@@ -69,11 +80,18 @@ export function VpsLineEdit({ resourceId, monthlyAmountUsd, onChanged }: VpsLine
           aria-label="Monthly VPS amount"
           className="field-control money w-28 text-xs"
         />
+        <input
+          type="date"
+          value={startDate}
+          onChange={(event) => setStartDate(event.target.value)}
+          aria-label="VPS start date"
+          className="field-control w-36 text-xs"
+        />
         <Button
           variant="secondary"
           className="text-xs"
           disabled={saving}
-          onClick={() => void saveAmount()}
+          onClick={() => void save()}
         >
           Update
         </Button>
@@ -87,7 +105,7 @@ export function VpsLineEdit({ resourceId, monthlyAmountUsd, onChanged }: VpsLine
         </Button>
       </div>
       <p className="text-[11px] text-[var(--muted)]">
-        Update applies to this month and later. Past months stay as booked.
+        Amount applies to this month from the start date. Days before the start date are dropped.
       </p>
       {error ? <p className="text-xs text-[var(--danger)]">{error}</p> : null}
     </div>

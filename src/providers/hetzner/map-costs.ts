@@ -2,6 +2,7 @@ import {
   eachUtcDay,
   endOfUtcMonth,
   startOfUtcMonth,
+  toUtcDateOnly,
   utcDaysInMonth,
   utcMonthKey,
   utcMonthsOverlapping,
@@ -48,8 +49,8 @@ export function splitMonthlyUsdAcrossDays(monthlyAmountUsd: number, daysInMonth:
 
 /**
  * One FIXED row per UTC day of each month that overlaps the range
- * and is on/after the resource effective month. The monthly fee is split
- * across days in that month (last day absorbs remainder).
+ * and is on/after `effectiveOn`. Daily rate is `$fee / days_in_month`;
+ * a mid-month start bills fewer days in that first month.
  */
 export function fixedResourcesToCosts(
   resources: FixedVpsResource[],
@@ -59,7 +60,8 @@ export function fixedResourcesToCosts(
   const months = utcMonthsOverlapping(range.from, range.to);
   const costs: NormalizedCost[] = [];
   for (const resource of resources) {
-    const effectiveMonth = startOfUtcMonth(resource.effectiveOn);
+    const effectiveDay = toUtcDateOnly(resource.effectiveOn);
+    const effectiveMonth = startOfUtcMonth(effectiveDay);
     for (const monthStart of months) {
       if (monthStart.getTime() < effectiveMonth.getTime()) {
         continue;
@@ -70,6 +72,9 @@ export function fixedResourcesToCosts(
         resource.monthlyAmountUsd;
       const amounts = splitMonthlyUsdAcrossDays(monthlyAmountUsd, utcDaysInMonth(monthStart));
       for (const [index, bucketDate] of days.entries()) {
+        if (bucketDate.getTime() < effectiveDay.getTime()) {
+          continue;
+        }
         const costUsd = amounts[index];
         if (costUsd === undefined) {
           throw new Error('VPS daily split length mismatch');

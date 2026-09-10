@@ -5,11 +5,23 @@ import { startOfUtcMonth, toUtcDateOnly, utcDayKey } from '@/shared/dates';
 import { decimalToNumber } from '@/shared/money';
 
 /**
- * Rewrites HETZNER/VPS FIXED lumps into daily slices for the current fee.
- * Current month always rewrites; same-amount 1st-of-month lumps convert too.
+ * Rewrites HETZNER/VPS FIXED rows into daily slices.
+ * `--created-today-starts-today` moves lines created today to start on today.
  */
 async function main(): Promise<void> {
   const now = new Date();
+  const today = toUtcDateOnly(now);
+  if (process.argv.includes('--created-today-starts-today')) {
+    const moved = await prisma.resource.updateMany({
+      where: {
+        providerKey: 'HETZNER',
+        archivedAt: null,
+        createdAt: { gte: today },
+      },
+      data: { fixedEffectiveOn: today },
+    });
+    process.stdout.write(`Set start date to ${utcDayKey(today)} on ${moved.count} line(s) created today.\n`);
+  }
   const resources = await prisma.resource.findMany({
     where: {
       providerKey: 'HETZNER',

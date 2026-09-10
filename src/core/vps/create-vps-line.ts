@@ -5,7 +5,7 @@ import { findOrCreateProjectProvider } from '@/core/mapping';
 import { ensureHetznerAccount } from '@/core/sync/ensure-hetzner-account';
 import type { CreateVpsLineBody } from '@/core/vps/schemas';
 import { prisma } from '@/shared/db';
-import { parseIsoDateOnly, startOfUtcMonth, toUtcDateOnly } from '@/shared/dates';
+import { parseIsoDateOnly, toUtcDateOnly, utcDayKey } from '@/shared/dates';
 import { decimalToNumber, toFixedUsd } from '@/shared/money';
 
 export type VpsLineView = {
@@ -29,7 +29,7 @@ export async function createVpsLine(
     return { ok: false, code: 'NOT_FOUND', message: 'Project not found' };
   }
   const account = await ensureHetznerAccount();
-  const effectiveOn = startOfUtcMonth(body.effectiveOn ? parseIsoDateOnly(body.effectiveOn) : now);
+  const effectiveOn = toUtcDateOnly(body.effectiveOn ? parseIsoDateOnly(body.effectiveOn) : now);
   const link = await findOrCreateProjectProvider(project.id, 'HETZNER');
   const resource = await prisma.resource.create({
     data: {
@@ -56,7 +56,7 @@ export async function createVpsLine(
       id: resource.id,
       displayName: resource.displayName,
       monthlyAmountUsd: decimalToNumber(resource.fixedMonthlyUsd ?? body.monthlyAmountUsd),
-      effectiveOn: effectiveOn.toISOString().slice(0, 10),
+      effectiveOn: utcDayKey(effectiveOn),
       archived: false,
     },
   };

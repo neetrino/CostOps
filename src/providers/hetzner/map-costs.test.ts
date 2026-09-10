@@ -63,6 +63,21 @@ describe('fixedResourcesToCosts', () => {
     expect(sumUsd(costs.slice(30))).toBe(14);
   });
 
+  it('starts on the effective day and prorates the first month', () => {
+    const costs = fixedResourcesToCosts(
+      [{ ...server, monthlyAmountUsd: 10, effectiveOn: new Date('2026-09-10T00:00:00.000Z') }],
+      {
+        from: new Date('2026-09-01T00:00:00.000Z'),
+        to: new Date('2026-10-02T00:00:00.000Z'),
+      },
+    );
+    expect(costs[0]?.bucketDate.toISOString().slice(0, 10)).toBe('2026-09-10');
+    expect(costs.filter((row) => row.bucketDate.getUTCMonth() === 8)).toHaveLength(21);
+    expect(sumUsd(costs.filter((row) => row.bucketDate.getUTCMonth() === 8))).toBe(7.000003);
+    expect(costs.filter((row) => row.bucketDate.getUTCMonth() === 9)).toHaveLength(31);
+    expect(sumUsd(costs.filter((row) => row.bucketDate.getUTCMonth() === 9))).toBe(10);
+  });
+
   it('skips months before the effective month', () => {
     const costs = fixedResourcesToCosts(
       [{ ...server, effectiveOn: new Date('2026-10-01T00:00:00.000Z') }],

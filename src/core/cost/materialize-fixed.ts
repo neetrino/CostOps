@@ -1,6 +1,6 @@
 import { upsertCostEntries } from '@/core/cost/upsert';
 import { prisma } from '@/shared/db';
-import { utcMonthsOverlapping } from '@/shared/dates';
+import { startOfUtcMonth, toUtcDateOnly, utcMonthsOverlapping } from '@/shared/dates';
 import { decimalToNumber } from '@/shared/money';
 import {
   classifyPastFixedMonths,
@@ -10,9 +10,9 @@ import {
 import type { DateRange } from '@/providers/types';
 
 /**
- * Writes FIXED daily rows for the monthly fee. Current and future months always upsert.
- * Past months stay as booked unless they are a convertible 1st-of-month lump
- * equal to the current monthly amount.
+ * Writes FIXED daily rows for the monthly fee from `fixedEffectiveOn`.
+ * Current and future months always upsert. Days before the start date in the
+ * current month are removed so a mid-month purchase does not bill the 1st.
  */
 export async function materializeFixedVpsCosts(input: {
   providerAccountId: string;
@@ -74,6 +74,17 @@ export async function materializeFixedVpsCosts(input: {
     past.lumpAmounts,
   );
   const costs = filterFixedCostsForRewrite(allCosts, past.skipKeys, now);
+  const effectiveOn = toUtcDateOnly(resource.fixedEffectiveOn);
+  await prisma.costEntry.deleteMany({
+    where: {
+      resourceId: resource.id,
+      sourceType: 'FIXED',
+      bucketDate: {
+        gte: startOfUtcMonth(now),
+        lt: effectiveOn,
+      },
+    },
+  });
   if (costs.length === 0) {
     return 0;
   }

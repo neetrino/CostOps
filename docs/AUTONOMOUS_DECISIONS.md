@@ -182,6 +182,8 @@ Paid models: not used. Fable 5: orchestrator only.
 | Last day absorbs remainder | `Decimal(14, 6)` integer micros so `$10` in a 30-day month still sums to `$10`. |
 | CostEntry stays daily | Hourly buckets would need a schema change. Daily is enough for the chart. |
 | Convert leftover 1st-of-month lumps | Redistribute the booked month amount across UTC days. Already-spread past months stay. |
+| Count VPS from the start date | Operator picks a UTC day. Daily rate stays `$fee / days_in_month`; the first month is shorter if they start mid-month. |
+| Add-form default = today | New purchases should not silently bill from the 1st. Pick the 1st for a full month. |
 
 ---
 

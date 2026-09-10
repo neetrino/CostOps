@@ -237,7 +237,8 @@ The `404 costs_not_found` was observed on a short UTC `from=today 00:00Z&to=now`
 ### 2026-09-10 — VPS monthly fee split across UTC days
 
 - Operator-entered `$ / month` is still the source of truth. CostOps now writes one FIXED row per UTC day (`$fee / days_in_month`, last day absorbs remainder) so charts stay flat instead of dumping the whole fee on the 1st.
-- Amount edits still rewrite the current UTC month only. A leftover 1st-of-month lump is rewritten as daily rows using that booked month amount (`pnpm exec tsx src/scripts/rewrite-vps-daily-costs.ts`).
+- VPS start is a UTC **date**. Cost begins that day; a mid-month purchase bills fewer days this month. Add form defaults to today. Lines created today can be moved with `pnpm exec tsx src/scripts/rewrite-vps-daily-costs.ts --created-today-starts-today`.
+- Amount edits still rewrite the current UTC month only. A leftover 1st-of-month lump is rewritten as daily rows using that booked month amount.
 
 ### 2026-09-07 — home = projects board
 
