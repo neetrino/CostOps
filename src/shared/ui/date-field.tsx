@@ -83,7 +83,9 @@ export function DateField({
         isDisabled={disabled}
         className={`field-control flex items-center justify-between gap-2 text-left ${triggerClassName}`}
       >
-        <span className={`money truncate ${selectedKey ? 'text-[var(--ink)]' : 'text-[var(--muted)]'}`}>
+        <span
+          className={`money truncate ${selectedKey ? 'text-[var(--ink)]' : 'text-[var(--muted)]'}`}
+        >
           {display}
         </span>
         <AppIcon name="calendar" size={16} className="shrink-0 text-[var(--muted)]" />
@@ -152,11 +154,13 @@ export function DateField({
                           });
                         }}
                         data-day={cell.dayKey}
-                        className={`relative mx-auto flex size-9 items-center justify-center rounded-full text-sm transition-[background-color,color,box-shadow] duration-[var(--duration-fast)] ease-[var(--ease-ui)] ${dayClassName({
-                          selected,
-                          today,
-                          inCurrentMonth: cell.inCurrentMonth,
-                        })}`}
+                        className={`relative mx-auto flex size-9 items-center justify-center rounded-full text-sm transition-[background-color,color,box-shadow] duration-[var(--duration-fast)] ease-[var(--ease-ui)] ${dayClassName(
+                          {
+                            selected,
+                            today,
+                            inCurrentMonth: cell.inCurrentMonth,
+                          },
+                        )}`}
                       >
                         <span className="money">{cell.day}</span>
                         {today && !selected ? (
