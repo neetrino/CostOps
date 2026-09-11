@@ -122,7 +122,7 @@ Before marking a UI task done, walk this list:
 | Screen | Design focus |
 |--------|----------------|
 | Home (`/`) | Projects board: rail, KPI, near-limit, full-width compare + series, cards/list |
-| Project detail | Story of one business: total → providers → resources; charts stacked full width |
+| Project detail | Story of one business: total → providers → resources; Move / Unmap on each resource; charts stacked full width |
 | Provider board | Neon board quality for every provider: compare, series, budgets |
 | Unmapped | Searchable project picker with slug + provider chips; mapping optional; archive/restore |
 | Settings / Integrations | Credential expiry, rotate links, last error — calm ops, not a form graveyard |

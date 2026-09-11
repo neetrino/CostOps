@@ -85,7 +85,7 @@ Do not emit `0` when status is `missing` or `error` without also sending that st
 | PATCH | `/api/resources/[id]/vps-line` | Update VPS name / monthly amount / start date / archive |
 | PATCH | `/api/budget-rules/[id]` | Optional aggregate rules |
 | POST | `/api/budget-rules` | Create optional scope rule |
-| PATCH | `/api/resources/[id]/mapping` | Assign or unassign Project (mapping a project also clears archive) |
+| PATCH | `/api/resources/[id]/mapping` | Assign, reassign, or unassign Project. Inbox Map and project-detail Move/Unmap. History follows. Mapping also clears archive |
 | POST | `/api/resources/[id]/project` | Create a standalone CostOps project from this inbox resource (not team leftover) |
 | PATCH | `/api/resources/[id]/archive` | `{ archived: true \| false }` — hide or restore an unmapped resource. History stays |
 | POST | `/api/sync/now` | Manual sync for one `{ providerKey }` (rate limited). UI calls Neon → Upstash → Vercel → Hetzner |
