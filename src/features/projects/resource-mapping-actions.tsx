@@ -149,7 +149,9 @@ export function ResourceMappingActions({
           variant="secondary"
           disabled={destinations.length === 0}
           title={
-            destinations.length === 0 ? 'No other live projects to move into' : 'Move to another project'
+            destinations.length === 0
+              ? 'No other live projects to move into'
+              : 'Move to another project'
           }
           onClick={openMove}
         >
