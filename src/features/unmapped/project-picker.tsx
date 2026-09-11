@@ -17,11 +17,19 @@ export function ProjectPicker({
   value,
   suggestedProjectId,
   onChange,
+  allowUnmapped = true,
+  label = 'Map to project',
+  unassignedTitle = 'Not assigned',
+  unassignedHint = 'Stay in inbox. Save as project if this app stands alone.',
 }: {
   projects: InboxProjectOption[];
   value: string;
   suggestedProjectId: string | null;
   onChange: (projectId: string) => void;
+  allowUnmapped?: boolean;
+  label?: string;
+  unassignedTitle?: string;
+  unassignedHint?: string;
 }) {
   const listId = useId();
   const searchRef = useRef<HTMLInputElement>(null);
@@ -47,7 +55,7 @@ export function ProjectPicker({
 
   return (
     <div className="min-w-0 flex-1">
-      <p className="mb-1.5 text-xs font-medium text-[var(--muted)]">Map to project</p>
+      <p className="mb-1.5 text-xs font-medium text-[var(--muted)]">{label}</p>
 
       <div className="sm:hidden">
         <MobileSheet
@@ -60,7 +68,11 @@ export function ProjectPicker({
           }`}
           trigger={
             <>
-              <PickerSummary selected={selected} />
+              <PickerSummary
+                selected={selected}
+                unassignedTitle={unassignedTitle}
+                unassignedHint={unassignedHint}
+              />
               <AppIcon name="arrow" size={17} className="shrink-0 text-[var(--muted)]" />
             </>
           }
@@ -74,13 +86,15 @@ export function ProjectPicker({
                 label="Search projects"
               />
               <ul role="listbox" className="mt-3 space-y-1">
-                <KeepUnmappedRow
-                  active={!value}
-                  onSelect={() => {
-                    onChange('');
-                    close();
-                  }}
-                />
+                {allowUnmapped ? (
+                  <KeepUnmappedRow
+                    active={!value}
+                    onSelect={() => {
+                      onChange('');
+                      close();
+                    }}
+                  />
+                ) : null}
                 {ranked.map((project) => (
                   <ProjectOptionRow
                     key={project.id}
@@ -116,7 +130,11 @@ export function ProjectPicker({
           }}
         >
           <AriaButton aria-haspopup="listbox" aria-controls={listId} className={triggerClassName}>
-            <PickerSummary selected={selected} />
+            <PickerSummary
+              selected={selected}
+              unassignedTitle={unassignedTitle}
+              unassignedHint={unassignedHint}
+            />
             <span className="text-[11px] font-medium text-[var(--muted)]">
               {open ? 'Close' : 'Choose'}
             </span>
@@ -136,13 +154,15 @@ export function ProjectPicker({
               className="field-control rounded-none border-x-0 border-t-0 text-sm"
             />
             <ul id={listId} role="listbox" className="max-h-72 overflow-auto p-1">
-              <KeepUnmappedRow
-                active={!value}
-                onSelect={() => {
-                  onChange('');
-                  setOpen(false);
-                }}
-              />
+              {allowUnmapped ? (
+                <KeepUnmappedRow
+                  active={!value}
+                  onSelect={() => {
+                    onChange('');
+                    setOpen(false);
+                  }}
+                />
+              ) : null}
               {ranked.map((project) => (
                 <ProjectOptionRow
                   key={project.id}
@@ -169,14 +189,20 @@ export function ProjectPicker({
   );
 }
 
-function PickerSummary({ selected }: { selected: InboxProjectOption | null }) {
+function PickerSummary({
+  selected,
+  unassignedTitle,
+  unassignedHint,
+}: {
+  selected: InboxProjectOption | null;
+  unassignedTitle: string;
+  unassignedHint: string;
+}) {
   if (!selected) {
     return (
       <span>
-        <span className="font-medium text-[var(--ink)]">Not assigned</span>
-        <span className="mt-0.5 block text-[11px] text-[var(--muted)]">
-          Stay in inbox. Save as project if this app stands alone.
-        </span>
+        <span className="font-medium text-[var(--ink)]">{unassignedTitle}</span>
+        <span className="mt-0.5 block text-[11px] text-[var(--muted)]">{unassignedHint}</span>
       </span>
     );
   }

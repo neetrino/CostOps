@@ -164,6 +164,7 @@ Discrepancies vs docs:
 - `/projects/[slug]`: filter rail, today/period hero, provider compare + usage series (`projectId`), provider/resource breakdown, inline budget, rename, archive confirm.
 - `/providers/[key]`: Neon-board quality — today/period/unmapped KPIs, compare + series (`providerKey`), project cards/list with Set limit.
 - `/unmapped`: inbox list with CostView, project picker → `PATCH /api/resources/[id]/mapping`.
+- `/projects/[slug]`: mapped resource rows expose **Move** (other live project) and **Unmap** (back to inbox, confirm). VPS is Move-only. Cost/metric history follows the resource.
 - `/integrations`: account status, last error, credential health badge, rotate external link, expiry + mark rotated (no secrets).
 - Verified at ~1280px on `:3001`: Overview/Projects regression OK; project detail, Neon board, empty unmapped, integrations health + rotate link.
 
@@ -239,6 +240,10 @@ The `404 costs_not_found` was observed on a short UTC `from=today 00:00Z&to=now`
 - Operator-entered `$ / month` is still the source of truth. CostOps now writes one FIXED row per UTC day (`$fee / days_in_month`, last day absorbs remainder) so charts stay flat instead of dumping the whole fee on the 1st.
 - VPS start is a UTC **date**. Cost begins that day; a mid-month purchase bills fewer days this month. Add form defaults to today. Lines created today can be moved with `pnpm exec tsx src/scripts/rewrite-vps-daily-costs.ts --created-today-starts-today`.
 - Amount edits still rewrite the current UTC month only. A leftover 1st-of-month lump is rewritten as daily rows using that booked month amount.
+
+### 2026-09-11 — remap from project detail
+
+- Mapped Neon / Vercel / Upstash resources can **Move** to another live CostOps project or **Unmap** back to the inbox. VPS lines Move only (they stay on a project). History follows the resource; archive the empty leftover project afterwards.
 
 ### 2026-09-07 — home = projects board
 

@@ -15,6 +15,7 @@ import { ProjectProviderSection } from '@/features/projects/project-provider-sec
 import { ProjectTotalHero } from '@/features/projects/project-total-hero';
 import { ProviderStackChart } from '@/features/projects/provider-stack-chart';
 import type { ProjectDetailResponse } from '@/features/projects/types';
+import type { InboxProjectOption, ProjectOptionsResponse } from '@/features/unmapped/types';
 import { providerUiLabel } from '@/shared/provider-label';
 import { Button } from '@/shared/ui/button';
 import { CardSkeleton, EmptyPanel, ErrorPanel } from '@/shared/ui/state-panels';
@@ -27,6 +28,7 @@ function ProjectDetailContent() {
   const { state, queryString, replaceState } = useDashboardUrl();
   const [detail, setDetail] = useState<ProjectDetailResponse | null>(null);
   const [seriesData, setSeriesData] = useState<UsageSeriesResponse | null>(null);
+  const [projects, setProjects] = useState<InboxProjectOption[]>([]);
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(true);
   const [editingName, setEditingName] = useState(false);
@@ -38,9 +40,10 @@ function ProjectDetailContent() {
     setLoading(true);
     setError(null);
     try {
-      const projectDetail = await fetchJson<ProjectDetailResponse>(
-        `/api/projects/${slug}${queryString}`,
-      );
+      const [projectDetail, options] = await Promise.all([
+        fetchJson<ProjectDetailResponse>(`/api/projects/${slug}${queryString}`),
+        fetchJson<ProjectOptionsResponse>('/api/projects/options'),
+      ]);
       const seriesParams = new URLSearchParams(queryString.replace(/^\?/, ''));
       seriesParams.set('projectId', projectDetail.project.id);
       const seriesQuery = seriesParams.toString();
@@ -49,10 +52,12 @@ function ProjectDetailContent() {
       );
       setDetail(projectDetail);
       setSeriesData(series);
+      setProjects(options.projects);
       setNameDraft(projectDetail.project.name);
     } catch (err) {
       setDetail(null);
       setSeriesData(null);
+      setProjects([]);
       setError(err instanceof Error ? err : new Error('Failed to load project'));
     } finally {
       setLoading(false);
@@ -65,9 +70,10 @@ function ProjectDetailContent() {
       setLoading(true);
       setError(null);
       try {
-        const projectDetail = await fetchJson<ProjectDetailResponse>(
-          `/api/projects/${slug}${queryString}`,
-        );
+        const [projectDetail, options] = await Promise.all([
+          fetchJson<ProjectDetailResponse>(`/api/projects/${slug}${queryString}`),
+          fetchJson<ProjectOptionsResponse>('/api/projects/options'),
+        ]);
         const seriesParams = new URLSearchParams(queryString.replace(/^\?/, ''));
         seriesParams.set('projectId', projectDetail.project.id);
         const seriesQuery = seriesParams.toString();
@@ -79,6 +85,7 @@ function ProjectDetailContent() {
         }
         setDetail(projectDetail);
         setSeriesData(series);
+        setProjects(options.projects);
         setNameDraft(projectDetail.project.name);
       } catch (err) {
         if (cancelled) {
@@ -86,6 +93,7 @@ function ProjectDetailContent() {
         }
         setDetail(null);
         setSeriesData(null);
+        setProjects([]);
         setError(err instanceof Error ? err : new Error('Failed to load project'));
       } finally {
         if (!cancelled) {
@@ -206,7 +214,13 @@ function ProjectDetailContent() {
               <EmptyPanel title="No provider links" detail="Map resources or run sync." />
             ) : (
               detail.providers.map((provider) => (
-                <ProjectProviderSection key={provider.projectProviderId} provider={provider} />
+                <ProjectProviderSection
+                  key={provider.projectProviderId}
+                  provider={provider}
+                  currentProjectId={detail.project.id}
+                  projects={projects}
+                  onMappingChanged={() => void load()}
+                />
               ))
             )}
           </section>
