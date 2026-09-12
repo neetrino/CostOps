@@ -18,7 +18,9 @@ describe('isPublicRequestPath', () => {
     expect(isPublicRequestPath('/api/cron/sync/neon')).toBe(true);
     expect(isPublicRequestPath('/_next/static/chunks/app.js')).toBe(true);
     expect(isPublicRequestPath('/favicon.ico')).toBe(true);
+    expect(isPublicRequestPath('/icon')).toBe(true);
     expect(isPublicRequestPath('/icon.svg')).toBe(true);
+    expect(isPublicRequestPath('/apple-icon')).toBe(true);
   });
 
   it('keeps the dashboard and JSON APIs behind the session gate', () => {

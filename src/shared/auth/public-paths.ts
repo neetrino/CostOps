@@ -2,6 +2,8 @@ const PUBLIC_STATIC_EXT = /\.(?:ico|png|jpg|jpeg|gif|webp|svg|avif|woff2?)$/i;
 
 const PUBLIC_EXACT_PATHS = new Set([
   '/favicon.ico',
+  '/icon',
+  '/apple-icon',
   '/sw.js',
   '/manifest.webmanifest',
   '/offline',
