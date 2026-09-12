@@ -89,6 +89,7 @@ export const ALERT_EVENT_QUERY_LIMIT = 500;
 export const UNMAPPED_RESOURCE_QUERY_LIMIT = 500;
 export const UNMAPPED_INBOX_PREVIEW_LIMIT = 8;
 export const UNMAPPED_INBOX_DISMISS_STORAGE_KEY = 'costops.unmapped-inbox.dismissed';
+export const INSTALL_BANNER_STORAGE_KEY = 'costops.installBanner.dismissed';
 export const SUGGEST_PROJECT_MIN_SCORE = 0.8;
 export const SUGGEST_PROJECT_AMBIGUITY_DELTA = 0.08;
 export const COST_SERIES_METRIC = 'cost';

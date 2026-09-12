@@ -4,15 +4,17 @@ import { LoginForm } from './login-form';
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<LoginFallback />}>
-      <LoginForm />
-    </Suspense>
+    <div className="flex min-h-0 flex-1 flex-col">
+      <Suspense fallback={<LoginFallback />}>
+        <LoginForm />
+      </Suspense>
+    </div>
   );
 }
 
 function LoginFallback() {
   return (
-    <main className="flex min-h-[100dvh] items-center bg-[var(--canvas)] px-4 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:px-6 lg:px-8">
+    <main className="flex min-h-full flex-1 items-center bg-[var(--canvas)] px-4 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:px-6 lg:px-8">
       <div
         className="mx-auto grid w-full max-w-6xl overflow-hidden rounded-[1.25rem] border border-[var(--line-strong)] bg-[var(--paper-raised)] shadow-[var(--shadow-popover)] lg:min-h-[42rem] lg:grid-cols-[1.08fr_0.92fr]"
         role="status"

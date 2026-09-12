@@ -23,3 +23,5 @@ No `next-pwa`, `@serwist/next`, or extra PWA runtime dependency.
 ## Consequences
 
 The request gate allowlists `/sw.js`, `/manifest.webmanifest`, and `/offline`. Bump `CACHE_NAME` in `public/sw.js` when worker behavior changes.
+
+Chrome no longer shows a default install bar. CostOps captures `beforeinstallprompt` and renders an Install / Not now banner (iOS Safari gets a Share hint). Dismiss is stored in `costops.installBanner.dismissed`.

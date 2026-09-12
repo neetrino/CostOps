@@ -39,7 +39,7 @@ export function LoginForm() {
   };
 
   return (
-    <main className="signal-grid flex min-h-[100dvh] items-center bg-[var(--inverse)] px-4 py-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:px-6 lg:px-8">
+    <main className="signal-grid flex min-h-full flex-1 items-center bg-[var(--inverse)] px-4 py-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:px-6 lg:px-8">
       <div className="mx-auto grid w-full max-w-6xl overflow-hidden rounded-[2rem] border border-white/15 bg-[var(--paper-raised)] shadow-[16px_16px_0_rgba(201,255,74,.22)] lg:min-h-[44rem] lg:grid-cols-[1.08fr_0.92fr]">
         <LoginEditorialPanel />
 
