@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Bricolage_Grotesque, IBM_Plex_Mono, IBM_Plex_Sans } from 'next/font/google';
 import { APP_DESCRIPTION, APP_NAME, PWA_THEME_COLOR } from '@/config/constants';
+import { InstallAppBanner } from '@/shared/pwa/install-app-banner';
 import { RegisterServiceWorker } from '@/shared/pwa/register-service-worker';
 import './globals.css';
 
@@ -62,8 +63,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${sans.variable} ${display.variable} ${mono.variable} antialiased`}>
-        {children}
+      <body
+        className={`${sans.variable} ${display.variable} ${mono.variable} flex min-h-dvh flex-col antialiased`}
+      >
+        <InstallAppBanner />
+        <div className="flex min-h-0 flex-1 flex-col">{children}</div>
         <RegisterServiceWorker />
       </body>
     </html>

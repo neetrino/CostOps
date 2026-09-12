@@ -67,7 +67,7 @@
 - [x] `/providers/upstash` nav + generic provider board + unmapped `upstash_redis` / `upstash_qstash`
 - [x] Hetzner/VPS FIXED: `Resource.fixedMonthlyUsd` + `fixedEffectiveOn`, adapter without API, add/update/stop only on `/providers/hetzner`, daily alerts skip FIXED, monthly fee split across UTC days
 - [x] Standard PWA: `app/manifest.ts`, production `sw.js`, 192/512/maskable icons, public `/offline` fallback (ADR-006)
-- [x] Standard PWA: `app/manifest.ts`, production `sw.js`, 192/512/maskable icons, public `/offline` fallback (ADR-006)
+- [x] PWA install banner (Chromium `beforeinstallprompt` + iOS Safari Share hint), same offer pattern as OpenDesk
 
 ---
 
