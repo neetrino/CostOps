@@ -34,7 +34,7 @@ Production migrations run from the deploy job (`prisma migrate deploy`), not fro
 
 ## Stack
 
-Next.js App Router · TypeScript strict · PostgreSQL + Prisma · Tailwind 4 · Recharts · Zod · Pino · Vercel Cron · Telegram Bot API.
+Next.js App Router · TypeScript strict · PostgreSQL + Prisma · Tailwind 4 · Recharts · Zod · Pino · Vercel Cron · Telegram Bot API · installable PWA.
 
 ---
 

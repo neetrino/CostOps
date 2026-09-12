@@ -50,7 +50,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
   return (
     <MotionConfig reducedMotion="user">
       <div className="app-bottom-safe min-h-dvh bg-[var(--inverse)] lg:grid lg:grid-cols-[7.25rem_minmax(0,1fr)] lg:p-3 lg:pr-0">
-        <header className="sticky top-0 z-30 border-b border-[var(--line-strong)] bg-[var(--paper-raised)] lg:hidden">
+        <header className="sticky top-0 z-30 border-b border-[var(--line-strong)] bg-[var(--paper-raised)] pt-[env(safe-area-inset-top)] lg:hidden">
           <div className="flex min-h-14 items-center justify-between gap-3 px-4 py-2">
             <MobileBrand />
             <div className="flex items-center gap-2">

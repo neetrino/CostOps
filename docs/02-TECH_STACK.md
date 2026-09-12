@@ -18,7 +18,8 @@ Aligned with the confirmed `docs/TECH_CARD.md` and the Neon baseline.
 
 | Piece | Version | Role |
 |-------|---------|------|
-| Next.js | 16.x (Neon baseline is 15 — port UI) | App Router, RSC, Route Handlers |
+| Next.js | 16.x (Neon baseline is 15 — port UI) | App Router, RSC, Route Handlers, web manifest |
+| PWA | Next.js Metadata Route + `public/sw.js` | Installable standalone. No next-pwa / Serwist |
 | React | 19 | UI |
 | Tailwind CSS | 4.x | Styling |
 | Recharts | 2.x | Charts (reuse Neon panels) |

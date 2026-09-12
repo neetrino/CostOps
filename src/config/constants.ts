@@ -1,5 +1,11 @@
 export const APP_NAME = 'CostOps';
+export const APP_DESCRIPTION =
+  'Neetrino FinOps — spend by project, alerts on Project × Provider limits.';
 export const SERVICE_NAME = 'neetrino-costops';
+
+/** Installed-app chrome and splash. Matches `--inverse` / `--canvas`. */
+export const PWA_THEME_COLOR = '#17182a';
+export const PWA_BACKGROUND_COLOR = '#ebe9f0';
 
 export const COOKIE_NAME = 'costops_session';
 export const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7;

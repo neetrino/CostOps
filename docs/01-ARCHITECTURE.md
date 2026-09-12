@@ -3,7 +3,7 @@
 Internal FinOps platform: pull provider usage/cost, normalize it, map it to Neetrino projects, store history, and evaluate Telegram alerts.
 
 **Project size.** B  
-**Last updated.** 2026-09-05
+**Last updated.** 2026-09-12
 
 ---
 
@@ -52,6 +52,7 @@ Style: **modular monolith** on Next.js. One deployable. Adapters are plugins, no
 | Component | Tech | Location | Role |
 |-----------|------|----------|------|
 | Web UI | Next.js 16 App Router, React 19, Tailwind 4, Recharts | `src/app`, `src/features` | Projects board (home), project detail, provider boards, settings |
+| PWA | `app/manifest.ts` + `public/sw.js` | `src/app/manifest.ts`, `src/shared/pwa` | Installable standalone app. Network-first HTML; `/api` is never cached |
 | API | Route Handlers + Zod | `src/app/api` | Reads aggregates, mutations for budgets/mapping, cron |
 | Core | TypeScript modules | `src/core` | Cost, metrics, sync orchestration, budgets, alerts, mapping |
 | Adapters | Per-provider packages | `src/providers/<key>` | API clients, schemas, metric maps, cost source type |
