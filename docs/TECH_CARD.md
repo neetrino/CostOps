@@ -38,7 +38,7 @@
 | 2.8 | SEO | not needed | ➖ | |
 | 2.9 | Dark theme | Follow Neon dashboard | ✅ | |
 | 2.10 | Animations | CSS transitions + selective Motion | ✅ | Motion only for purposeful layout/sheet transitions; respect reduced motion |
-| 2.11 | PWA | not needed | ➖ | |
+| 2.11 | PWA | Next.js `app/manifest.ts` + root `sw.js` | ✅ | Installable standalone. No next-pwa. SW never caches `/api`. ADR-006 |
 
 ---
 

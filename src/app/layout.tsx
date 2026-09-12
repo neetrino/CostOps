@@ -1,6 +1,7 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Bricolage_Grotesque, IBM_Plex_Mono, IBM_Plex_Sans } from 'next/font/google';
-import { APP_NAME } from '@/config/constants';
+import { APP_DESCRIPTION, APP_NAME, PWA_THEME_COLOR } from '@/config/constants';
+import { RegisterServiceWorker } from '@/shared/pwa/register-service-worker';
 import './globals.css';
 
 const sans = IBM_Plex_Sans({
@@ -26,7 +27,27 @@ const mono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   title: APP_NAME,
-  description: 'Neetrino FinOps — spend by project, alerts on Project × Provider limits.',
+  description: APP_DESCRIPTION,
+  applicationName: APP_NAME,
+  appleWebApp: {
+    capable: true,
+    title: APP_NAME,
+    statusBarStyle: 'default',
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  icons: {
+    apple: '/apple-touch-icon.png',
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: PWA_THEME_COLOR,
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  colorScheme: 'light',
 };
 
 export default function RootLayout({
@@ -38,6 +59,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${sans.variable} ${display.variable} ${mono.variable} antialiased`}>
         {children}
+        <RegisterServiceWorker />
       </body>
     </html>
   );

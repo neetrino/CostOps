@@ -32,8 +32,9 @@ CostOps/
 │   │   ├── vercel/
 │   │   └── …
 │   ├── notifications/telegram/
-│   ├── shared/                   # UI primitives, dates, logger, env
+│   ├── shared/                   # UI primitives, dates, logger, env, PWA register
 │   └── config/
+├── public/                       # sw.js, install icons
 ├── prisma/
 ├── tests/                        # extra integration/e2e if not colocated
 ├── scripts/                      # backfill, migrate-from-neon, reconcile

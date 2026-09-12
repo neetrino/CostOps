@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { COOKIE_NAME } from '@/config/constants';
+import { isPublicRequestPath } from '@/shared/auth/public-paths';
 import { verifySessionToken } from '@/shared/auth/verify-session-token';
-
-const PUBLIC_STATIC_EXT = /\.(?:ico|png|jpg|jpeg|gif|webp|svg|avif|woff2?)$/i;
 
 /**
  * Next.js 16 request gate (replaces middleware.ts). Ports Neon dashboard auth.
@@ -11,17 +10,7 @@ const PUBLIC_STATIC_EXT = /\.(?:ico|png|jpg|jpeg|gif|webp|svg|avif|woff2?)$/i;
 export async function proxy(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
 
-  if (
-    pathname.startsWith('/_next') ||
-    pathname === '/favicon.ico' ||
-    PUBLIC_STATIC_EXT.test(pathname) ||
-    pathname.startsWith('/api/cron/') ||
-    pathname === '/api/health'
-  ) {
-    return NextResponse.next();
-  }
-
-  if (pathname === '/login' || pathname === '/api/auth/login' || pathname === '/api/auth/logout') {
+  if (isPublicRequestPath(pathname)) {
     return NextResponse.next();
   }
 

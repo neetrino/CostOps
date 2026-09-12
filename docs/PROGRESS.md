@@ -2,7 +2,7 @@
 
 **Phase.** 4 — Upstash + VPS FIXED  
 **Overall.** 96% (Neon + Vercel + project totals + Upstash + Hetzner/VPS fixed lines; operator mapping still open)  
-**Updated.** 2026-09-10 (VPS monthly fee split across UTC days)
+**Updated.** 2026-09-12 (installable PWA)
 
 ---
 
@@ -66,6 +66,8 @@
 - [x] Seed + cron ensure Provider `UPSTASH` + ProviderAccount from `UPSTASH_EMAIL`
 - [x] `/providers/upstash` nav + generic provider board + unmapped `upstash_redis` / `upstash_qstash`
 - [x] Hetzner/VPS FIXED: `Resource.fixedMonthlyUsd` + `fixedEffectiveOn`, adapter without API, add/update/stop only on `/providers/hetzner`, daily alerts skip FIXED, monthly fee split across UTC days
+- [x] Standard PWA: `app/manifest.ts`, production `sw.js`, 192/512/maskable icons, public `/offline` fallback (ADR-006)
+- [x] Standard PWA: `app/manifest.ts`, production `sw.js`, 192/512/maskable icons, public `/offline` fallback (ADR-006)
 
 ---
 
