@@ -3,6 +3,7 @@ import { startOfUtcMonth } from '@/shared/dates';
 import { decimalToNumber } from '@/shared/money';
 import {
   classifyPastFixedMonths,
+  fixedDayKey,
   type FixedVpsResource,
   type PastFixedMonthRewrite,
 } from '@/providers/hetzner/map-costs';
@@ -34,6 +35,31 @@ export async function loadActiveFixedVpsResources(accountId: string): Promise<Fi
       },
     ];
   });
+}
+
+export async function loadExistingCurrentMonthFixedDays(
+  accountId: string,
+  now: Date,
+): Promise<Set<string>> {
+  const rows = await prisma.costEntry.findMany({
+    where: {
+      providerAccountId: accountId,
+      providerKey: 'HETZNER',
+      sourceType: 'FIXED',
+      bucketDate: { gte: startOfUtcMonth(now) },
+    },
+    select: {
+      bucketDate: true,
+      resource: { select: { externalId: true } },
+    },
+  });
+  const keys = new Set<string>();
+  for (const row of rows) {
+    if (row.resource) {
+      keys.add(fixedDayKey(row.resource.externalId, row.bucketDate));
+    }
+  }
+  return keys;
 }
 
 export async function loadPastFixedMonthRewrite(

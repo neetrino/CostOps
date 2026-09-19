@@ -1,14 +1,21 @@
-import { startOfUtcMonth } from '@/shared/dates';
+import { toUtcDateOnly } from '@/shared/dates';
 
 /**
- * Amount edits rewrite the current UTC month and later.
- * Never walk back before the line start date.
+ * Amount edits rewrite from the chosen day (default today).
+ * Earlier booked days stay. Never walk back before the purchase start.
  */
 export function vpsMaterializeFrom(input: {
   now: Date;
-  effectiveOn: Date;
+  purchaseStart: Date;
+  amountFrom: Date;
   amountChanged: boolean;
 }): Date {
-  const rewriteFrom = input.amountChanged ? startOfUtcMonth(input.now) : input.effectiveOn;
-  return rewriteFrom.getTime() < input.effectiveOn.getTime() ? input.effectiveOn : rewriteFrom;
+  const purchaseStart = toUtcDateOnly(input.purchaseStart);
+  if (!input.amountChanged) {
+    return purchaseStart;
+  }
+  const today = toUtcDateOnly(input.now);
+  const amountFrom = toUtcDateOnly(input.amountFrom);
+  const from = amountFrom.getTime() < purchaseStart.getTime() ? purchaseStart : amountFrom;
+  return from.getTime() > today.getTime() ? today : from;
 }

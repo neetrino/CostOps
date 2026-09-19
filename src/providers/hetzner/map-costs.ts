@@ -3,6 +3,7 @@ import {
   endOfUtcMonth,
   startOfUtcMonth,
   toUtcDateOnly,
+  utcDayKey,
   utcDaysInMonth,
   utcMonthKey,
   utcMonthsOverlapping,
@@ -26,6 +27,26 @@ export type PastFixedCostRow = {
 
 export function fixedMonthKey(externalId: string, bucketDate: Date): string {
   return `${externalId}:${utcMonthKey(bucketDate)}`;
+}
+
+export function fixedDayKey(externalId: string, bucketDate: Date): string {
+  return `${externalId}:${utcDayKey(bucketDate)}`;
+}
+
+/** Drop generated days before `from` so an amount change does not rewrite earlier booked days. */
+export function clipFixedCostsOnOrAfter(costs: NormalizedCost[], from: Date): NormalizedCost[] {
+  const fromMs = toUtcDateOnly(from).getTime();
+  return costs.filter((cost) => toUtcDateOnly(cost.bucketDate).getTime() >= fromMs);
+}
+
+/** Keep already-written FIXED days (sync must not overwrite a mid-month price change). */
+export function excludeExistingFixedDays(
+  costs: NormalizedCost[],
+  existingDayKeys: ReadonlySet<string>,
+): NormalizedCost[] {
+  return costs.filter(
+    (cost) => !existingDayKeys.has(fixedDayKey(cost.externalId, cost.bucketDate)),
+  );
 }
 
 /**

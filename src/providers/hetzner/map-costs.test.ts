@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
+  clipFixedCostsOnOrAfter,
+  excludeExistingFixedDays,
   filterFixedCostsForRewrite,
+  fixedDayKey,
   fixedMonthKey,
   fixedResourcesToCosts,
   pastFixedMonthSkipKeys,
@@ -89,6 +92,31 @@ describe('fixedResourcesToCosts', () => {
     expect(costs[0]?.bucketDate.toISOString().slice(0, 10)).toBe('2026-10-01');
     expect(costs).toHaveLength(31);
     expect(sumUsd(costs)).toBe(14);
+  });
+});
+
+describe('clipFixedCostsOnOrAfter', () => {
+  it('keeps days on/after the amount-from date', () => {
+    const costs = fixedResourcesToCosts([server], {
+      from: new Date('2026-09-01T00:00:00.000Z'),
+      to: new Date('2026-09-30T00:00:00.000Z'),
+    });
+    const clipped = clipFixedCostsOnOrAfter(costs, new Date('2026-09-19T00:00:00.000Z'));
+    expect(clipped[0]?.bucketDate.toISOString().slice(0, 10)).toBe('2026-09-19');
+    expect(clipped).toHaveLength(12);
+  });
+});
+
+describe('excludeExistingFixedDays', () => {
+  it('leaves already-booked current-month days out of a sync rewrite', () => {
+    const costs = fixedResourcesToCosts([server], {
+      from: new Date('2026-09-01T00:00:00.000Z'),
+      to: new Date('2026-09-02T00:00:00.000Z'),
+    });
+    const existing = new Set([fixedDayKey('vps-nbos', new Date('2026-09-01T00:00:00.000Z'))]);
+    const next = excludeExistingFixedDays(costs, existing);
+    expect(next[0]?.bucketDate.toISOString().slice(0, 10)).toBe('2026-09-02');
+    expect(next).toHaveLength(29);
   });
 });
 

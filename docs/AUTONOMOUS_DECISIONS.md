@@ -184,6 +184,7 @@ Paid models: not used. Fable 5: orchestrator only.
 | Convert leftover 1st-of-month lumps | Redistribute the booked month amount across UTC days. Already-spread past months stay. |
 | Count VPS from the start date | Operator picks a UTC day. Daily rate stays `$fee / days_in_month`; the first month is shorter if they start mid-month. |
 | Add-form default = today | New purchases should not silently bill from the 1st. Pick the 1st for a full month. |
+| Amount edit from a chosen day | Price change is not a new purchase. Rewrite from the form date (default today). Keep earlier booked days. Do not move `fixedEffectiveOn`. Sync must not overwrite those days. |
 
 ---
 

@@ -243,6 +243,14 @@ The `404 costs_not_found` was observed on a short UTC `from=today 00:00Z&to=now`
 - VPS start is a UTC **date**. Cost begins that day; a mid-month purchase bills fewer days this month. Add form defaults to today. Lines created today can be moved with `pnpm exec tsx src/scripts/rewrite-vps-daily-costs.ts --created-today-starts-today`.
 - Amount edits still rewrite the current UTC month only. A leftover 1st-of-month lump is rewritten as daily rows using that booked month amount.
 
+### 2026-09-19 — VPS amount change keeps earlier days
+
+- **Update** applies the new monthly fee from the date on the form (defaults to today). Days before that date stay as booked. The original purchase start is not moved, so later sync cannot wipe them.
+
+### 2026-09-19 — remove empty VPS leftover
+
+- After **Stop**, the Project × VPS link can remain with no active line. **Remove leftover** on the VPS board (and empty VPS section on project detail) deletes that link only. The CostOps project stays; archived lines and past months stay.
+
 ### 2026-09-11 — remap from project detail
 
 - Mapped Neon / Vercel / Upstash resources can **Move** to another live CostOps project or **Unmap** back to the inbox. VPS lines Move only (they stay on a project). History follows the resource; archive the empty leftover project afterwards.
