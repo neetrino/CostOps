@@ -1,11 +1,19 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { useEffect, useState, useSyncExternalStore } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 import { UNMAPPED_INBOX_DISMISS_STORAGE_KEY } from '@/config/constants';
 import { shouldShowUnmappedInbox } from '@/core/mapping/inbox-dismiss';
 import { UnmappedInboxDialog } from '@/features/dashboard/unmapped-inbox-dialog';
 import type { InboxStatusResponse } from '@/features/unmapped/types';
+
+const dismissedListeners = new Set<() => void>();
+
+function notifyDismissedListeners(): void {
+  for (const listener of dismissedListeners) {
+    listener();
+  }
+}
 
 function readDismissedCount(): number | null {
   if (typeof sessionStorage === 'undefined') {
@@ -24,11 +32,16 @@ function writeDismissedCount(count: number): void {
     return;
   }
   sessionStorage.setItem(UNMAPPED_INBOX_DISMISS_STORAGE_KEY, String(count));
+  notifyDismissedListeners();
 }
 
 function subscribeDismissed(onStoreChange: () => void): () => void {
+  dismissedListeners.add(onStoreChange);
   window.addEventListener('storage', onStoreChange);
-  return () => window.removeEventListener('storage', onStoreChange);
+  return () => {
+    dismissedListeners.delete(onStoreChange);
+    window.removeEventListener('storage', onStoreChange);
+  };
 }
 
 function getDismissedSnapshot(): number | null {
@@ -41,22 +54,17 @@ function getDismissedServerSnapshot(): number | null {
 
 export function UnmappedInboxController({ status }: { status: InboxStatusResponse }) {
   const pathname = usePathname();
-  const storedCount = useSyncExternalStore(
+  const dismissedCount = useSyncExternalStore(
     subscribeDismissed,
     getDismissedSnapshot,
     getDismissedServerSnapshot,
   );
-  const [overrideCount, setOverrideCount] = useState<number | null>(null);
-  const dismissedCount = overrideCount ?? storedCount;
 
   useEffect(() => {
     if (pathname !== '/unmapped') {
       return;
     }
     writeDismissedCount(status.unmappedCount);
-    setOverrideCount((current) =>
-      current === status.unmappedCount ? current : status.unmappedCount,
-    );
   }, [pathname, status.unmappedCount]);
 
   const open =
@@ -72,7 +80,6 @@ export function UnmappedInboxController({ status }: { status: InboxStatusRespons
       preview={status.preview}
       onDismiss={() => {
         writeDismissedCount(status.unmappedCount);
-        setOverrideCount(status.unmappedCount);
       }}
     />
   );
