@@ -1,13 +1,15 @@
 import { CostViewDisplay } from '@/shared/ui/cost-view-display';
 import type { InboxResourceRow } from '@/features/unmapped/types';
 import { providerUiLabel } from '@/shared/provider-label';
+import { ProviderSwatch } from '@/shared/ui/provider-swatch';
 
 export function ResourceMeta({ resource, extra }: { resource: InboxResourceRow; extra?: string }) {
   return (
     <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-start">
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <span className="inline-flex shrink-0 rounded-full bg-[var(--accent-soft)] px-2 py-1 text-[9px] font-semibold tracking-[0.12em] text-[var(--accent)] uppercase">
+          <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[var(--line)] bg-[var(--paper-raised)] px-2 py-1 text-[9px] font-semibold tracking-[0.12em] text-[var(--ink)] uppercase">
+            <ProviderSwatch providerKey={resource.providerKey} />
             {providerUiLabel(resource.providerKey)}
           </span>
           {extra ? (

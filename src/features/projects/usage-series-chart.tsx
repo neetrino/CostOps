@@ -151,7 +151,7 @@ function renderSeriesTooltip(
     <div className="w-[min(18rem,calc(100vw-3rem))] rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--paper-raised)] p-3 text-xs shadow-[var(--shadow-popover)]">
       <p className="font-semibold text-[var(--ink)]">{label}</p>
       <p className="mt-0.5 text-[11px] text-[var(--muted)]">Same rank as the legend</p>
-      <ul className="mt-2 max-h-[16rem] space-y-1 overflow-y-auto">
+      <ul className="scrollbar-none mt-2 max-h-[16rem] space-y-1 overflow-y-auto">
         {series.map((item) => {
           const value = valueById.get(item.projectId);
           return (

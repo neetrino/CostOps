@@ -1,93 +1,37 @@
 'use client';
 
-import { Suspense, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { fetchJson, UnauthorizedError } from '@/features/dashboard/api-client';
+import { Suspense, useMemo, useState, type ReactNode } from 'react';
+import type { DashboardUrlState } from '@/features/dashboard/dashboard-url';
+import { useDashboardRefresh } from '@/features/dashboard/use-dashboard-refresh';
 import { useDashboardUrl } from '@/features/dashboard/use-dashboard-url';
-import { useUnauthorizedRedirect } from '@/features/dashboard/use-unauthorized-redirect';
+import type { UnmappedBoardPayload } from '@/features/unmapped/load-unmapped-board';
 import { ArchivedRow } from '@/features/unmapped/archived-row';
 import { UnmappedRow } from '@/features/unmapped/unmapped-row';
-import type {
-  InboxProjectOption,
-  InboxResourcesResponse,
-  ProjectOptionsResponse,
-} from '@/features/unmapped/types';
+import type { InboxResourcesResponse } from '@/features/unmapped/types';
 import { DashboardBoard } from '@/features/projects/dashboard-board';
 import { FilterRail } from '@/features/projects/filter-rail';
 import { AppIcon } from '@/shared/ui/app-icon';
 import { SearchField } from '@/shared/ui/search-field';
-import { CardSkeleton, EmptyPanel, ErrorPanel } from '@/shared/ui/state-panels';
+import { CardSkeleton, EmptyPanel } from '@/shared/ui/state-panels';
 
 type InboxTab = InboxResourcesResponse['inbox'];
 
-function UnmappedContent() {
-  const { state, queryString, replaceState } = useDashboardUrl();
-  const [tab, setTab] = useState<InboxTab>('open');
-  const [data, setData] = useState<InboxResourcesResponse | null>(null);
-  const [projects, setProjects] = useState<InboxProjectOption[]>([]);
-  const [error, setError] = useState<Error | null>(null);
-  const [loading, setLoading] = useState(true);
+function UnmappedContent({ board }: { board: UnmappedBoardPayload }) {
+  const { state, replaceState } = useDashboardUrl();
+  const { isPending, startTransition, refresh, bustAndRefresh } = useDashboardRefresh();
+  const tab: InboxTab = state.inbox === 'archived' ? 'archived' : 'open';
+  const data = board.inbox;
+  const projects = board.options.projects;
   const [search, setSearch] = useState('');
-  useUnauthorizedRedirect(error);
+  const loading = isPending;
 
-  const applyInbox = useCallback(
-    (inbox: InboxResourcesResponse, options: ProjectOptionsResponse) => {
-      setData(inbox);
-      setProjects(options.projects);
-    },
-    [],
-  );
+  const onFilterChange = (patch: Partial<DashboardUrlState>) => {
+    startTransition(() => replaceState(patch));
+  };
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const path = tab === 'archived' ? '/api/resources/archived' : '/api/resources/unmapped';
-      const [inbox, options] = await Promise.all([
-        fetchJson<InboxResourcesResponse>(`${path}${queryString}`),
-        fetchJson<ProjectOptionsResponse>('/api/projects/options'),
-      ]);
-      applyInbox(inbox, options);
-    } catch (err) {
-      setData(null);
-      setProjects([]);
-      setError(err instanceof Error ? err : new Error('Failed to load inbox'));
-    } finally {
-      setLoading(false);
-    }
-  }, [applyInbox, queryString, tab]);
-
-  useEffect(() => {
-    let cancelled = false;
-    void (async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const path = tab === 'archived' ? '/api/resources/archived' : '/api/resources/unmapped';
-        const [inbox, options] = await Promise.all([
-          fetchJson<InboxResourcesResponse>(`${path}${queryString}`),
-          fetchJson<ProjectOptionsResponse>('/api/projects/options'),
-        ]);
-        if (cancelled) {
-          return;
-        }
-        applyInbox(inbox, options);
-      } catch (err) {
-        if (cancelled) {
-          return;
-        }
-        setData(null);
-        setProjects([]);
-        setError(err instanceof Error ? err : new Error('Failed to load inbox'));
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [applyInbox, queryString, tab]);
+  const onTab = (next: InboxTab) => {
+    startTransition(() => replaceState({ inbox: next === 'archived' ? 'archived' : undefined }));
+  };
 
   const filtered = useMemo(() => {
     const list = data?.resources ?? [];
@@ -108,8 +52,8 @@ function UnmappedContent() {
       rail={
         <FilterRail
           state={state}
-          onChange={replaceState}
-          onRefresh={() => void load()}
+          onChange={onFilterChange}
+          onRefresh={bustAndRefresh}
           loading={loading}
         />
       }
@@ -120,17 +64,10 @@ function UnmappedContent() {
         archivedCount={data?.archivedCount ?? 0}
         rangeLabel={`${data?.range.from ?? '…'} → ${data?.range.to ?? '…'}`}
         search={search}
-        onTab={setTab}
+        onTab={onTab}
         onSearch={setSearch}
       />
-      {error && !data ? (
-        <ErrorPanel
-          message={error instanceof UnauthorizedError ? 'Session expired' : error.message}
-          onRetry={() => void load()}
-        />
-      ) : loading && (!data || data.inbox !== tab) ? (
-        <CardSkeleton />
-      ) : filtered.length === 0 ? (
+      {filtered.length === 0 ? (
         <EmptyPanel
           title={search ? 'No matches' : tab === 'archived' ? 'Archive empty' : 'Inbox clear'}
           detail={
@@ -145,13 +82,13 @@ function UnmappedContent() {
         <ul className="space-y-3">
           {filtered.map((resource) =>
             data?.inbox === 'archived' ? (
-              <ArchivedRow key={resource.id} resource={resource} onChanged={() => void load()} />
+              <ArchivedRow key={resource.id} resource={resource} onChanged={refresh} />
             ) : (
               <UnmappedRow
                 key={resource.id}
                 resource={resource}
                 projects={projects}
-                onChanged={() => void load()}
+                onChanged={refresh}
               />
             ),
           )}
@@ -269,10 +206,10 @@ function TabButton({
   );
 }
 
-export function UnmappedPage() {
+export function UnmappedPage({ board }: { board: UnmappedBoardPayload }) {
   return (
     <Suspense fallback={<CardSkeleton />}>
-      <UnmappedContent />
+      <UnmappedContent board={board} />
     </Suspense>
   );
 }

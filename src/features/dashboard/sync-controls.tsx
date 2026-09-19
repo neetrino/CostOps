@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import type { SyncStatusView } from '@/core/sync/load-status';
 import { fetchJson } from '@/features/dashboard/api-client';
 import { REGISTERED_PROVIDER_KEYS } from '@/shared/registered-providers';
@@ -79,30 +79,11 @@ export function SyncNowButton({ onComplete, compact = false }: SyncNowButtonProp
 }
 
 type SyncStatusChipProps = {
+  status: SyncStatusView;
   refreshKey?: number;
 };
 
-export function SyncStatusChip({ refreshKey = 0 }: SyncStatusChipProps) {
-  const [status, setStatus] = useState<SyncStatusView | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    void fetchJson<SyncStatusView>('/api/sync/status')
-      .then((data) => {
-        if (!cancelled) {
-          setStatus(data);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setStatus(null);
-        }
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [refreshKey]);
-
+export function SyncStatusChip({ status }: SyncStatusChipProps) {
   const latestRun = status?.runs[0];
   const account = status?.accounts[0];
   const label = account

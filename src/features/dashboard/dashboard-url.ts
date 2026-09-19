@@ -9,6 +9,7 @@ export type DashboardUrlState = {
   groupBy?: GroupBy;
   projectId?: string;
   providerKey?: string;
+  inbox?: 'archived';
 };
 
 const PRESET_SET = new Set<string>(DATE_PRESETS);
@@ -42,6 +43,9 @@ export function readDashboardUrlState(
   if (providerKey) {
     state.providerKey = providerKey;
   }
+  if (params.get('inbox') === 'archived') {
+    state.inbox = 'archived';
+  }
   return state;
 }
 
@@ -64,6 +68,9 @@ export function buildDashboardQueryString(state: DashboardUrlState): string {
   }
   if (state.providerKey) {
     params.set('providerKey', state.providerKey);
+  }
+  if (state.inbox === 'archived') {
+    params.set('inbox', 'archived');
   }
   const query = params.toString();
   return query ? `?${query}` : '';

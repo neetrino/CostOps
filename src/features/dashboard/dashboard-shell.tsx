@@ -1,8 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
+import type { SyncStatusView } from '@/core/sync/load-status';
+import type { InboxStatusResponse } from '@/features/unmapped/types';
 import { motion, MotionConfig } from 'motion/react';
 import { APP_NAME } from '@/config/constants';
 import {
@@ -25,6 +27,8 @@ const PROVIDER_NAV = [
 
 type DashboardShellProps = {
   children: React.ReactNode;
+  sync: SyncStatusView;
+  inbox: InboxStatusResponse;
 };
 
 function isBoardPath(pathname: string): boolean {
@@ -43,9 +47,14 @@ function navActive(href: string, pathname: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function DashboardShell({ children }: DashboardShellProps) {
+export function DashboardShell({ children, sync, inbox }: DashboardShellProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [syncKey, setSyncKey] = useState(0);
+  const afterSync = () => {
+    setSyncKey((value) => value + 1);
+    router.refresh();
+  };
 
   return (
     <MotionConfig reducedMotion="user">
@@ -54,7 +63,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
           <div className="flex min-h-14 items-center justify-between gap-3 px-4 py-2">
             <MobileBrand />
             <div className="flex items-center gap-2">
-              <SyncNowButton compact onComplete={() => setSyncKey((value) => value + 1)} />
+              <SyncNowButton compact onComplete={afterSync} />
               <MobileWorkspaceMenu />
             </div>
           </div>
@@ -75,8 +84,8 @@ export function DashboardShell({ children }: DashboardShellProps) {
               </div>
             </div>
             <div className="flex items-center gap-2.5">
-              <SyncStatusChip refreshKey={syncKey} />
-              <SyncNowButton onComplete={() => setSyncKey((value) => value + 1)} />
+              <SyncStatusChip status={sync} refreshKey={syncKey} />
+              <SyncNowButton onComplete={afterSync} />
               <SignOutButton />
             </div>
           </header>
@@ -93,7 +102,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
           </motion.main>
         </section>
         <MobileBottomNavigation />
-        <UnmappedInboxController />
+        <UnmappedInboxController status={inbox} />
       </div>
     </MotionConfig>
   );

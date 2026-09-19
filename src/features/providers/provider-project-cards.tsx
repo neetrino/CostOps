@@ -5,7 +5,7 @@ import type { ProviderProjectRow } from '@/features/providers/load-provider-deta
 import { VpsLeftoverRemove } from '@/features/providers/vps-leftover-remove';
 import { VpsLineEdit } from '@/features/providers/vps-line-edit';
 import { BudgetInlineField } from '@/features/projects/budget-inline-field';
-import { CostViewDisplay } from '@/shared/ui/cost-view-display';
+import { CostMetricTile } from '@/shared/ui/cost-view-display';
 import { AppIcon } from '@/shared/ui/app-icon';
 import { BudgetMeter } from '@/shared/ui/budget-meter';
 import { motion } from 'motion/react';
@@ -100,8 +100,8 @@ function ProviderProjectCard({
       </div>
       <div className="flex flex-1 flex-col gap-4 p-5">
         <div className="grid grid-cols-2 gap-3">
-          <Metric label="Period" cost={project.period} tone="dark" />
-          <Metric label="Today" cost={project.today} tone="signal" />
+          <CostMetricTile label="Period" cost={project.period} tone="dark" />
+          <CostMetricTile label="Today" cost={project.today} tone="signal" />
         </div>
         {hideDailyLimit ? (
           <div className="mt-auto space-y-3 border-t border-[var(--line)] pt-3">
@@ -156,26 +156,5 @@ function ProviderProjectCard({
         )}
       </div>
     </motion.li>
-  );
-}
-
-function Metric({
-  label,
-  cost,
-  tone,
-}: {
-  label: string;
-  cost: ProviderProjectRow['period'];
-  tone: 'dark' | 'signal';
-}) {
-  return (
-    <div
-      className={`min-w-0 rounded-[var(--radius-sm)] px-3 py-3 ${tone === 'dark' ? 'dark-stage' : 'tone-signal'}`}
-    >
-      <p className="eyebrow">{label}</p>
-      <div className="mt-1">
-        <CostViewDisplay cost={cost} size="sm" />
-      </div>
-    </div>
   );
 }

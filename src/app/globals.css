@@ -163,7 +163,6 @@ textarea {
 .workspace-frame {
   position: relative;
   isolation: isolate;
-  overflow: hidden;
   background-color: var(--canvas);
 }
 
@@ -237,6 +236,15 @@ textarea {
   --line: rgba(23, 24, 42, 0.14);
   color: var(--accent-ink);
   background-color: var(--accent);
+}
+
+.tone-danger {
+  --ink: #fffdf5;
+  --muted: rgba(255, 253, 245, 0.72);
+  --faint: rgba(255, 253, 245, 0.48);
+  --line: rgba(255, 253, 245, 0.18);
+  color: #fffdf5;
+  background-color: var(--danger);
 }
 
 .signal-grid {
@@ -376,6 +384,7 @@ textarea {
 
   .workspace-frame {
     min-height: calc(100dvh - 1.5rem);
+    overflow: hidden;
     border: 1px solid rgba(255, 253, 245, 0.16);
     border-radius: 2rem 0 0 2rem;
     box-shadow: -18px 0 60px rgba(0, 0, 0, 0.14);

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createVpsLine, createVpsLineBodySchema } from '@/core/vps';
-import { dashboardWriteFailed } from '@/shared/dashboard-route';
+import { dashboardWriteFailed, dashboardWriteJson } from '@/shared/dashboard-route';
 import { jsonError, readJsonBody } from '@/shared/http';
 
 export const runtime = 'nodejs';
@@ -23,7 +23,7 @@ export async function POST(request: Request, context: RouteContext): Promise<Nex
     if (!result.ok) {
       return jsonError('NOT_FOUND', result.message, 404);
     }
-    return NextResponse.json(result.data, { status: 201 });
+    return dashboardWriteJson(result.data, 201);
   } catch (error) {
     return dashboardWriteFailed('VPS line create', error);
   }

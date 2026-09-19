@@ -5,7 +5,10 @@ import {
   rowsInDashboardPeriod,
   rowsOnUtcDay,
 } from '@/core/cost/filter-entries';
-import { loadDashboardCostContext } from '@/core/cost/load-dashboard-costs';
+import {
+  loadDashboardCostContext,
+  type DashboardCostContext,
+} from '@/core/cost/load-dashboard-costs';
 import { ruleViewForProjectProvider } from '@/core/budgets/rule-view';
 import type {
   ProjectListResponse,
@@ -16,14 +19,18 @@ import { sortByPeriodCostDesc } from '@/features/projects/sort-projects-by-cost'
 import { prisma } from '@/shared/db';
 import { rangePayload, type ResolvedDashboardQuery } from '@/shared/dashboard-query';
 
-export async function loadProjects(query: ResolvedDashboardQuery): Promise<ProjectListResponse> {
-  const [cost, projects, rules] = await Promise.all([
-    loadDashboardCostContext({
-      from: query.from,
-      to: query.to,
-      projectId: query.projectId,
-      providerKey: query.providerKey,
-    }),
+export async function loadProjects(
+  query: ResolvedDashboardQuery,
+  cost?: DashboardCostContext,
+): Promise<ProjectListResponse> {
+  const [resolvedCost, projects, rules] = await Promise.all([
+    cost ??
+      loadDashboardCostContext({
+        from: query.from,
+        to: query.to,
+        projectId: query.projectId,
+        providerKey: query.providerKey,
+      }),
     prisma.project.findMany({
       where: query.projectId ? { id: query.projectId } : { archived: false },
       include: {
@@ -35,25 +42,30 @@ export async function loadProjects(query: ResolvedDashboardQuery): Promise<Proje
       where: { scope: 'PROJECT_PROVIDER' },
     }),
   ]);
-  const periodRows = rowsInDashboardPeriod(cost.entries, query.from, query.to, query.preset);
-  const todayRows = rowsOnUtcDay(cost.entries, cost.today);
+  const periodRows = rowsInDashboardPeriod(
+    resolvedCost.entries,
+    query.from,
+    query.to,
+    query.preset,
+  );
+  const todayRows = rowsOnUtcDay(resolvedCost.entries, resolvedCost.today);
 
   const rows: ProjectListRow[] = projects.map((project) => {
     const providers: ProjectProviderRow[] = project.projectProviders
       .filter((link) => !query.providerKey || link.providerKey === query.providerKey)
       .map((link) => {
-        const linkFallback = latestSyncForAccounts(cost.accounts, link.providerKey);
+        const linkFallback = latestSyncForAccounts(resolvedCost.accounts, link.providerKey);
         return {
           providerKey: link.providerKey,
           projectProviderId: link.id,
           today: costViewForRows(
             rowsForProjectProvider(todayRows, link.id),
-            cost.syncAtByAccountId,
+            resolvedCost.syncAtByAccountId,
             linkFallback,
           ),
           period: costViewForRows(
             rowsForProjectProvider(periodRows, link.id),
-            cost.syncAtByAccountId,
+            resolvedCost.syncAtByAccountId,
             linkFallback,
           ),
           budget: ruleViewForProjectProvider(rules, link.id),

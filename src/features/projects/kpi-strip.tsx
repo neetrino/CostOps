@@ -3,6 +3,7 @@
 import type { CostView } from '@/core/cost/types';
 import { motion } from 'motion/react';
 import { providerUiLabel } from '@/shared/provider-label';
+import { providerStageClass } from '@/shared/provider-tone';
 import { compareProviderNavOrder } from '@/shared/registered-providers';
 import { CostViewDisplay } from '@/shared/ui/cost-view-display';
 
@@ -52,7 +53,7 @@ export function KpiStrip({ byProvider, loading }: KpiStripProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.34, delay: index * 0.055 }}
             whileHover={{ y: -5, rotate: index % 2 === 0 ? -0.35 : 0.35 }}
-            className={`relative min-h-36 min-w-[76vw] snap-start overflow-hidden rounded-[var(--radius)] border border-[var(--line)] p-5 shadow-[var(--shadow-card)] sm:min-w-0 ${tileTone(index)}`}
+            className={`relative flex min-h-44 min-w-[76vw] snap-start flex-col overflow-hidden rounded-[var(--radius)] border border-[var(--line)] p-5 shadow-[var(--shadow-card)] sm:min-w-0 ${providerStageClass(tile.providerKey)}`}
           >
             <span className="absolute -right-5 -bottom-9 font-[family-name:var(--font-display)] text-[7rem] leading-none font-extrabold text-[var(--ink)] opacity-[0.055]">
               {String(index + 1).padStart(2, '0')}
@@ -63,10 +64,10 @@ export function KpiStrip({ byProvider, loading }: KpiStripProps) {
                 {String(index + 1).padStart(2, '0')}
               </span>
             </div>
-            <div className="mt-4">
-              <CostViewDisplay cost={tile.cost} size="md" />
+            <div className="mt-5 flex flex-1 flex-col items-center justify-center">
+              <CostViewDisplay cost={tile.cost} size="lg" align="center" />
             </div>
-            <p className="mt-3 text-[11px] leading-relaxed text-[var(--muted)]">
+            <p className="mt-4 text-center text-[11px] leading-relaxed text-[var(--muted)]">
               {periodCostHint(tile.cost.sourceType, tile.providerKey)}
             </p>
           </motion.div>
@@ -74,9 +75,4 @@ export function KpiStrip({ byProvider, loading }: KpiStripProps) {
       </div>
     </section>
   );
-}
-
-function tileTone(index: number): string {
-  const tones = ['dark-stage', 'tone-signal', 'tone-violet', 'tone-accent'] as const;
-  return tones[index % tones.length];
 }

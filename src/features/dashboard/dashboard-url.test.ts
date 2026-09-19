@@ -22,4 +22,11 @@ describe('dashboard URL helpers', () => {
       mergeDashboardUrlState({ preset: 'current_month', groupBy: 'day' }, { groupBy: 'week' }),
     ).toEqual({ preset: 'current_month', groupBy: 'week' });
   });
+
+  it('persists the archived inbox tab in the query string', () => {
+    expect(readDashboardUrlState(new URLSearchParams('inbox=archived'))).toEqual({
+      inbox: 'archived',
+    });
+    expect(buildDashboardQueryString({ inbox: 'archived' })).toBe('?inbox=archived');
+  });
 });

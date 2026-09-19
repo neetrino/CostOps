@@ -3,9 +3,10 @@
 import Link from 'next/link';
 import type { ProjectListRow } from '@/features/projects/types';
 import { BudgetInlineField } from '@/features/projects/budget-inline-field';
-import { CostViewDisplay } from '@/shared/ui/cost-view-display';
+import { CostMetricTile } from '@/shared/ui/cost-view-display';
 import { firstAlertableProvider } from '@/features/projects/alertable-provider';
 import { providerUiLabel } from '@/shared/provider-label';
+import { ProviderSwatch } from '@/shared/ui/provider-swatch';
 import { formatUsd } from '@/shared/money';
 import { motion } from 'motion/react';
 import { AppIcon } from '@/shared/ui/app-icon';
@@ -90,17 +91,17 @@ function ProjectCard({
       </div>
       <div className="flex flex-1 flex-col gap-4 p-5">
         <div className="grid grid-cols-2 gap-3">
-          <Metric label="Period" cost={project.period} tone="dark" />
-          <Metric label="Today" cost={project.today} tone="signal" />
+          <CostMetricTile label="Period" cost={project.period} tone="dark" />
+          <CostMetricTile label="Today" cost={project.today} tone="signal" />
         </div>
         {project.providers.length > 0 ? (
           <div className="rounded-[var(--radius-sm)] border border-[var(--violet)]/15 bg-[var(--violet-soft)] px-4 py-3.5">
             <p className="eyebrow">Providers</p>
             <ul className="mt-2 space-y-1 text-xs">
-              {project.providers.map((link, providerIndex) => (
+              {project.providers.map((link) => (
                 <li key={link.projectProviderId} className="flex justify-between gap-2">
                   <span className="flex items-center gap-2 text-[var(--ink)]">
-                    <span className={`size-1.5 rounded-full ${cardAccent(providerIndex + 1)}`} />
+                    <ProviderSwatch providerKey={link.providerKey} />
                     {providerUiLabel(link.providerKey)}
                   </span>
                   <span className="money text-[var(--muted)]">
@@ -132,27 +133,6 @@ function ProjectCard({
         ) : null}
       </div>
     </motion.li>
-  );
-}
-
-function Metric({
-  label,
-  cost,
-  tone,
-}: {
-  label: string;
-  cost: ProjectListRow['period'];
-  tone: 'dark' | 'signal';
-}) {
-  return (
-    <div
-      className={`min-w-0 rounded-[var(--radius-sm)] px-3 py-3 ${tone === 'dark' ? 'dark-stage' : 'tone-signal'}`}
-    >
-      <p className="eyebrow">{label}</p>
-      <div className="mt-1">
-        <CostViewDisplay cost={cost} size="sm" />
-      </div>
-    </div>
   );
 }
 

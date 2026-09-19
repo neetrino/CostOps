@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { resourceArchiveBodySchema, setResourceArchived } from '@/core/mapping';
-import { dashboardWriteFailed } from '@/shared/dashboard-route';
+import { dashboardWriteFailed, dashboardWriteJson } from '@/shared/dashboard-route';
 import { jsonError, readJsonBody } from '@/shared/http';
 
 export const runtime = 'nodejs';
@@ -27,7 +27,7 @@ export async function PATCH(request: Request, context: RouteContext): Promise<Ne
       const status = result.code === 'NOT_FOUND' ? 404 : 409;
       return jsonError(result.code, result.message, status);
     }
-    return NextResponse.json(result.data);
+    return dashboardWriteJson(result.data);
   } catch (error) {
     return dashboardWriteFailed('Resource archive patch', error);
   }

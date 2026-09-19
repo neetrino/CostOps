@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { runForcedAccountSyncs } from '@/core/sync/run-due-syncs';
 import { clientIpFromHeaders } from '@/shared/auth/login-rate-limit';
 import { consumeSyncNowAttempt } from '@/shared/auth/sync-now-rate-limit';
+import { afterDashboardWrite } from '@/shared/dashboard-route';
 import { jsonError, safeErrorMessage } from '@/shared/http';
 import { logger } from '@/shared/logger';
 import { parseRegisteredProviderKey } from '@/shared/registered-providers';
@@ -40,6 +41,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   try {
     const results = await runForcedAccountSyncs({ providerKey });
+    afterDashboardWrite();
     return NextResponse.json({
       ok: results.every((result) => result.ok),
       providerKey,

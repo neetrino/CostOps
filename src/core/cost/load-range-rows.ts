@@ -18,6 +18,19 @@ export async function loadRangeCostRows(filter: CostRangeFilter): Promise<CostEn
       ...(filter.projectId ? { projectId: filter.projectId } : {}),
       ...(filter.providerKey ? { providerKey: filter.providerKey } : {}),
     },
+    select: {
+      costUsd: true,
+      sourceStatus: true,
+      sourceType: true,
+      isPartial: true,
+      projectId: true,
+      projectProviderId: true,
+      providerKey: true,
+      bucketDate: true,
+      resourceId: true,
+      providerAccountId: true,
+      metadata: true,
+    },
   });
   return rows.map((row) => ({
     costUsd: decimalToNumber(row.costUsd),

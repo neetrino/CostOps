@@ -6,6 +6,7 @@ import { BudgetInlineField } from '@/features/projects/budget-inline-field';
 import { CostViewDisplay } from '@/shared/ui/cost-view-display';
 import { firstAlertableProvider } from '@/features/projects/alertable-provider';
 import { providerUiLabel } from '@/shared/provider-label';
+import { ProviderSwatch } from '@/shared/ui/provider-swatch';
 import { formatUsd } from '@/shared/money';
 import { AppIcon } from '@/shared/ui/app-icon';
 import { BudgetMeter } from '@/shared/ui/budget-meter';
@@ -52,8 +53,9 @@ export function ProjectListView({ projects, onBudgetSaved }: ProjectListViewProp
                   {project.providers.map((provider) => (
                     <span
                       key={provider.projectProviderId}
-                      className="rounded-full border border-[var(--line)] bg-[var(--sunken)] px-2 py-1 text-[10px] font-semibold text-[var(--muted)]"
+                      className="inline-flex items-center gap-1.5 rounded-full border border-[var(--line)] bg-[var(--sunken)] px-2 py-1 text-[10px] font-semibold text-[var(--muted)]"
                     >
+                      <ProviderSwatch providerKey={provider.providerKey} />
                       {providerUiLabel(provider.providerKey)}
                     </span>
                   ))}
@@ -119,7 +121,10 @@ export function ProjectListView({ projects, onBudgetSaved }: ProjectListViewProp
                   <td className="px-4 py-3 text-xs text-[var(--muted)]">
                     {project.providers.map((link) => (
                       <div key={link.projectProviderId} className="flex justify-between gap-4">
-                        <span>{providerUiLabel(link.providerKey)}</span>
+                        <span className="inline-flex items-center gap-1.5">
+                          <ProviderSwatch providerKey={link.providerKey} />
+                          {providerUiLabel(link.providerKey)}
+                        </span>
                         <span className="money">
                           {link.period.costUsd === null ? '—' : formatUsd(link.period.costUsd)}
                         </span>

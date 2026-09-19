@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { credentialPatchBodySchema, patchProviderAccountCredential } from '@/features/integrations';
-import { dashboardWriteFailed } from '@/shared/dashboard-route';
+import { dashboardWriteFailed, dashboardWriteJson } from '@/shared/dashboard-route';
 import { jsonError, readJsonBody } from '@/shared/http';
 
 export const runtime = 'nodejs';
@@ -23,7 +23,7 @@ export async function PATCH(request: Request, context: RouteContext): Promise<Ne
     if (!updated) {
       return jsonError('NOT_FOUND', 'Provider account not found', 404);
     }
-    return NextResponse.json(updated);
+    return dashboardWriteJson(updated);
   } catch (error) {
     return dashboardWriteFailed('Credential patch', error);
   }

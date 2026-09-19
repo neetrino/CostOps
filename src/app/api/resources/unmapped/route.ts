@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { loadUnmappedResources } from '@/features/settings';
 import { dashboardReadFailed, parseDashboardRequest } from '@/shared/dashboard-route';
+import { cacheDashboardRead, dashboardReadCacheKey } from '@/shared/dashboard-read-cache';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -11,7 +12,11 @@ export async function GET(request: Request): Promise<NextResponse> {
     return parsed.response;
   }
   try {
-    return NextResponse.json(await loadUnmappedResources(parsed.query));
+    return NextResponse.json(
+      await cacheDashboardRead('unmapped', dashboardReadCacheKey(parsed.query), () =>
+        loadUnmappedResources(parsed.query),
+      ),
+    );
   } catch (error) {
     return dashboardReadFailed('Unmapped resources read', error);
   }

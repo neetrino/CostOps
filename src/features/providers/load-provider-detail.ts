@@ -6,7 +6,10 @@ import {
   rowsOnUtcDay,
   unmappedRows,
 } from '@/core/cost/filter-entries';
-import { loadDashboardCostContext } from '@/core/cost/load-dashboard-costs';
+import {
+  loadDashboardCostContext,
+  type DashboardCostContext,
+} from '@/core/cost/load-dashboard-costs';
 import { loadSyncStatus } from '@/core/sync/load-status';
 import { ruleViewForProjectProvider, type BudgetRuleView } from '@/core/budgets/rule-view';
 import type { CostView } from '@/core/cost/types';
@@ -54,19 +57,21 @@ export async function loadProviderDetail(
   providerKey: ProviderKey,
   query: ResolvedDashboardQuery,
   now: Date = new Date(),
+  cost?: DashboardCostContext,
 ): Promise<ProviderDetailResponse | null> {
   const provider = await prisma.provider.findUnique({ where: { key: providerKey } });
   if (!provider) {
     return null;
   }
-  const [cost, links, rules, unmappedCount, sync, vpsResources] = await Promise.all([
-    loadDashboardCostContext({
-      from: query.from,
-      to: query.to,
-      projectId: query.projectId,
-      providerKey,
-      now,
-    }),
+  const [resolvedCost, links, rules, unmappedCount, sync, vpsResources] = await Promise.all([
+    cost ??
+      loadDashboardCostContext({
+        from: query.from,
+        to: query.to,
+        projectId: query.projectId,
+        providerKey,
+        now,
+      }),
     prisma.projectProvider.findMany({
       where: { providerKey },
       include: { project: { select: { id: true, slug: true, name: true, archived: true } } },
@@ -108,11 +113,14 @@ export async function loadProviderDetail(
     vpsLinesByLink.set(resource.projectProviderId, lines);
   }
   const periodRows = rowsForProvider(
-    rowsInDashboardPeriod(cost.entries, query.from, query.to, query.preset),
+    rowsInDashboardPeriod(resolvedCost.entries, query.from, query.to, query.preset),
     providerKey,
   );
-  const todayRows = rowsForProvider(rowsOnUtcDay(cost.entries, cost.today), providerKey);
-  const fallback = latestSyncForAccounts(cost.accounts, providerKey);
+  const todayRows = rowsForProvider(
+    rowsOnUtcDay(resolvedCost.entries, resolvedCost.today),
+    providerKey,
+  );
+  const fallback = latestSyncForAccounts(resolvedCost.accounts, providerKey);
 
   return {
     range: rangePayload(query),
@@ -121,12 +129,12 @@ export async function loadProviderDetail(
       displayName: provider.displayName,
       enabled: provider.enabled,
     },
-    today: costViewForRows(todayRows, cost.syncAtByAccountId, fallback),
-    period: costViewForRows(periodRows, cost.syncAtByAccountId, fallback),
+    today: costViewForRows(todayRows, resolvedCost.syncAtByAccountId, fallback),
+    period: costViewForRows(periodRows, resolvedCost.syncAtByAccountId, fallback),
     unmapped: {
       count: unmappedCount,
-      today: costViewForRows(unmappedRows(todayRows), cost.syncAtByAccountId, fallback),
-      period: costViewForRows(unmappedRows(periodRows), cost.syncAtByAccountId, fallback),
+      today: costViewForRows(unmappedRows(todayRows), resolvedCost.syncAtByAccountId, fallback),
+      period: costViewForRows(unmappedRows(periodRows), resolvedCost.syncAtByAccountId, fallback),
     },
     projects: sortByPeriodCostDesc(
       links
@@ -140,12 +148,12 @@ export async function loadProviderDetail(
           projectProviderId: link.id,
           today: costViewForRows(
             rowsForProject(todayRows, link.projectId),
-            cost.syncAtByAccountId,
+            resolvedCost.syncAtByAccountId,
             fallback,
           ),
           period: costViewForRows(
             rowsForProject(periodRows, link.projectId),
-            cost.syncAtByAccountId,
+            resolvedCost.syncAtByAccountId,
             fallback,
           ),
           budget: ruleViewForProjectProvider(rules, link.id),

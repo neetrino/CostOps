@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createProjectForResource } from '@/core/mapping';
-import { dashboardWriteFailed } from '@/shared/dashboard-route';
+import { dashboardWriteFailed, dashboardWriteJson } from '@/shared/dashboard-route';
 import { jsonError } from '@/shared/http';
 
 export const runtime = 'nodejs';
@@ -16,7 +16,7 @@ export async function POST(_request: Request, context: RouteContext): Promise<Ne
       const status = result.code === 'NOT_FOUND' ? 404 : 409;
       return jsonError(result.code, result.message, status);
     }
-    return NextResponse.json(result.data, { status: 201 });
+    return dashboardWriteJson(result.data, 201);
   } catch (error) {
     return dashboardWriteFailed('Standalone project create', error);
   }

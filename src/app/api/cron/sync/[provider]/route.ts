@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { runDueAccountSyncs } from '@/core/sync/run-due-syncs';
 import { requireCronSecret } from '@/shared/auth/require-cron-secret';
+import { afterDashboardWrite } from '@/shared/dashboard-route';
 import { jsonError, safeErrorMessage } from '@/shared/http';
 import { logger } from '@/shared/logger';
 import { parseRegisteredProviderKey } from '@/shared/registered-providers';
@@ -26,6 +27,7 @@ export async function GET(request: Request, context: RouteContext): Promise<Next
 
   try {
     const results = await runDueAccountSyncs({ providerKey });
+    afterDashboardWrite();
     return NextResponse.json({
       ok: results.every((result) => result.ok),
       providerKey,

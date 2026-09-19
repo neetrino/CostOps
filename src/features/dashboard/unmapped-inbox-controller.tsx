@@ -1,14 +1,24 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 import { UNMAPPED_INBOX_DISMISS_STORAGE_KEY } from '@/config/constants';
 import { shouldShowUnmappedInbox } from '@/core/mapping/inbox-dismiss';
-import { fetchJson, UnauthorizedError } from '@/features/dashboard/api-client';
 import { UnmappedInboxDialog } from '@/features/dashboard/unmapped-inbox-dialog';
 import type { InboxStatusResponse } from '@/features/unmapped/types';
 
+const dismissedListeners = new Set<() => void>();
+
+function notifyDismissedListeners(): void {
+  for (const listener of dismissedListeners) {
+    listener();
+  }
+}
+
 function readDismissedCount(): number | null {
+  if (typeof sessionStorage === 'undefined') {
+    return null;
+  }
   const raw = sessionStorage.getItem(UNMAPPED_INBOX_DISMISS_STORAGE_KEY);
   if (raw === null) {
     return null;
@@ -18,45 +28,49 @@ function readDismissedCount(): number | null {
 }
 
 function writeDismissedCount(count: number): void {
+  if (typeof sessionStorage === 'undefined') {
+    return;
+  }
   sessionStorage.setItem(UNMAPPED_INBOX_DISMISS_STORAGE_KEY, String(count));
+  notifyDismissedListeners();
 }
 
-export function UnmappedInboxController() {
+function subscribeDismissed(onStoreChange: () => void): () => void {
+  dismissedListeners.add(onStoreChange);
+  window.addEventListener('storage', onStoreChange);
+  return () => {
+    dismissedListeners.delete(onStoreChange);
+    window.removeEventListener('storage', onStoreChange);
+  };
+}
+
+function getDismissedSnapshot(): number | null {
+  return readDismissedCount();
+}
+
+function getDismissedServerSnapshot(): number | null {
+  return null;
+}
+
+export function UnmappedInboxController({ status }: { status: InboxStatusResponse }) {
   const pathname = usePathname();
-  const [status, setStatus] = useState<InboxStatusResponse | null>(null);
-  const [dismissedCount, setDismissedCount] = useState<number | null>(null);
+  const dismissedCount = useSyncExternalStore(
+    subscribeDismissed,
+    getDismissedSnapshot,
+    getDismissedServerSnapshot,
+  );
 
   useEffect(() => {
-    let cancelled = false;
-    void fetchJson<InboxStatusResponse>('/api/resources/inbox-status')
-      .then((payload) => {
-        if (cancelled) {
-          return;
-        }
-        setDismissedCount(readDismissedCount());
-        setStatus(payload);
-      })
-      .catch((error: unknown) => {
-        if (!(error instanceof UnauthorizedError) && !cancelled) {
-          setStatus(null);
-        }
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  if (pathname === '/unmapped' && status && dismissedCount !== status.unmappedCount) {
+    if (pathname !== '/unmapped') {
+      return;
+    }
     writeDismissedCount(status.unmappedCount);
-    setDismissedCount(status.unmappedCount);
-  }
+  }, [pathname, status.unmappedCount]);
 
   const open =
-    pathname !== '/unmapped' &&
-    status !== null &&
-    shouldShowUnmappedInbox(status.unmappedCount, dismissedCount);
+    pathname !== '/unmapped' && shouldShowUnmappedInbox(status.unmappedCount, dismissedCount);
 
-  if (!open || !status) {
+  if (!open) {
     return null;
   }
 
@@ -66,7 +80,6 @@ export function UnmappedInboxController() {
       preview={status.preview}
       onDismiss={() => {
         writeDismissedCount(status.unmappedCount);
-        setDismissedCount(status.unmappedCount);
       }}
     />
   );

@@ -20,7 +20,8 @@ import {
 import { formatChartAxisUsd } from '@/features/projects/chart-format';
 import { ChartPanel } from '@/features/projects/chart-panel';
 import { providerUiLabel } from '@/shared/provider-label';
-import { chartColorForKey } from '@/shared/ui/chart-colors';
+import { providerChartColor } from '@/shared/provider-tone';
+import { ProviderSwatch } from '@/shared/ui/provider-swatch';
 import { EmptyPanel } from '@/shared/ui/state-panels';
 
 type ProviderStackChartProps = {
@@ -81,7 +82,10 @@ export function ProviderStackChart({ points, providerKeys }: ProviderStackChartP
                     <ul className="mt-2 space-y-1">
                       {payload.map((entry) => (
                         <li key={String(entry.dataKey)} className="flex justify-between gap-4">
-                          <span className="text-[var(--muted)]">{entry.name}</span>
+                          <span className="inline-flex items-center gap-1.5 text-[var(--muted)]">
+                            <ProviderSwatch providerKey={String(entry.dataKey)} />
+                            {entry.name}
+                          </span>
                           <span className="money">
                             {typeof entry.value === 'number' ? formatChartUsd(entry.value) : '—'}
                           </span>
@@ -102,7 +106,7 @@ export function ProviderStackChart({ points, providerKeys }: ProviderStackChartP
                 dataKey={key}
                 name={providerUiLabel(key)}
                 stackId="providers"
-                fill={chartColorForKey(key)}
+                fill={providerChartColor(key)}
                 maxBarSize={36}
                 isAnimationActive
                 animationDuration={420}
