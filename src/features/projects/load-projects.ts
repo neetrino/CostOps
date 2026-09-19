@@ -25,7 +25,7 @@ export async function loadProjects(query: ResolvedDashboardQuery): Promise<Proje
       providerKey: query.providerKey,
     }),
     prisma.project.findMany({
-      where: query.projectId ? { id: query.projectId } : undefined,
+      where: query.projectId ? { id: query.projectId } : { archived: false },
       include: {
         projectProviders: { orderBy: { providerKey: 'asc' } },
       },
