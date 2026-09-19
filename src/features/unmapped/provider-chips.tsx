@@ -1,4 +1,5 @@
 import { providerUiLabel } from '@/shared/provider-label';
+import { ProviderSwatch } from '@/shared/ui/provider-swatch';
 
 export function ProviderChips({ providerKeys }: { providerKeys: readonly string[] }) {
   if (providerKeys.length === 0) {
@@ -9,8 +10,9 @@ export function ProviderChips({ providerKeys }: { providerKeys: readonly string[
       {providerKeys.map((key) => (
         <span
           key={key}
-          className="rounded-full border border-[var(--accent-mid)] bg-[var(--accent-soft)] px-2 py-0.5 text-[9px] font-semibold tracking-[0.1em] text-[var(--accent)] uppercase"
+          className="inline-flex items-center gap-1.5 rounded-full border border-[var(--line)] bg-[var(--paper-raised)] px-2 py-0.5 text-[9px] font-semibold tracking-[0.1em] text-[var(--ink)] uppercase"
         >
+          <ProviderSwatch providerKey={key} />
           {providerUiLabel(key)}
         </span>
       ))}

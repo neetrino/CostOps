@@ -42,6 +42,8 @@ Generalize Neon `/api/usage/*`. Keep response fields stable enough to port UI, t
 | GET | `/api/alerts` | Alert events for a date range |
 | GET | `/api/integrations` | Provider accounts + credential health + create-token URLs |
 
+Dashboard HTML is loaded by Server Components. Read APIs stay for mutations and tools. Both paths share the `dashboard-reads` cache tag.
+
 ### Shared query
 
 ```text
@@ -92,6 +94,7 @@ Do not emit `0` when status is `missing` or `error` without also sending that st
 | POST | `/api/sync/now` | Manual sync for one `{ providerKey }` (rate limited). UI calls Neon → Upstash → Vercel → Hetzner |
 | POST | `/api/sync/backfill` | Range backfill for one account |
 | PATCH | `/api/provider-accounts/[id]/credential` | Set `credentialExpiresAt` or mark rotated |
+| POST | `/api/dashboard/revalidate` | Bust dashboard read cache (Refresh). Sync and writes already do this |
 
 Inline budget PATCH must stay as small as Neon `spend-alert` (limit + escalation only).
 

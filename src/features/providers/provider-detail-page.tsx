@@ -1,13 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
-import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import { Suspense, useMemo, useState } from 'react';
 import { motion } from 'motion/react';
-import type { CostSeriesPoint } from '@/core/cost/build-series';
-import { fetchJson, UnauthorizedError } from '@/features/dashboard/api-client';
+import type { DashboardUrlState } from '@/features/dashboard/dashboard-url';
+import { useDashboardRefresh } from '@/features/dashboard/use-dashboard-refresh';
 import { useDashboardUrl } from '@/features/dashboard/use-dashboard-url';
-import { useUnauthorizedRedirect } from '@/features/dashboard/use-unauthorized-redirect';
+import type { ProviderDetailBoardPayload } from '@/features/providers/load-provider-detail-board';
 import { buildCompareBarData } from '@/features/projects/chart-data';
 import { DashboardBoard } from '@/features/projects/dashboard-board';
 import { FilterRail } from '@/features/projects/filter-rail';
@@ -23,81 +22,21 @@ import { ProviderProjectList } from '@/features/providers/provider-project-list'
 import { VpsAddProject } from '@/features/providers/vps-add-project';
 import { isFixedVpsProvider } from '@/shared/provider-label';
 import { CostMetricTile, CostViewDisplay } from '@/shared/ui/cost-view-display';
-import { CardSkeleton, EmptyPanel, ErrorPanel } from '@/shared/ui/state-panels';
+import { CardSkeleton, EmptyPanel } from '@/shared/ui/state-panels';
 import { SearchField } from '@/shared/ui/search-field';
 
-type UsageSeriesResponse = { points: CostSeriesPoint[] };
-
-function ProviderDetailContent() {
-  const params = useParams<{ key: string }>();
-  const providerKey = params.key.toUpperCase();
-  const { state, queryString, replaceState } = useDashboardUrl();
-  const [detail, setDetail] = useState<ProviderDetailResponse | null>(null);
-  const [seriesData, setSeriesData] = useState<UsageSeriesResponse | null>(null);
-  const [error, setError] = useState<Error | null>(null);
-  const [loading, setLoading] = useState(true);
+function ProviderDetailContent({ board }: { board: ProviderDetailBoardPayload }) {
+  const { state, replaceState } = useDashboardUrl();
+  const { isPending, startTransition, refresh, bustAndRefresh } = useDashboardRefresh();
+  const detail = board.detail;
+  const seriesData = board.series;
   const [search, setSearch] = useState('');
   const [viewMode, setViewMode] = useBoardViewMode();
-  useUnauthorizedRedirect(error);
+  const loading = isPending;
 
-  const scopedQuery = useMemo(() => {
-    const params = new URLSearchParams(queryString.replace(/^\?/, ''));
-    params.set('providerKey', providerKey);
-    const query = params.toString();
-    return query ? `?${query}` : '';
-  }, [providerKey, queryString]);
-
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const [providerDetail, series] = await Promise.all([
-        fetchJson<ProviderDetailResponse>(`/api/providers/${params.key}${queryString}`),
-        fetchJson<UsageSeriesResponse>(`/api/usage/series${scopedQuery}`),
-      ]);
-      setDetail(providerDetail);
-      setSeriesData(series);
-    } catch (err) {
-      setDetail(null);
-      setSeriesData(null);
-      setError(err instanceof Error ? err : new Error('Failed to load provider'));
-    } finally {
-      setLoading(false);
-    }
-  }, [params.key, queryString, scopedQuery]);
-
-  useEffect(() => {
-    let cancelled = false;
-    void (async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const [providerDetail, series] = await Promise.all([
-          fetchJson<ProviderDetailResponse>(`/api/providers/${params.key}${queryString}`),
-          fetchJson<UsageSeriesResponse>(`/api/usage/series${scopedQuery}`),
-        ]);
-        if (cancelled) {
-          return;
-        }
-        setDetail(providerDetail);
-        setSeriesData(series);
-      } catch (err) {
-        if (cancelled) {
-          return;
-        }
-        setDetail(null);
-        setSeriesData(null);
-        setError(err instanceof Error ? err : new Error('Failed to load provider'));
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [params.key, queryString, scopedQuery]);
+  const onFilterChange = (patch: Partial<DashboardUrlState>) => {
+    startTransition(() => replaceState(patch));
+  };
 
   const filteredProjects = useMemo(() => {
     const list = detail?.projects ?? [];
@@ -138,23 +77,13 @@ function ProviderDetailContent() {
       rail={
         <FilterRail
           state={state}
-          onChange={replaceState}
-          onRefresh={() => void load()}
+          onChange={onFilterChange}
+          onRefresh={bustAndRefresh}
           loading={loading}
         />
       }
     >
-      {error && !detail ? (
-        <ErrorPanel
-          message={error instanceof UnauthorizedError ? 'Session expired' : error.message}
-          onRetry={() => void load()}
-        />
-      ) : loading && !detail ? (
-        <CardSkeleton />
-      ) : !detail ? (
-        <EmptyPanel title="Provider not found" detail="Unknown provider key." />
-      ) : (
-        <>
+      <>
           <motion.header
             initial={{ opacity: 0, scale: 0.992 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -185,7 +114,7 @@ function ProviderDetailContent() {
                   providerKey={detail.provider.key}
                   from={detail.range.from}
                   to={detail.range.to}
-                  onComplete={() => void load()}
+                  onComplete={refresh}
                 />
               </div>
             </div>
@@ -199,7 +128,7 @@ function ProviderDetailContent() {
           </motion.header>
 
           {isFixedVpsProvider(detail.provider.key) ? (
-            <VpsAddProject onAdded={() => void load()} />
+            <VpsAddProject onAdded={refresh} />
           ) : null}
 
           <div className="grid gap-3 sm:grid-cols-3">
@@ -237,17 +166,16 @@ function ProviderDetailContent() {
             <ProviderProjectCards
               projects={filteredProjects}
               hideDailyLimit={isFixedVpsProvider(detail.provider.key)}
-              onBudgetSaved={() => void load()}
+              onBudgetSaved={refresh}
             />
           ) : (
             <ProviderProjectList
               projects={filteredProjects}
               hideDailyLimit={isFixedVpsProvider(detail.provider.key)}
-              onBudgetSaved={() => void load()}
+              onBudgetSaved={refresh}
             />
           )}
-        </>
-      )}
+      </>
     </DashboardBoard>
   );
 }
@@ -277,10 +205,10 @@ function UnmappedTile({ unmapped }: { unmapped: ProviderDetailResponse['unmapped
   );
 }
 
-export function ProviderDetailPage() {
+export function ProviderDetailPage({ board }: { board: ProviderDetailBoardPayload }) {
   return (
     <Suspense fallback={<CardSkeleton />}>
-      <ProviderDetailContent />
+      <ProviderDetailContent board={board} />
     </Suspense>
   );
 }

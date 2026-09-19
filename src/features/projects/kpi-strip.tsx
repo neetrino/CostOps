@@ -3,6 +3,7 @@
 import type { CostView } from '@/core/cost/types';
 import { motion } from 'motion/react';
 import { providerUiLabel } from '@/shared/provider-label';
+import { providerStageClass } from '@/shared/provider-tone';
 import { compareProviderNavOrder } from '@/shared/registered-providers';
 import { CostViewDisplay } from '@/shared/ui/cost-view-display';
 
@@ -52,7 +53,7 @@ export function KpiStrip({ byProvider, loading }: KpiStripProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.34, delay: index * 0.055 }}
             whileHover={{ y: -5, rotate: index % 2 === 0 ? -0.35 : 0.35 }}
-            className={`relative flex min-h-44 min-w-[76vw] snap-start flex-col overflow-hidden rounded-[var(--radius)] border border-[var(--line)] p-5 shadow-[var(--shadow-card)] sm:min-w-0 ${tileTone(tile.providerKey)}`}
+            className={`relative flex min-h-44 min-w-[76vw] snap-start flex-col overflow-hidden rounded-[var(--radius)] border border-[var(--line)] p-5 shadow-[var(--shadow-card)] sm:min-w-0 ${providerStageClass(tile.providerKey)}`}
           >
             <span className="absolute -right-5 -bottom-9 font-[family-name:var(--font-display)] text-[7rem] leading-none font-extrabold text-[var(--ink)] opacity-[0.055]">
               {String(index + 1).padStart(2, '0')}
@@ -74,20 +75,4 @@ export function KpiStrip({ byProvider, loading }: KpiStripProps) {
       </div>
     </section>
   );
-}
-
-function tileTone(providerKey: string): string {
-  if (providerKey === 'NEON') {
-    return 'tone-signal';
-  }
-  if (providerKey === 'VERCEL') {
-    return 'dark-stage';
-  }
-  if (providerKey === 'UPSTASH') {
-    return 'tone-violet';
-  }
-  if (providerKey === 'HETZNER') {
-    return 'tone-danger';
-  }
-  return 'dark-stage';
 }

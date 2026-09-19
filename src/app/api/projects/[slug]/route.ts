@@ -3,6 +3,7 @@ import { loadProjectDetail, patchProjectBySlug, projectPatchBodySchema } from '@
 import {
   dashboardReadFailed,
   dashboardWriteFailed,
+  dashboardWriteJson,
   parseDashboardRequest,
 } from '@/shared/dashboard-route';
 import { jsonError, readJsonBody } from '@/shared/http';
@@ -44,7 +45,7 @@ export async function PATCH(request: Request, context: RouteContext): Promise<Ne
     if (!updated) {
       return jsonError('NOT_FOUND', 'Project not found', 404);
     }
-    return NextResponse.json(updated);
+    return dashboardWriteJson(updated);
   } catch (error) {
     return dashboardWriteFailed('Project patch', error);
   }

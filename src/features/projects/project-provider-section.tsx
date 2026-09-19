@@ -5,6 +5,8 @@ import type { ProjectDetailResponse } from '@/features/projects/types';
 import { VpsLeftoverRemove } from '@/features/providers/vps-leftover-remove';
 import type { InboxProjectOption } from '@/features/unmapped/types';
 import { isFixedVpsProvider, providerUiLabel } from '@/shared/provider-label';
+import { providerSwatchClass } from '@/shared/provider-tone';
+import { ProviderSwatch } from '@/shared/ui/provider-swatch';
 import { CostViewDisplay } from '@/shared/ui/cost-view-display';
 
 type ProjectProviderSectionProps = {
@@ -23,10 +25,11 @@ export function ProjectProviderSection({
   const isVps = isFixedVpsProvider(provider.providerKey);
   return (
     <article className="overflow-hidden rounded-[var(--radius)] border border-[var(--line-strong)] bg-[var(--paper-raised)] shadow-[var(--shadow-color)]">
-      <div className="h-2 bg-[var(--violet)]" />
+      <div className={`h-2 ${providerSwatchClass(provider.providerKey)}`} />
       <div className="border-b border-[var(--line)] bg-[var(--violet-soft)] px-5 py-5">
         <p className="eyebrow">Provider resources</p>
-        <h3 className="mt-1 font-semibold text-[var(--ink)]">
+        <h3 className="mt-1 inline-flex items-center gap-2 font-semibold text-[var(--ink)]">
+          <ProviderSwatch providerKey={provider.providerKey} />
           {providerUiLabel(provider.providerKey)}
         </h3>
         <p className="mt-1 text-xs text-[var(--muted)]">

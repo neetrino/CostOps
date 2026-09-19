@@ -128,10 +128,13 @@ docs/
 ```
 1. Operator → page (RSC) or /api/*
 2. Zod-validate range / filters
-3. Aggregate CostEntry + MetricEntry for UTC range
-4. Attach freshness from SyncRun + sourceStatus
-5. Return view models (project / provider / overview)
+3. Serve tagged Next.js data cache when the tag is warm
+4. On miss: one CostEntry range load → projects + totals + series
+5. Attach freshness from SyncRun + sourceStatus
+6. Return view models (project / provider / overview)
 ```
+
+Cache tag `dashboard-reads` is dropped after sync, backfill, reconcile, and dashboard writes (budget, mapping, rename, VPS). The operator Refresh button also busts the tag.
 
 ### Auth
 

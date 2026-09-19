@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { loadSyncStatus } from '@/core/sync/load-status';
+import { loadSyncStatusCached } from '@/features/dashboard/cached-shell-reads';
 import { jsonError, safeErrorMessage } from '@/shared/http';
 import { logger } from '@/shared/logger';
 
@@ -8,8 +8,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(): Promise<NextResponse> {
   try {
-    const status = await loadSyncStatus();
-    return NextResponse.json(status);
+    return NextResponse.json(await loadSyncStatusCached());
   } catch (error) {
     logger.error({ err: error }, 'Sync status failed');
     return jsonError('STATUS_FAILED', safeErrorMessage(error), 500);

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { backfillBodySchema, parseBackfillRange, runProviderBackfill } from '@/core/sync';
 import { clientIpFromHeaders } from '@/shared/auth/login-rate-limit';
 import { consumeSyncNowAttempt } from '@/shared/auth/sync-now-rate-limit';
+import { afterDashboardWrite } from '@/shared/dashboard-route';
 import { jsonError, readJsonBody, safeErrorMessage } from '@/shared/http';
 import { logger } from '@/shared/logger';
 
@@ -34,6 +35,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       const status = result.code === 'NOT_FOUND' ? 404 : 400;
       return jsonError(result.code, result.message, status);
     }
+    afterDashboardWrite();
     return NextResponse.json({
       ok: result.results.every((row) => row.ok),
       results: result.results,

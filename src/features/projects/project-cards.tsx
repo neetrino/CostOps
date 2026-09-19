@@ -6,6 +6,7 @@ import { BudgetInlineField } from '@/features/projects/budget-inline-field';
 import { CostMetricTile } from '@/shared/ui/cost-view-display';
 import { firstAlertableProvider } from '@/features/projects/alertable-provider';
 import { providerUiLabel } from '@/shared/provider-label';
+import { ProviderSwatch } from '@/shared/ui/provider-swatch';
 import { formatUsd } from '@/shared/money';
 import { motion } from 'motion/react';
 import { AppIcon } from '@/shared/ui/app-icon';
@@ -97,10 +98,10 @@ function ProjectCard({
           <div className="rounded-[var(--radius-sm)] border border-[var(--violet)]/15 bg-[var(--violet-soft)] px-4 py-3.5">
             <p className="eyebrow">Providers</p>
             <ul className="mt-2 space-y-1 text-xs">
-              {project.providers.map((link, providerIndex) => (
+              {project.providers.map((link) => (
                 <li key={link.projectProviderId} className="flex justify-between gap-2">
                   <span className="flex items-center gap-2 text-[var(--ink)]">
-                    <span className={`size-1.5 rounded-full ${cardAccent(providerIndex + 1)}`} />
+                    <ProviderSwatch providerKey={link.providerKey} />
                     {providerUiLabel(link.providerKey)}
                   </span>
                   <span className="money text-[var(--muted)]">

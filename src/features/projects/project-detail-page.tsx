@@ -2,11 +2,13 @@
 
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
-import type { CostSeriesPoint } from '@/core/cost/build-series';
+import { Suspense, useMemo, useState } from 'react';
 import { fetchJson, UnauthorizedError } from '@/features/dashboard/api-client';
+import type { DashboardUrlState } from '@/features/dashboard/dashboard-url';
+import { useDashboardRefresh } from '@/features/dashboard/use-dashboard-refresh';
 import { useDashboardUrl } from '@/features/dashboard/use-dashboard-url';
 import { useUnauthorizedRedirect } from '@/features/dashboard/use-unauthorized-redirect';
+import type { ProjectDetailBoardPayload } from '@/features/projects/load-project-detail-board';
 import { buildCompareBarData } from '@/features/projects/chart-data';
 import { DashboardBoard } from '@/features/projects/dashboard-board';
 import { FilterRail } from '@/features/projects/filter-rail';
@@ -15,96 +17,28 @@ import { ProjectProviderSection } from '@/features/projects/project-provider-sec
 import { ProjectTotalHero } from '@/features/projects/project-total-hero';
 import { ProviderStackChart } from '@/features/projects/provider-stack-chart';
 import type { ProjectDetailResponse } from '@/features/projects/types';
-import type { InboxProjectOption, ProjectOptionsResponse } from '@/features/unmapped/types';
 import { providerUiLabel } from '@/shared/provider-label';
 import { Button } from '@/shared/ui/button';
 import { CardSkeleton, EmptyPanel, ErrorPanel } from '@/shared/ui/state-panels';
 
-type UsageSeriesResponse = { points: CostSeriesPoint[] };
-
-function ProjectDetailContent() {
+function ProjectDetailContent({ board }: { board: ProjectDetailBoardPayload }) {
   const params = useParams<{ slug: string }>();
   const slug = params.slug;
-  const { state, queryString, replaceState } = useDashboardUrl();
-  const [detail, setDetail] = useState<ProjectDetailResponse | null>(null);
-  const [seriesData, setSeriesData] = useState<UsageSeriesResponse | null>(null);
-  const [projects, setProjects] = useState<InboxProjectOption[]>([]);
+  const { state, replaceState } = useDashboardUrl();
+  const { isPending, startTransition, refresh, bustAndRefresh } = useDashboardRefresh();
+  const detail = board.detail;
+  const seriesData = board.series;
+  const projects = board.options.projects;
   const [error, setError] = useState<Error | null>(null);
-  const [loading, setLoading] = useState(true);
   const [editingName, setEditingName] = useState(false);
-  const [nameDraft, setNameDraft] = useState('');
+  const [nameDraft, setNameDraft] = useState(detail.project.name);
   const [savingName, setSavingName] = useState(false);
   useUnauthorizedRedirect(error);
+  const loading = isPending;
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const [projectDetail, options] = await Promise.all([
-        fetchJson<ProjectDetailResponse>(`/api/projects/${slug}${queryString}`),
-        fetchJson<ProjectOptionsResponse>('/api/projects/options'),
-      ]);
-      const seriesParams = new URLSearchParams(queryString.replace(/^\?/, ''));
-      seriesParams.set('projectId', projectDetail.project.id);
-      const seriesQuery = seriesParams.toString();
-      const series = await fetchJson<UsageSeriesResponse>(
-        `/api/usage/series${seriesQuery ? `?${seriesQuery}` : ''}`,
-      );
-      setDetail(projectDetail);
-      setSeriesData(series);
-      setProjects(options.projects);
-      setNameDraft(projectDetail.project.name);
-    } catch (err) {
-      setDetail(null);
-      setSeriesData(null);
-      setProjects([]);
-      setError(err instanceof Error ? err : new Error('Failed to load project'));
-    } finally {
-      setLoading(false);
-    }
-  }, [queryString, slug]);
-
-  useEffect(() => {
-    let cancelled = false;
-    void (async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const [projectDetail, options] = await Promise.all([
-          fetchJson<ProjectDetailResponse>(`/api/projects/${slug}${queryString}`),
-          fetchJson<ProjectOptionsResponse>('/api/projects/options'),
-        ]);
-        const seriesParams = new URLSearchParams(queryString.replace(/^\?/, ''));
-        seriesParams.set('projectId', projectDetail.project.id);
-        const seriesQuery = seriesParams.toString();
-        const series = await fetchJson<UsageSeriesResponse>(
-          `/api/usage/series${seriesQuery ? `?${seriesQuery}` : ''}`,
-        );
-        if (cancelled) {
-          return;
-        }
-        setDetail(projectDetail);
-        setSeriesData(series);
-        setProjects(options.projects);
-        setNameDraft(projectDetail.project.name);
-      } catch (err) {
-        if (cancelled) {
-          return;
-        }
-        setDetail(null);
-        setSeriesData(null);
-        setProjects([]);
-        setError(err instanceof Error ? err : new Error('Failed to load project'));
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [queryString, slug]);
+  const onFilterChange = (patch: Partial<DashboardUrlState>) => {
+    startTransition(() => replaceState(patch));
+  };
 
   const compareData = useMemo(
     () =>
@@ -137,7 +71,7 @@ function ProjectDetailContent() {
         body: JSON.stringify({ name: trimmed }),
       });
       setEditingName(false);
-      await load();
+      refresh();
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Rename failed'));
     } finally {
@@ -155,7 +89,7 @@ function ProjectDetailContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ archived: true }),
       });
-      await load();
+      refresh();
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Archive failed'));
     }
@@ -166,21 +100,17 @@ function ProjectDetailContent() {
       rail={
         <FilterRail
           state={state}
-          onChange={replaceState}
-          onRefresh={() => void load()}
+          onChange={onFilterChange}
+          onRefresh={bustAndRefresh}
           loading={loading}
         />
       }
     >
-      {error && !detail ? (
+      {error ? (
         <ErrorPanel
           message={error instanceof UnauthorizedError ? 'Session expired' : error.message}
-          onRetry={() => void load()}
+          onRetry={bustAndRefresh}
         />
-      ) : loading && !detail ? (
-        <CardSkeleton />
-      ) : !detail ? (
-        <EmptyPanel title="Project not found" detail="Check the slug or return to Projects." />
       ) : (
         <>
           <ProjectDetailHeader
@@ -194,7 +124,7 @@ function ProjectDetailContent() {
             onSaveName={() => void saveName()}
             onArchive={() => void archiveProject()}
           />
-          <ProjectTotalHero slug={slug} detail={detail} onBudgetSaved={() => void load()} />
+          <ProjectTotalHero slug={slug} detail={detail} onBudgetSaved={refresh} />
           <ProjectCompareChart
             data={compareData}
             title="Provider mix"
@@ -219,7 +149,7 @@ function ProjectDetailContent() {
                   provider={provider}
                   currentProjectId={detail.project.id}
                   projects={projects}
-                  onMappingChanged={() => void load()}
+                  onMappingChanged={refresh}
                 />
               ))
             )}
@@ -319,10 +249,10 @@ function ProjectDetailHeader({
   );
 }
 
-export function ProjectDetailPage() {
+export function ProjectDetailPage({ board }: { board: ProjectDetailBoardPayload }) {
   return (
     <Suspense fallback={<CardSkeleton />}>
-      <ProjectDetailContent />
+      <ProjectDetailContent board={board} />
     </Suspense>
   );
 }

@@ -15,8 +15,14 @@ import type { CompareBarDatum } from '@/features/projects/chart-data';
 import { formatChartUsd } from '@/features/projects/chart-data';
 import { formatChartAxisUsd, formatChartBarLabel } from '@/features/projects/chart-format';
 import { ChartPanel } from '@/features/projects/chart-panel';
+import { parseRegisteredProviderKey } from '@/shared/registered-providers';
+import { providerChartColor } from '@/shared/provider-tone';
 import { chartColorForKey } from '@/shared/ui/chart-colors';
 import { EmptyPanel } from '@/shared/ui/state-panels';
+
+function compareBarFill(key: string): string {
+  return parseRegisteredProviderKey(key) ? providerChartColor(key) : chartColorForKey(key);
+}
 
 const BAR_SLOT_PX = 92;
 const CHART_MIN_WIDTH_PX = 760;
@@ -110,7 +116,7 @@ export function ProjectCompareChart({
                 animationEasing="ease-out"
               >
                 {rankedData.map((row) => (
-                  <Cell key={row.projectId} fill={chartColorForKey(row.projectId)} />
+                  <Cell key={row.projectId} fill={compareBarFill(row.projectId)} />
                 ))}
                 <LabelList
                   dataKey="costUsd"

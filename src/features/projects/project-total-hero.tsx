@@ -3,6 +3,7 @@
 import { BudgetInlineField } from '@/features/projects/budget-inline-field';
 import type { ProjectDetailResponse } from '@/features/projects/types';
 import { isFixedVpsProvider, providerUiLabel } from '@/shared/provider-label';
+import { ProviderSwatch } from '@/shared/ui/provider-swatch';
 import { CostMetricTile, CostViewDisplay } from '@/shared/ui/cost-view-display';
 
 type ProjectTotalHeroProps = {
@@ -44,7 +45,8 @@ export function ProjectTotalHero({ slug, detail, onBudgetSaved }: ProjectTotalHe
                 key={provider.projectProviderId}
                 className="grid gap-3 px-4 py-4 sm:grid-cols-[minmax(8rem,1fr)_auto] sm:items-center"
               >
-                <p className="font-medium text-[var(--ink)]">
+                <p className="inline-flex items-center gap-2 font-medium text-[var(--ink)]">
+                  <ProviderSwatch providerKey={provider.providerKey} />
                   {providerUiLabel(provider.providerKey)}
                 </p>
                 <div className="grid grid-cols-2 items-center gap-3 sm:flex sm:flex-wrap sm:gap-4">

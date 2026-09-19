@@ -1,18 +1,18 @@
 'use client';
 
-import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import { Suspense, useMemo, useState } from 'react';
 import { motion } from 'motion/react';
-import type { CostSeriesPoint } from '@/core/cost/build-series';
 import type { CostView } from '@/core/cost/types';
-import { fetchJson, UnauthorizedError } from '@/features/dashboard/api-client';
+import type { DashboardUrlState } from '@/features/dashboard/dashboard-url';
+import { useDashboardRefresh } from '@/features/dashboard/use-dashboard-refresh';
 import { useDashboardUrl } from '@/features/dashboard/use-dashboard-url';
-import { useUnauthorizedRedirect } from '@/features/dashboard/use-unauthorized-redirect';
 import { buildCompareBarData } from '@/features/projects/chart-data';
 import { DashboardBoard } from '@/features/projects/dashboard-board';
 import { FilterRail } from '@/features/projects/filter-rail';
 import { KpiStrip } from '@/features/projects/kpi-strip';
 import { NearLimitStrip } from '@/features/projects/near-limit-strip';
 import { buildBoardNearLimitItems } from '@/features/projects/near-limit-from-projects';
+import type { ProjectsBoardPayload } from '@/features/projects/load-projects-board';
 import { ProjectCards } from '@/features/projects/project-cards';
 import { ProjectCompareChart } from '@/features/projects/project-compare-chart';
 import { ProjectListView } from '@/features/projects/project-list-view';
@@ -20,95 +20,23 @@ import { UsageSeriesChart } from '@/features/projects/usage-series-chart';
 import { sortByPeriodCostDesc } from '@/features/projects/sort-projects-by-cost';
 import { ViewToggle } from '@/features/projects/view-toggle';
 import { useBoardViewMode } from '@/features/projects/use-board-view-mode';
-import type { ProjectListResponse } from '@/features/projects/types';
 import { CostViewDisplay } from '@/shared/ui/cost-view-display';
 import { SearchField } from '@/shared/ui/search-field';
-import { CardSkeleton, EmptyPanel, ErrorPanel } from '@/shared/ui/state-panels';
+import { CardSkeleton, EmptyPanel } from '@/shared/ui/state-panels';
 
-type UsageTotalsResponse = {
-  total: CostView;
-  byProvider: Array<{ providerKey: string; displayName: string; cost: CostView }>;
-  byProject: Array<{
-    projectId: string;
-    slug: string;
-    name: string;
-    archived: boolean;
-    cost: CostView;
-  }>;
-};
-
-type UsageSeriesResponse = {
-  points: CostSeriesPoint[];
-};
-
-function ProjectsContent() {
-  const { state, queryString, replaceState } = useDashboardUrl();
-  const [projectsData, setProjectsData] = useState<ProjectListResponse | null>(null);
-  const [totalsData, setTotalsData] = useState<UsageTotalsResponse | null>(null);
-  const [seriesData, setSeriesData] = useState<UsageSeriesResponse | null>(null);
-  const [error, setError] = useState<Error | null>(null);
-  const [loading, setLoading] = useState(true);
+function ProjectsContent({ board }: { board: ProjectsBoardPayload }) {
+  const { state, replaceState } = useDashboardUrl();
+  const { isPending, startTransition, refresh, bustAndRefresh } = useDashboardRefresh();
   const [search, setSearch] = useState('');
   const [viewMode, setViewMode] = useBoardViewMode();
-  useUnauthorizedRedirect(error);
+  const projectsData = board.projects;
+  const totalsData = board.totals;
+  const seriesData = board.series;
+  const loading = isPending;
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const [projects, totals, series] = await Promise.all([
-        fetchJson<ProjectListResponse>(`/api/projects${queryString}`),
-        fetchJson<UsageTotalsResponse>(`/api/usage/totals${queryString}`),
-        fetchJson<UsageSeriesResponse>(`/api/usage/series${queryString}`),
-      ]);
-      setProjectsData(projects);
-      setTotalsData(totals);
-      setSeriesData(series);
-    } catch (err) {
-      setProjectsData(null);
-      setTotalsData(null);
-      setSeriesData(null);
-      setError(err instanceof Error ? err : new Error('Failed to load projects'));
-    } finally {
-      setLoading(false);
-    }
-  }, [queryString]);
-
-  useEffect(() => {
-    let cancelled = false;
-    void (async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const [projects, totals, series] = await Promise.all([
-          fetchJson<ProjectListResponse>(`/api/projects${queryString}`),
-          fetchJson<UsageTotalsResponse>(`/api/usage/totals${queryString}`),
-          fetchJson<UsageSeriesResponse>(`/api/usage/series${queryString}`),
-        ]);
-        if (cancelled) {
-          return;
-        }
-        setProjectsData(projects);
-        setTotalsData(totals);
-        setSeriesData(series);
-      } catch (err) {
-        if (cancelled) {
-          return;
-        }
-        setProjectsData(null);
-        setTotalsData(null);
-        setSeriesData(null);
-        setError(err instanceof Error ? err : new Error('Failed to load projects'));
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [queryString]);
+  const onFilterChange = (patch: Partial<DashboardUrlState>) => {
+    startTransition(() => replaceState(patch));
+  };
 
   const filteredProjects = useMemo(() => {
     const list = projectsData?.projects ?? [];
@@ -153,8 +81,8 @@ function ProjectsContent() {
       rail={
         <FilterRail
           state={state}
-          onChange={replaceState}
-          onRefresh={() => void load()}
+          onChange={onFilterChange}
+          onRefresh={bustAndRefresh}
           loading={loading}
         />
       }
@@ -209,14 +137,8 @@ function ProjectsContent() {
         </div>
       </motion.header>
 
-      {error && !projectsData ? (
-        <ErrorPanel
-          message={error instanceof UnauthorizedError ? 'Session expired' : error.message}
-          onRetry={() => void load()}
-        />
-      ) : (
-        <>
-          <KpiStrip byProvider={totalsData?.byProvider ?? []} loading={loading && !totalsData} />
+      <>
+          <KpiStrip byProvider={totalsData.byProvider} loading={false} />
           <NearLimitStrip rows={nearLimit} />
           <ProjectCompareChart data={compareData} />
           <UsageSeriesChart
@@ -232,23 +154,17 @@ function ProjectsContent() {
             <ViewToggle mode={viewMode} onChange={setViewMode} />
           </div>
 
-          {loading && !projectsData ? (
-            <div className="grid gap-4 sm:grid-cols-2">
-              <CardSkeleton />
-              <CardSkeleton />
-            </div>
-          ) : filteredProjects.length === 0 ? (
+          {filteredProjects.length === 0 ? (
             <EmptyPanel
               title="No projects in range"
               detail={search ? 'Try clearing search.' : 'Run sync or widen the date range.'}
             />
           ) : viewMode === 'cards' ? (
-            <ProjectCards projects={filteredProjects} onBudgetSaved={() => void load()} />
+            <ProjectCards projects={filteredProjects} onBudgetSaved={refresh} />
           ) : (
-            <ProjectListView projects={filteredProjects} onBudgetSaved={() => void load()} />
+            <ProjectListView projects={filteredProjects} onBudgetSaved={refresh} />
           )}
-        </>
-      )}
+      </>
     </DashboardBoard>
   );
 }
@@ -263,10 +179,10 @@ function emptyCost(): CostView {
   };
 }
 
-export function ProjectsPage() {
+export function ProjectsPage({ board }: { board: ProjectsBoardPayload }) {
   return (
     <Suspense fallback={<CardSkeleton />}>
-      <ProjectsContent />
+      <ProjectsContent board={board} />
     </Suspense>
   );
 }

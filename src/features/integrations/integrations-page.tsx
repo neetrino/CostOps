@@ -1,81 +1,21 @@
 'use client';
 
-import { Suspense, useCallback, useEffect, useState } from 'react';
+import { Suspense, useState } from 'react';
 import { motion } from 'motion/react';
 import type { loadIntegrations } from '@/features/integrations/load-integrations';
-import { fetchJson, UnauthorizedError } from '@/features/dashboard/api-client';
-import { useUnauthorizedRedirect } from '@/features/dashboard/use-unauthorized-redirect';
+import { fetchJson } from '@/features/dashboard/api-client';
+import { useDashboardRefresh } from '@/features/dashboard/use-dashboard-refresh';
 import { AppIcon } from '@/shared/ui/app-icon';
 import { Button } from '@/shared/ui/button';
-import { CardSkeleton, EmptyPanel, ErrorPanel } from '@/shared/ui/state-panels';
+import { CardSkeleton, EmptyPanel } from '@/shared/ui/state-panels';
 
 type IntegrationsResponse = Awaited<ReturnType<typeof loadIntegrations>>;
 type IntegrationAccount = IntegrationsResponse['accounts'][number];
 
-function IntegrationsContent() {
-  const [data, setData] = useState<IntegrationsResponse | null>(null);
-  const [error, setError] = useState<Error | null>(null);
-  const [loading, setLoading] = useState(true);
-  useUnauthorizedRedirect(error);
+function IntegrationsContent({ data }: { data: IntegrationsResponse }) {
+  const { refresh } = useDashboardRefresh();
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      setData(await fetchJson<IntegrationsResponse>('/api/integrations'));
-    } catch (err) {
-      setData(null);
-      setError(err instanceof Error ? err : new Error('Failed to load integrations'));
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    void (async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const payload = await fetchJson<IntegrationsResponse>('/api/integrations');
-        if (!cancelled) {
-          setData(payload);
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setData(null);
-          setError(err instanceof Error ? err : new Error('Failed to load integrations'));
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  if (loading && !data) {
-    return (
-      <div className="grid gap-4 lg:grid-cols-2">
-        <CardSkeleton />
-        <CardSkeleton />
-      </div>
-    );
-  }
-
-  if (error && !data) {
-    return (
-      <ErrorPanel
-        message={error instanceof UnauthorizedError ? 'Session expired' : error.message}
-        onRetry={() => void load()}
-      />
-    );
-  }
-
-  if (!data || data.accounts.length === 0) {
+  if (data.accounts.length === 0) {
     return (
       <EmptyPanel
         title="No provider accounts"
@@ -123,7 +63,7 @@ function IntegrationsContent() {
             key={account.id}
             account={account}
             index={index}
-            onUpdated={() => void load()}
+            onUpdated={refresh}
           />
         ))}
       </ul>
@@ -354,7 +294,7 @@ function formatTimestamp(value: string | null): string {
   return value.replace('T', ' ').slice(0, 16);
 }
 
-export function IntegrationsPage() {
+export function IntegrationsPage({ data }: { data: IntegrationsResponse }) {
   return (
     <Suspense
       fallback={
@@ -364,7 +304,7 @@ export function IntegrationsPage() {
         </div>
       }
     >
-      <IntegrationsContent />
+      <IntegrationsContent data={data} />
     </Suspense>
   );
 }

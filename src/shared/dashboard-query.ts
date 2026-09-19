@@ -152,6 +152,27 @@ export function parseProviderKeyParam(key: string): ProviderKey | null {
   return normalized in ProviderKey ? (normalized as ProviderKey) : null;
 }
 
+export function flattenSearchParams(
+  raw: Record<string, string | string[] | undefined>,
+): Record<string, string | undefined> {
+  const query: Record<string, string | undefined> = {};
+  for (const [key, value] of Object.entries(raw)) {
+    if (typeof value === 'string' && value.length > 0) {
+      query[key] = value;
+    } else if (Array.isArray(value) && value[0]) {
+      query[key] = value[0];
+    }
+  }
+  return query;
+}
+
+export function resolveSearchParamsQuery(
+  raw: Record<string, string | string[] | undefined>,
+  now?: Date,
+): DashboardQueryResult {
+  return resolveDashboardQuery(flattenSearchParams(raw), now);
+}
+
 function resolvePresetBounds(
   preset: DatePreset,
   input: DashboardQueryInput,
