@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import type { ProviderProjectRow } from '@/features/providers/load-provider-detail';
+import { VpsLeftoverRemove } from '@/features/providers/vps-leftover-remove';
 import { VpsLineEdit } from '@/features/providers/vps-line-edit';
 import { BudgetInlineField } from '@/features/projects/budget-inline-field';
 import { CostViewDisplay } from '@/shared/ui/cost-view-display';
@@ -106,9 +107,12 @@ function ProviderProjectCard({
           <div className="mt-auto space-y-3 border-t border-[var(--line)] pt-3">
             <p className="eyebrow">Monthly hosting</p>
             {project.vpsLines.length === 0 ? (
-              <p className="rounded-[var(--radius-sm)] bg-[var(--sunken)] px-3 py-3 text-xs text-[var(--muted)]">
-                No active VPS line.
-              </p>
+              <div className="rounded-[var(--radius-sm)] bg-[var(--sunken)] px-3 py-3">
+                <VpsLeftoverRemove
+                  projectProviderId={project.projectProviderId}
+                  onRemoved={onBudgetSaved}
+                />
+              </div>
             ) : (
               project.vpsLines.map((line) => (
                 <div

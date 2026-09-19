@@ -2,6 +2,7 @@
 
 import { ResourceMappingActions } from '@/features/projects/resource-mapping-actions';
 import type { ProjectDetailResponse } from '@/features/projects/types';
+import { VpsLeftoverRemove } from '@/features/providers/vps-leftover-remove';
 import type { InboxProjectOption } from '@/features/unmapped/types';
 import { isFixedVpsProvider, providerUiLabel } from '@/shared/provider-label';
 import { CostViewDisplay } from '@/shared/ui/cost-view-display';
@@ -35,7 +36,16 @@ export function ProjectProviderSection({
         </p>
       </div>
       {provider.resources.length === 0 ? (
-        <p className="px-4 py-4 text-sm text-[var(--muted)]">No resources linked.</p>
+        <div className="px-4 py-4">
+          {isVps ? (
+            <VpsLeftoverRemove
+              projectProviderId={provider.projectProviderId}
+              onRemoved={onMappingChanged}
+            />
+          ) : (
+            <p className="text-sm text-[var(--muted)]">No resources linked.</p>
+          )}
+        </div>
       ) : (
         <ul className="divide-y divide-[var(--line)]">
           {provider.resources.map((resource) => (

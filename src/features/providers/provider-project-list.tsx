@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import type { ProviderProjectRow } from '@/features/providers/load-provider-detail';
+import { VpsLeftoverRemove } from '@/features/providers/vps-leftover-remove';
 import { VpsLineEdit } from '@/features/providers/vps-line-edit';
 import { BudgetInlineField } from '@/features/projects/budget-inline-field';
 import { CostViewDisplay } from '@/shared/ui/cost-view-display';
@@ -73,7 +74,10 @@ export function ProviderProjectList({
                 <td className="px-4 py-3">
                   {hideDailyLimit ? (
                     project.vpsLines.length === 0 ? (
-                      <span className="text-xs text-[var(--muted)]">No active VPS line</span>
+                      <VpsLeftoverRemove
+                        projectProviderId={project.projectProviderId}
+                        onRemoved={onBudgetSaved}
+                      />
                     ) : (
                       <div className="space-y-3">
                         {project.vpsLines.map((line) => (
@@ -166,7 +170,10 @@ function MobileProviderProjectRow({
       <div className="space-y-3 px-4 py-3">
         {hideDailyLimit ? (
           project.vpsLines.length === 0 ? (
-            <p className="text-xs text-[var(--muted)]">No active VPS line</p>
+            <VpsLeftoverRemove
+              projectProviderId={project.projectProviderId}
+              onRemoved={onBudgetSaved}
+            />
           ) : (
             <div className="space-y-3">
               {project.vpsLines.map((line) => (
