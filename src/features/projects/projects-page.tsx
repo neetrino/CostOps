@@ -189,7 +189,7 @@ function ProjectsContent() {
               </div>
             </div>
           </div>
-          <div className="signal-grid dark-stage relative flex min-h-[16rem] flex-col justify-between overflow-hidden p-6 sm:p-8 lg:p-10">
+          <div className="signal-grid dark-stage relative flex min-h-[16rem] flex-col overflow-hidden p-6 sm:p-8 lg:min-h-[21rem] lg:p-10">
             <CostOrbitGraphic />
             <div className="relative z-10 flex items-center justify-between gap-3">
               <p className="eyebrow !text-white/45">Selected period</p>
@@ -197,9 +197,9 @@ function ProjectsContent() {
                 Live ledger
               </span>
             </div>
-            <div className="relative z-10 mt-16 [&_*]:!text-[var(--inverse-ink)]">
-              <p className="mb-3 text-xs text-white/45">TOTAL OBSERVED SPEND</p>
-              <CostViewDisplay cost={totalsData?.total ?? emptyCost()} size="lg" />
+            <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-2">
+              <p className="mb-3 text-center text-xs text-white/45">TOTAL OBSERVED SPEND</p>
+              <CostViewDisplay cost={totalsData?.total ?? emptyCost()} size="xl" align="center" />
             </div>
           </div>
         </div>
@@ -274,7 +274,7 @@ export function ProjectsPage() {
 function CostOrbitGraphic() {
   return (
     <div
-      className="pointer-events-none absolute top-1/2 left-1/2 aspect-[18/13] w-[115%] -translate-x-1/2 -translate-y-1/2 opacity-70"
+      className="pointer-events-none absolute top-1/2 left-1/2 aspect-[18/13] w-[115%] -translate-x-1/2 -translate-y-1/2 opacity-45"
       aria-hidden="true"
     >
       <div className="orbit-spin size-full">
@@ -294,15 +294,7 @@ function CostOrbitGraphic() {
         </svg>
       </div>
       <svg viewBox="0 0 360 260" className="absolute inset-0 size-full" fill="none">
-        <circle
-          cx="180"
-          cy="130"
-          r="42"
-          fill="var(--inverse-2)"
-          stroke="white"
-          strokeOpacity=".18"
-        />
-        <path d="M160 130h40M180 110v40" stroke="white" strokeOpacity=".5" />
+        <ellipse cx="180" cy="130" rx="58" ry="58" stroke="white" strokeOpacity=".12" />
       </svg>
     </div>
   );

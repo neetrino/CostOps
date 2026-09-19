@@ -5,7 +5,6 @@ import { useParams } from 'next/navigation';
 import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { motion } from 'motion/react';
 import type { CostSeriesPoint } from '@/core/cost/build-series';
-import type { CostView } from '@/core/cost/types';
 import { fetchJson, UnauthorizedError } from '@/features/dashboard/api-client';
 import { useDashboardUrl } from '@/features/dashboard/use-dashboard-url';
 import { useUnauthorizedRedirect } from '@/features/dashboard/use-unauthorized-redirect';
@@ -23,7 +22,7 @@ import { ProviderProjectCards } from '@/features/providers/provider-project-card
 import { ProviderProjectList } from '@/features/providers/provider-project-list';
 import { VpsAddProject } from '@/features/providers/vps-add-project';
 import { isFixedVpsProvider } from '@/shared/provider-label';
-import { CostViewDisplay } from '@/shared/ui/cost-view-display';
+import { CostMetricTile, CostViewDisplay } from '@/shared/ui/cost-view-display';
 import { CardSkeleton, EmptyPanel, ErrorPanel } from '@/shared/ui/state-panels';
 import { SearchField } from '@/shared/ui/search-field';
 
@@ -204,8 +203,8 @@ function ProviderDetailContent() {
           ) : null}
 
           <div className="grid gap-3 sm:grid-cols-3">
-            <HeroMetric label="Today" cost={detail.today} tone="signal" />
-            <HeroMetric label="Selected period" cost={detail.period} tone="dark" />
+            <CostMetricTile label="Today" cost={detail.today} tone="signal" size="lg" />
+            <CostMetricTile label="Selected period" cost={detail.period} tone="dark" size="lg" />
             <UnmappedTile unmapped={detail.unmapped} />
           </div>
 
@@ -250,27 +249,6 @@ function ProviderDetailContent() {
         </>
       )}
     </DashboardBoard>
-  );
-}
-
-function HeroMetric({
-  label,
-  cost,
-  tone,
-}: {
-  label: string;
-  cost: CostView;
-  tone: 'dark' | 'signal';
-}) {
-  return (
-    <div
-      className={`min-h-36 rounded-[var(--radius)] border border-[var(--line)] px-5 py-5 shadow-[var(--shadow-card)] ${tone === 'dark' ? 'dark-stage' : 'tone-signal'}`}
-    >
-      <p className="eyebrow">{label}</p>
-      <div className="mt-7">
-        <CostViewDisplay cost={cost} size="lg" />
-      </div>
-    </div>
   );
 }
 
