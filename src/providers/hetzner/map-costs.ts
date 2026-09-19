@@ -44,7 +44,9 @@ export function excludeExistingFixedDays(
   costs: NormalizedCost[],
   existingDayKeys: ReadonlySet<string>,
 ): NormalizedCost[] {
-  return costs.filter((cost) => !existingDayKeys.has(fixedDayKey(cost.externalId, cost.bucketDate)));
+  return costs.filter(
+    (cost) => !existingDayKeys.has(fixedDayKey(cost.externalId, cost.bucketDate)),
+  );
 }
 
 /**

@@ -113,9 +113,7 @@ describe('excludeExistingFixedDays', () => {
       from: new Date('2026-09-01T00:00:00.000Z'),
       to: new Date('2026-09-02T00:00:00.000Z'),
     });
-    const existing = new Set([
-      fixedDayKey('vps-nbos', new Date('2026-09-01T00:00:00.000Z')),
-    ]);
+    const existing = new Set([fixedDayKey('vps-nbos', new Date('2026-09-01T00:00:00.000Z'))]);
     const next = excludeExistingFixedDays(costs, existing);
     expect(next[0]?.bucketDate.toISOString().slice(0, 10)).toBe('2026-09-02');
     expect(next).toHaveLength(29);
