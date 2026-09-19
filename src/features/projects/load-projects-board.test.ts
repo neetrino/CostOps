@@ -13,14 +13,11 @@ vi.mock('@/features/projects/load-projects', () => ({
   loadProjects: vi.fn(),
 }));
 
-vi.mock('@/features/usage', async () => {
-  const actual = await vi.importActual<typeof import('@/features/usage')>('@/features/usage');
-  return {
-    ...actual,
-    loadUsageSeries: vi.fn(),
-    loadUsageTotals: vi.fn(),
-  };
-});
+vi.mock('@/features/usage', () => ({
+  loadUsageSeries: vi.fn(),
+  loadUsageTotals: vi.fn(),
+  requireCostSeries: (series: unknown) => series,
+}));
 
 const emptyCost = {
   today: new Date('2026-09-19T00:00:00.000Z'),

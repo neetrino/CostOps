@@ -39,21 +39,21 @@ function ProviderDetailContent({ board }: { board: ProviderDetailBoardPayload })
   };
 
   const filteredProjects = useMemo(() => {
-    const list = detail?.projects ?? [];
+    const list = detail.projects;
     const term = search.trim().toLowerCase();
     const matched = term
       ? list.filter((project) => project.name.toLowerCase().includes(term))
       : list;
     return sortByPeriodCostDesc(matched);
-  }, [detail?.projects, search]);
+  }, [detail.projects, search]);
 
   const projectNames = useMemo(() => {
     const map: Record<string, string> = {};
-    for (const project of detail?.projects ?? []) {
+    for (const project of detail.projects) {
       map[project.projectId] = project.name;
     }
     return map;
-  }, [detail?.projects]);
+  }, [detail.projects]);
 
   const compareData = useMemo(
     () =>
@@ -139,7 +139,7 @@ function ProviderDetailContent({ board }: { board: ProviderDetailBoardPayload })
 
           <ProjectCompareChart data={compareData} />
           <UsageSeriesChart
-            points={seriesData?.points ?? []}
+            points={seriesData.points}
             projectNames={projectNames}
             visibleIds={visibleIds}
           />

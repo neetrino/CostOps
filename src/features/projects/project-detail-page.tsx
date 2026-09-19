@@ -43,18 +43,18 @@ function ProjectDetailContent({ board }: { board: ProjectDetailBoardPayload }) {
   const compareData = useMemo(
     () =>
       buildCompareBarData(
-        (detail?.providers ?? []).map((row) => ({
+        detail.providers.map((row) => ({
           projectId: row.projectProviderId,
           name: providerUiLabel(row.providerKey),
           cost: row.period,
         })),
       ),
-    [detail?.providers],
+    [detail.providers],
   );
 
   const providerKeys = useMemo(
-    () => (detail?.providers ?? []).map((provider) => provider.providerKey),
-    [detail?.providers],
+    () => detail.providers.map((provider) => provider.providerKey),
+    [detail.providers],
   );
 
   const saveName = async () => {

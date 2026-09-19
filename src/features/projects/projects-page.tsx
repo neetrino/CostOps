@@ -2,7 +2,6 @@
 
 import { Suspense, useMemo, useState } from 'react';
 import { motion } from 'motion/react';
-import type { CostView } from '@/core/cost/types';
 import type { DashboardUrlState } from '@/features/dashboard/dashboard-url';
 import { useDashboardRefresh } from '@/features/dashboard/use-dashboard-refresh';
 import { useDashboardUrl } from '@/features/dashboard/use-dashboard-url';
@@ -39,13 +38,13 @@ function ProjectsContent({ board }: { board: ProjectsBoardPayload }) {
   };
 
   const filteredProjects = useMemo(() => {
-    const list = projectsData?.projects ?? [];
+    const list = projectsData.projects;
     const term = search.trim().toLowerCase();
     const matched = term
       ? list.filter((project) => project.name.toLowerCase().includes(term))
       : list;
     return sortByPeriodCostDesc(matched);
-  }, [projectsData?.projects, search]);
+  }, [projectsData.projects, search]);
 
   const visibleIds = useMemo(
     () => new Set(filteredProjects.map((project) => project.id)),
@@ -63,7 +62,7 @@ function ProjectsContent({ board }: { board: ProjectsBoardPayload }) {
   const compareData = useMemo(
     () =>
       buildCompareBarData(
-        (totalsData?.byProject ?? [])
+        totalsData.byProject
           .filter((row) => visibleIds.has(row.projectId))
           .map((row) => ({
             projectId: row.projectId,
@@ -71,7 +70,7 @@ function ProjectsContent({ board }: { board: ProjectsBoardPayload }) {
             cost: row.cost,
           })),
       ),
-    [totalsData?.byProject, visibleIds],
+    [totalsData.byProject, visibleIds],
   );
 
   const nearLimit = useMemo(() => buildBoardNearLimitItems(filteredProjects), [filteredProjects]);
@@ -127,7 +126,7 @@ function ProjectsContent({ board }: { board: ProjectsBoardPayload }) {
             </div>
             <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-2">
               <p className="mb-3 text-center text-xs text-white/45">TOTAL OBSERVED SPEND</p>
-              <CostViewDisplay cost={totalsData?.total ?? emptyCost()} size="xl" align="center" />
+              <CostViewDisplay cost={totalsData.total} size="xl" align="center" />
             </div>
           </div>
         </div>
@@ -142,7 +141,7 @@ function ProjectsContent({ board }: { board: ProjectsBoardPayload }) {
           <NearLimitStrip rows={nearLimit} />
           <ProjectCompareChart data={compareData} />
           <UsageSeriesChart
-            points={seriesData?.points ?? []}
+            points={seriesData.points}
             projectNames={projectNames}
             visibleIds={visibleIds}
           />
@@ -167,16 +166,6 @@ function ProjectsContent({ board }: { board: ProjectsBoardPayload }) {
       </>
     </DashboardBoard>
   );
-}
-
-function emptyCost(): CostView {
-  return {
-    costUsd: null,
-    sourceStatus: 'missing',
-    sourceType: null,
-    isPartial: false,
-    lastSuccessfulSyncAt: null,
-  };
 }
 
 export function ProjectsPage({ board }: { board: ProjectsBoardPayload }) {
