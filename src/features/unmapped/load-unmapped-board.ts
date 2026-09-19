@@ -27,9 +27,7 @@ export function loadUnmappedBoardCached(
   query: ResolvedDashboardQuery,
   tab: InboxTab,
 ): Promise<UnmappedBoardPayload> {
-  return cacheDashboardRead(
-    'unmapped-board',
-    `${tab}|${dashboardReadCacheKey(query)}`,
-    () => loadUnmappedBoard(query, tab),
+  return cacheDashboardRead('unmapped-board', `${tab}|${dashboardReadCacheKey(query)}`, () =>
+    loadUnmappedBoard(query, tab),
   );
 }

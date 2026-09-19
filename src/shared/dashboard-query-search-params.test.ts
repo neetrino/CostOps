@@ -16,10 +16,7 @@ describe('flattenSearchParams', () => {
 
 describe('resolveSearchParamsQuery', () => {
   it('resolves a page searchParams object', () => {
-    const parsed = resolveSearchParamsQuery(
-      { preset: '1' },
-      new Date('2026-09-19T12:00:00.000Z'),
-    );
+    const parsed = resolveSearchParamsQuery({ preset: '1' }, new Date('2026-09-19T12:00:00.000Z'));
     expect(parsed.ok).toBe(true);
     if (parsed.ok) {
       expect(parsed.data.fromKey).toBe('2026-09-19');

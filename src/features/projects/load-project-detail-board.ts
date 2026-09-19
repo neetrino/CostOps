@@ -48,9 +48,7 @@ export function loadProjectDetailBoardCached(
   slug: string,
   query: ResolvedDashboardQuery,
 ): Promise<ProjectDetailBoardPayload | null> {
-  return cacheDashboardRead(
-    'project-detail-board',
-    `${slug}|${dashboardReadCacheKey(query)}`,
-    () => loadProjectDetailBoard(slug, query),
+  return cacheDashboardRead('project-detail-board', `${slug}|${dashboardReadCacheKey(query)}`, () =>
+    loadProjectDetailBoard(slug, query),
   );
 }

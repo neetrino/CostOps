@@ -1,4 +1,7 @@
-import { loadInboxStatusCached, loadSyncStatusCached } from '@/features/dashboard/cached-shell-reads';
+import {
+  loadInboxStatusCached,
+  loadSyncStatusCached,
+} from '@/features/dashboard/cached-shell-reads';
 import { DashboardShell } from '@/features/dashboard/dashboard-shell';
 
 export const dynamic = 'force-dynamic';

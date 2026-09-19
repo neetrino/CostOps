@@ -87,4 +87,3 @@ export function ProjectTotalHero({ slug, detail, onBudgetSaved }: ProjectTotalHe
     </section>
   );
 }
-

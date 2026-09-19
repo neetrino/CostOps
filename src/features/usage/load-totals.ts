@@ -12,10 +12,7 @@ import {
 import { prisma } from '@/shared/db';
 import { rangePayload, type ResolvedDashboardQuery } from '@/shared/dashboard-query';
 
-export async function loadUsageTotals(
-  query: ResolvedDashboardQuery,
-  cost?: DashboardCostContext,
-) {
+export async function loadUsageTotals(query: ResolvedDashboardQuery, cost?: DashboardCostContext) {
   const [resolvedCost, projects, providers] = await Promise.all([
     cost ??
       loadDashboardCostContext({
@@ -31,7 +28,12 @@ export async function loadUsageTotals(
     }),
     prisma.provider.findMany({ orderBy: { displayName: 'asc' } }),
   ]);
-  const periodRows = rowsInDashboardPeriod(resolvedCost.entries, query.from, query.to, query.preset);
+  const periodRows = rowsInDashboardPeriod(
+    resolvedCost.entries,
+    query.from,
+    query.to,
+    query.preset,
+  );
   const fallback = latestSyncForAccounts(resolvedCost.accounts, query.providerKey);
   const visibleProviders = query.providerKey
     ? providers.filter((provider) => provider.key === query.providerKey)

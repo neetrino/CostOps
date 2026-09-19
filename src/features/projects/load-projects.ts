@@ -42,7 +42,12 @@ export async function loadProjects(
       where: { scope: 'PROJECT_PROVIDER' },
     }),
   ]);
-  const periodRows = rowsInDashboardPeriod(resolvedCost.entries, query.from, query.to, query.preset);
+  const periodRows = rowsInDashboardPeriod(
+    resolvedCost.entries,
+    query.from,
+    query.to,
+    query.preset,
+  );
   const todayRows = rowsOnUtcDay(resolvedCost.entries, resolvedCost.today);
 
   const rows: ProjectListRow[] = projects.map((project) => {

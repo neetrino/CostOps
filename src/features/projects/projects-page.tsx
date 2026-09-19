@@ -137,32 +137,32 @@ function ProjectsContent({ board }: { board: ProjectsBoardPayload }) {
       </motion.header>
 
       <>
-          <KpiStrip byProvider={totalsData.byProvider} loading={false} />
-          <NearLimitStrip rows={nearLimit} />
-          <ProjectCompareChart data={compareData} />
-          <UsageSeriesChart
-            points={seriesData.points}
-            projectNames={projectNames}
-            visibleIds={visibleIds}
+        <KpiStrip byProvider={totalsData.byProvider} loading={false} />
+        <NearLimitStrip rows={nearLimit} />
+        <ProjectCompareChart data={compareData} />
+        <UsageSeriesChart
+          points={seriesData.points}
+          projectNames={projectNames}
+          visibleIds={visibleIds}
+        />
+
+        <div className="flex items-center justify-between gap-3 border-b border-[var(--line-strong)] pb-3">
+          <p className="eyebrow">
+            {filteredProjects.length} project{filteredProjects.length === 1 ? '' : 's'}
+          </p>
+          <ViewToggle mode={viewMode} onChange={setViewMode} />
+        </div>
+
+        {filteredProjects.length === 0 ? (
+          <EmptyPanel
+            title="No projects in range"
+            detail={search ? 'Try clearing search.' : 'Run sync or widen the date range.'}
           />
-
-          <div className="flex items-center justify-between gap-3 border-b border-[var(--line-strong)] pb-3">
-            <p className="eyebrow">
-              {filteredProjects.length} project{filteredProjects.length === 1 ? '' : 's'}
-            </p>
-            <ViewToggle mode={viewMode} onChange={setViewMode} />
-          </div>
-
-          {filteredProjects.length === 0 ? (
-            <EmptyPanel
-              title="No projects in range"
-              detail={search ? 'Try clearing search.' : 'Run sync or widen the date range.'}
-            />
-          ) : viewMode === 'cards' ? (
-            <ProjectCards projects={filteredProjects} onBudgetSaved={refresh} />
-          ) : (
-            <ProjectListView projects={filteredProjects} onBudgetSaved={refresh} />
-          )}
+        ) : viewMode === 'cards' ? (
+          <ProjectCards projects={filteredProjects} onBudgetSaved={refresh} />
+        ) : (
+          <ProjectListView projects={filteredProjects} onBudgetSaved={refresh} />
+        )}
       </>
     </DashboardBoard>
   );

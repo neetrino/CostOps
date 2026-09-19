@@ -12,7 +12,11 @@ import { buildMetricSeries } from '@/core/metrics/build-series';
 import { loadRangeMetricRows } from '@/core/metrics/load-range';
 import { periodHoursForKey } from '@/core/cost/series-buckets';
 import { metricDisplayUnit, toMetricDisplayValue } from '@/features/usage/metric-display';
-import { rangePayload, type RangePayload, type ResolvedDashboardQuery } from '@/shared/dashboard-query';
+import {
+  rangePayload,
+  type RangePayload,
+  type ResolvedDashboardQuery,
+} from '@/shared/dashboard-query';
 
 export type UsageSeriesResponse = Awaited<ReturnType<typeof loadUsageSeries>>;
 
@@ -35,10 +39,7 @@ export function requireCostSeries(series: UsageSeriesResponse): CostUsageSeriesR
   };
 }
 
-export async function loadUsageSeries(
-  query: ResolvedDashboardQuery,
-  cost?: DashboardCostContext,
-) {
+export async function loadUsageSeries(query: ResolvedDashboardQuery, cost?: DashboardCostContext) {
   const metric = query.metric;
   if (metric === COST_SERIES_METRIC) {
     const rows = cost

@@ -50,13 +50,18 @@ export async function loadProjectDetail(
       },
     }),
   ]);
-  const periodRows = rowsInDashboardPeriod(resolvedCost.entries, query.from, query.to, query.preset);
+  const periodRows = rowsInDashboardPeriod(
+    resolvedCost.entries,
+    query.from,
+    query.to,
+    query.preset,
+  );
   const todayRows = rowsOnUtcDay(resolvedCost.entries, resolvedCost.today);
   const providers = project.projectProviders
     .filter((link) => !query.providerKey || link.providerKey === query.providerKey)
     .map((link) => {
-        const linkFallback = latestSyncForAccounts(resolvedCost.accounts, link.providerKey);
-        return {
+      const linkFallback = latestSyncForAccounts(resolvedCost.accounts, link.providerKey);
+      return {
         providerKey: link.providerKey,
         projectProviderId: link.id,
         today: costViewForRows(

@@ -158,4 +158,3 @@ function ProviderProjectCard({
     </motion.li>
   );
 }
-

@@ -84,97 +84,95 @@ function ProviderDetailContent({ board }: { board: ProviderDetailBoardPayload })
       }
     >
       <>
-          <motion.header
-            initial={{ opacity: 0, scale: 0.992 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="kinetic-panel overflow-hidden"
-          >
-            <div className="grid xl:grid-cols-[minmax(0,1fr)_20rem]">
-              <div className="tone-violet relative overflow-hidden p-6 sm:p-8 lg:p-10">
-                <span className="absolute top-6 right-8 size-28 rounded-full border border-white/15" />
-                <span className="absolute top-16 right-16 size-8 rounded-full bg-[var(--signal)]" />
-                <div className="relative flex items-center gap-3">
-                  <span className="money text-xs">PROVIDER / {detail.provider.key}</span>
-                  <span className="h-px flex-1 bg-white/25" />
-                </div>
-                <p className="eyebrow relative mt-12 !text-white/45">Cost stream</p>
-                <h1 className="wordmark relative mt-3 text-[clamp(3.7rem,7vw,6.8rem)] leading-[0.82] text-[var(--ink)]">
-                  {detail.provider.displayName}
-                </h1>
-                <p className="relative mt-6 text-sm text-[var(--muted)]">
-                  {detail.range.from} → {detail.range.to} · Sync now refreshes today
-                </p>
+        <motion.header
+          initial={{ opacity: 0, scale: 0.992 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="kinetic-panel overflow-hidden"
+        >
+          <div className="grid xl:grid-cols-[minmax(0,1fr)_20rem]">
+            <div className="tone-violet relative overflow-hidden p-6 sm:p-8 lg:p-10">
+              <span className="absolute top-6 right-8 size-28 rounded-full border border-white/15" />
+              <span className="absolute top-16 right-16 size-8 rounded-full bg-[var(--signal)]" />
+              <div className="relative flex items-center gap-3">
+                <span className="money text-xs">PROVIDER / {detail.provider.key}</span>
+                <span className="h-px flex-1 bg-white/25" />
               </div>
-              <div className="dark-stage signal-grid flex flex-col justify-between gap-12 p-6 sm:p-8">
-                <div>
-                  <p className="eyebrow !text-white/40">Historical lens</p>
-                  <p className="wordmark mt-3 text-3xl leading-none">Repair the timeline.</p>
-                </div>
-                <BackfillPeriodButton
-                  providerKey={detail.provider.key}
-                  from={detail.range.from}
-                  to={detail.range.to}
-                  onComplete={refresh}
-                />
-              </div>
+              <p className="eyebrow relative mt-12 !text-white/45">Cost stream</p>
+              <h1 className="wordmark relative mt-3 text-[clamp(3.7rem,7vw,6.8rem)] leading-[0.82] text-[var(--ink)]">
+                {detail.provider.displayName}
+              </h1>
+              <p className="relative mt-6 text-sm text-[var(--muted)]">
+                {detail.range.from} → {detail.range.to} · Sync now refreshes today
+              </p>
             </div>
-            <div className="border-t border-[var(--line)] bg-[var(--violet-soft)] p-3 sm:p-4">
-              <SearchField
-                value={search}
-                onChange={setSearch}
-                placeholder="Search this provider's projects…"
+            <div className="dark-stage signal-grid flex flex-col justify-between gap-12 p-6 sm:p-8">
+              <div>
+                <p className="eyebrow !text-white/40">Historical lens</p>
+                <p className="wordmark mt-3 text-3xl leading-none">Repair the timeline.</p>
+              </div>
+              <BackfillPeriodButton
+                providerKey={detail.provider.key}
+                from={detail.range.from}
+                to={detail.range.to}
+                onComplete={refresh}
               />
             </div>
-          </motion.header>
-
-          {isFixedVpsProvider(detail.provider.key) ? (
-            <VpsAddProject onAdded={refresh} />
-          ) : null}
-
-          <div className="grid gap-3 sm:grid-cols-3">
-            <CostMetricTile label="Today" cost={detail.today} tone="signal" size="lg" />
-            <CostMetricTile label="Selected period" cost={detail.period} tone="dark" size="lg" />
-            <UnmappedTile unmapped={detail.unmapped} />
           </div>
+          <div className="border-t border-[var(--line)] bg-[var(--violet-soft)] p-3 sm:p-4">
+            <SearchField
+              value={search}
+              onChange={setSearch}
+              placeholder="Search this provider's projects…"
+            />
+          </div>
+        </motion.header>
 
-          <ProjectCompareChart data={compareData} />
-          <UsageSeriesChart
-            points={seriesData.points}
-            projectNames={projectNames}
-            visibleIds={visibleIds}
+        {isFixedVpsProvider(detail.provider.key) ? <VpsAddProject onAdded={refresh} /> : null}
+
+        <div className="grid gap-3 sm:grid-cols-3">
+          <CostMetricTile label="Today" cost={detail.today} tone="signal" size="lg" />
+          <CostMetricTile label="Selected period" cost={detail.period} tone="dark" size="lg" />
+          <UnmappedTile unmapped={detail.unmapped} />
+        </div>
+
+        <ProjectCompareChart data={compareData} />
+        <UsageSeriesChart
+          points={seriesData.points}
+          projectNames={projectNames}
+          visibleIds={visibleIds}
+        />
+
+        <div className="flex items-center justify-between gap-3 border-b border-[var(--line-strong)] pb-3">
+          <p className="eyebrow">
+            {filteredProjects.length} project{filteredProjects.length === 1 ? '' : 's'}
+          </p>
+          <ViewToggle mode={viewMode} onChange={setViewMode} />
+        </div>
+
+        {filteredProjects.length === 0 ? (
+          <EmptyPanel
+            title="No projects in range"
+            detail={
+              search
+                ? 'Try clearing search.'
+                : isFixedVpsProvider(detail.provider.key)
+                  ? 'Add a project above to attach a monthly VPS line.'
+                  : 'Run sync or widen the date range.'
+            }
           />
-
-          <div className="flex items-center justify-between gap-3 border-b border-[var(--line-strong)] pb-3">
-            <p className="eyebrow">
-              {filteredProjects.length} project{filteredProjects.length === 1 ? '' : 's'}
-            </p>
-            <ViewToggle mode={viewMode} onChange={setViewMode} />
-          </div>
-
-          {filteredProjects.length === 0 ? (
-            <EmptyPanel
-              title="No projects in range"
-              detail={
-                search
-                  ? 'Try clearing search.'
-                  : isFixedVpsProvider(detail.provider.key)
-                    ? 'Add a project above to attach a monthly VPS line.'
-                    : 'Run sync or widen the date range.'
-              }
-            />
-          ) : viewMode === 'cards' ? (
-            <ProviderProjectCards
-              projects={filteredProjects}
-              hideDailyLimit={isFixedVpsProvider(detail.provider.key)}
-              onBudgetSaved={refresh}
-            />
-          ) : (
-            <ProviderProjectList
-              projects={filteredProjects}
-              hideDailyLimit={isFixedVpsProvider(detail.provider.key)}
-              onBudgetSaved={refresh}
-            />
-          )}
+        ) : viewMode === 'cards' ? (
+          <ProviderProjectCards
+            projects={filteredProjects}
+            hideDailyLimit={isFixedVpsProvider(detail.provider.key)}
+            onBudgetSaved={refresh}
+          />
+        ) : (
+          <ProviderProjectList
+            projects={filteredProjects}
+            hideDailyLimit={isFixedVpsProvider(detail.provider.key)}
+            onBudgetSaved={refresh}
+          />
+        )}
       </>
     </DashboardBoard>
   );

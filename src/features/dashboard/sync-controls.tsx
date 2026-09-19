@@ -84,7 +84,6 @@ type SyncStatusChipProps = {
 };
 
 export function SyncStatusChip({ status }: SyncStatusChipProps) {
-
   const latestRun = status?.runs[0];
   const account = status?.accounts[0];
   const label = account

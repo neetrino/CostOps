@@ -116,7 +116,10 @@ export async function loadProviderDetail(
     rowsInDashboardPeriod(resolvedCost.entries, query.from, query.to, query.preset),
     providerKey,
   );
-  const todayRows = rowsForProvider(rowsOnUtcDay(resolvedCost.entries, resolvedCost.today), providerKey);
+  const todayRows = rowsForProvider(
+    rowsOnUtcDay(resolvedCost.entries, resolvedCost.today),
+    providerKey,
+  );
   const fallback = latestSyncForAccounts(resolvedCost.accounts, providerKey);
 
   return {
