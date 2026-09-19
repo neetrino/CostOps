@@ -163,7 +163,6 @@ textarea {
 .workspace-frame {
   position: relative;
   isolation: isolate;
-  overflow: hidden;
   background-color: var(--canvas);
 }
 
@@ -385,6 +384,7 @@ textarea {
 
   .workspace-frame {
     min-height: calc(100dvh - 1.5rem);
+    overflow: hidden;
     border: 1px solid rgba(255, 253, 245, 0.16);
     border-radius: 2rem 0 0 2rem;
     box-shadow: -18px 0 60px rgba(0, 0, 0, 0.14);

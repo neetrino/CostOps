@@ -63,7 +63,7 @@ export function FilterRail({ state, onChange, onRefresh, loading }: FilterRailPr
 
   return (
     <>
-      <div className="sticky top-14 z-20 flex items-center justify-between gap-3 border-b border-[var(--line)] bg-[var(--sidebar)] px-4 py-2 lg:hidden">
+      <div className="sticky top-[calc(env(safe-area-inset-top)+3.5rem)] z-20 flex items-center justify-between gap-3 border-b border-[var(--line)] bg-[var(--paper-raised)] px-4 py-2 lg:hidden">
         <div className="min-w-0">
           <p className="eyebrow">Viewing</p>
           <p className="truncate text-sm font-semibold text-[var(--ink)]">{activeLabel}</p>
