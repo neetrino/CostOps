@@ -18,6 +18,7 @@ export async function loadUsageTotals(query: ResolvedDashboardQuery) {
       providerKey: query.providerKey,
     }),
     prisma.project.findMany({
+      where: query.projectId ? { id: query.projectId } : { archived: false },
       select: { id: true, slug: true, name: true, archived: true },
       orderBy: { name: 'asc' },
     }),
