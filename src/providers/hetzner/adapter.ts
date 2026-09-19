@@ -1,6 +1,10 @@
 import { HETZNER_FIXED_SYNC_INTERVAL_MINUTES } from '@/config/constants';
 import { hetznerCredentialMeta } from '@/providers/hetzner/credentials';
-import { filterFixedCostsForRewrite, fixedResourcesToCosts } from '@/providers/hetzner/map-costs';
+import {
+  excludeExistingFixedDays,
+  filterFixedCostsForRewrite,
+  fixedResourcesToCosts,
+} from '@/providers/hetzner/map-costs';
 import type {
   CostProviderAdapter,
   DateRange,
@@ -22,11 +26,16 @@ export const hetznerAdapter: CostProviderAdapter = {
   },
 
   async fetchCosts(ctx: ProviderContext, range: DateRange): Promise<NormalizedCost[]> {
-    const { loadActiveFixedVpsResources, loadPastFixedMonthRewrite } =
-      await import('@/providers/hetzner/load-resources');
-    const resources = await loadActiveFixedVpsResources(ctx.account.id);
-    const past = await loadPastFixedMonthRewrite(ctx.account.id, ctx.now);
+    const loaders = await import('@/providers/hetzner/load-resources');
+    const resources = await loaders.loadActiveFixedVpsResources(ctx.account.id);
+    const [past, existingDays] = await Promise.all([
+      loaders.loadPastFixedMonthRewrite(ctx.account.id, ctx.now),
+      loaders.loadExistingCurrentMonthFixedDays(ctx.account.id, ctx.now),
+    ]);
     const costs = fixedResourcesToCosts(resources, range, past.lumpAmounts);
-    return filterFixedCostsForRewrite(costs, past.skipKeys, ctx.now);
+    return excludeExistingFixedDays(
+      filterFixedCostsForRewrite(costs, past.skipKeys, ctx.now),
+      existingDays,
+    );
   },
 };

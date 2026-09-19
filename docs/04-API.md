@@ -82,7 +82,7 @@ Do not emit `0` when status is `missing` or `error` without also sending that st
 | PATCH | `/api/project-providers/[id]/budget` | Daily limit + escalation % |
 | PATCH | `/api/projects/[slug]/budget-total` | Optional PROJECT_TOTAL limit + escalation % |
 | POST | `/api/projects/[slug]/vps-lines` | Add a static VPS line from the VPS board (`displayName`, `monthlyAmountUsd`, optional `effectiveOn` YYYY-MM-DD) |
-| PATCH | `/api/resources/[id]/vps-line` | Update VPS name / monthly amount / start date / archive |
+| PATCH | `/api/resources/[id]/vps-line` | Update VPS name / monthly amount / archive. `effectiveOn` is the new-amount day, not the purchase start |
 | DELETE | `/api/project-providers/[id]` | Remove an empty VPS leftover (no active line). Project and history stay |
 | PATCH | `/api/budget-rules/[id]` | Optional aggregate rules |
 | POST | `/api/budget-rules` | Create optional scope rule |

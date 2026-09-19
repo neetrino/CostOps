@@ -18,9 +18,10 @@ export async function patchVpsLine(
   if (!resource || resource.providerKey !== 'HETZNER') {
     return { ok: false, code: 'NOT_FOUND', message: 'VPS line not found' };
   }
-  const nextEffectiveOn = body.effectiveOn
+  const purchaseStart = resource.fixedEffectiveOn ?? toUtcDateOnly(now);
+  const amountFrom = body.effectiveOn
     ? toUtcDateOnly(parseIsoDateOnly(body.effectiveOn))
-    : resource.fixedEffectiveOn;
+    : toUtcDateOnly(now);
   const nextArchivedAt =
     body.archived === undefined
       ? resource.archivedAt
@@ -35,21 +36,17 @@ export async function patchVpsLine(
         body.monthlyAmountUsd !== undefined
           ? toFixedUsd(body.monthlyAmountUsd, 4)
           : resource.fixedMonthlyUsd,
-      fixedEffectiveOn: nextEffectiveOn,
       archivedAt: nextArchivedAt,
     },
   });
-  const effectiveOn = updated.fixedEffectiveOn ?? toUtcDateOnly(now);
+  const effectiveOn = updated.fixedEffectiveOn ?? purchaseStart;
   if (!updated.archivedAt && updated.fixedMonthlyUsd) {
-    const from = vpsMaterializeFrom({
-      now,
-      effectiveOn,
-      amountChanged: body.monthlyAmountUsd !== undefined,
-    });
-    await materializeFixedVpsCosts({
+    await rematerializePatchedLine({
       providerAccountId: updated.providerAccountId,
       resourceId: updated.id,
-      range: { from, to: toUtcDateOnly(now) },
+      purchaseStart: effectiveOn,
+      amountFrom,
+      amountChanged: body.monthlyAmountUsd !== undefined,
       now,
     });
   }
@@ -65,4 +62,26 @@ export async function patchVpsLine(
       archived: Boolean(updated.archivedAt),
     },
   };
+}
+
+async function rematerializePatchedLine(input: {
+  providerAccountId: string;
+  resourceId: string;
+  purchaseStart: Date;
+  amountFrom: Date;
+  amountChanged: boolean;
+  now: Date;
+}): Promise<void> {
+  const from = vpsMaterializeFrom({
+    now: input.now,
+    purchaseStart: input.purchaseStart,
+    amountFrom: input.amountFrom,
+    amountChanged: input.amountChanged,
+  });
+  await materializeFixedVpsCosts({
+    providerAccountId: input.providerAccountId,
+    resourceId: input.resourceId,
+    range: { from, to: toUtcDateOnly(input.now) },
+    now: input.now,
+  });
 }

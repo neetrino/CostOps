@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { fetchJson } from '@/features/dashboard/api-client';
+import { utcDayKey } from '@/shared/dates';
 import { Button } from '@/shared/ui/button';
 import { DateField } from '@/shared/ui/date-field';
 
@@ -19,7 +20,7 @@ export function VpsLineEdit({
   onChanged,
 }: VpsLineEditProps) {
   const [amount, setAmount] = useState(String(monthlyAmountUsd ?? ''));
-  const [startDate, setStartDate] = useState(effectiveOn ?? '');
+  const [amountFrom, setAmountFrom] = useState(utcDayKey(new Date()));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,8 +30,8 @@ export function VpsLineEdit({
       setError('Enter a positive monthly amount');
       return;
     }
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(startDate)) {
-      setError('Enter a start date');
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(amountFrom)) {
+      setError('Enter the day the new amount starts');
       return;
     }
     setSaving(true);
@@ -39,7 +40,7 @@ export function VpsLineEdit({
       await fetchJson(`/api/resources/${resourceId}/vps-line`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ monthlyAmountUsd: nextAmount, effectiveOn: startDate }),
+        body: JSON.stringify({ monthlyAmountUsd: nextAmount, effectiveOn: amountFrom }),
       });
       onChanged();
     } catch (err) {
@@ -82,9 +83,9 @@ export function VpsLineEdit({
           className="field-control money w-28 text-xs"
         />
         <DateField
-          value={startDate}
-          onChange={setStartDate}
-          aria-label="VPS start date"
+          value={amountFrom}
+          onChange={setAmountFrom}
+          aria-label="New amount from"
           allowClear={false}
           className="w-36"
           triggerClassName="text-xs"
@@ -107,7 +108,8 @@ export function VpsLineEdit({
         </Button>
       </div>
       <p className="text-[11px] text-[var(--muted)]">
-        Amount applies to this month from the start date. Days before the start date are dropped.
+        New amount applies from this day. Earlier days this month stay
+        {effectiveOn ? ` (line started ${effectiveOn})` : ''}.
       </p>
       {error ? <p className="text-xs text-[var(--danger)]">{error}</p> : null}
     </div>
