@@ -25,6 +25,7 @@ env:
   DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/ci
   DIRECT_URL: postgresql://ci:ci@127.0.0.1:5432/ci
   JWT_SECRET: ci-jwt-secret-must-be-at-least-32-chars
+  DASHBOARD_LOGIN: ci-operator@example.com
   DASHBOARD_PASSWORD: ci-dashboard-password
   CRON_SECRET: ci-cron-secret-16
 

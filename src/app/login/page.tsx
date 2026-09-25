@@ -34,6 +34,7 @@ function LoginFallback() {
           <SkeletonBlock className="mt-5 h-10 w-48" />
           <SkeletonBlock className="mt-4 h-4 w-64 max-w-full" />
           <SkeletonBlock className="mt-10 h-12 w-full" />
+          <SkeletonBlock className="mt-4 h-12 w-full" />
           <SkeletonBlock className="mt-4 h-12 w-full bg-[var(--accent-mid)]" />
         </div>
       </div>

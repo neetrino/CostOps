@@ -4,6 +4,7 @@ import { parseEnv } from '@/shared/env';
 const validEnv = {
   DATABASE_URL: 'postgresql://costops:costops@127.0.0.1:5432/costops',
   JWT_SECRET: 'abcdefghijklmnopqrstuvwxyz012345',
+  DASHBOARD_LOGIN: 'operator@example.com',
   DASHBOARD_PASSWORD: 'test-password',
   CRON_SECRET: 'cron-secret-16ch',
   NEON_ORG_ID: 'org-example',
@@ -15,6 +16,7 @@ describe('parseEnv', () => {
     expect(env.DATABASE_URL).toContain('postgresql://');
     expect(env.NEON_PRICING_PLAN).toBe('launch');
     expect(env.TELEGRAM_SPEND_ALERT_DEFAULT_USD).toBe(1);
+    expect(env.DASHBOARD_LOGIN).toBe('operator@example.com');
     expect(env.OLD_NEON_PROJECT_DATABASE_URL).toBeUndefined();
     expect(env.UPSTASH_API_KEY).toBeUndefined();
     expect(env.GCP_PROJECT_ID).toBeUndefined();
@@ -33,9 +35,30 @@ describe('parseEnv', () => {
     expect(env.GCP_BILLING_ACCOUNT_ID).toBe('012345-ABCDEF-678901');
   });
 
-  it('requires JWT_SECRET when dashboard password is set', () => {
+  it('requires JWT_SECRET when dashboard auth is set', () => {
     expect(() =>
-      parseEnv({ DATABASE_URL: validEnv.DATABASE_URL, DASHBOARD_PASSWORD: 'x' }),
+      parseEnv({
+        DATABASE_URL: validEnv.DATABASE_URL,
+        DASHBOARD_LOGIN: 'operator@example.com',
+        DASHBOARD_PASSWORD: 'x',
+      }),
     ).toThrow(/Invalid environment/);
+  });
+
+  it('requires login and password together, including in production', () => {
+    expect(() =>
+      parseEnv({
+        DATABASE_URL: validEnv.DATABASE_URL,
+        JWT_SECRET: validEnv.JWT_SECRET,
+        DASHBOARD_PASSWORD: 'x',
+      }),
+    ).toThrow(/DASHBOARD_LOGIN and DASHBOARD_PASSWORD must be set together/);
+    expect(() =>
+      parseEnv({
+        DATABASE_URL: validEnv.DATABASE_URL,
+        NODE_ENV: 'production',
+        JWT_SECRET: validEnv.JWT_SECRET,
+      }),
+    ).toThrow(/required in production/);
   });
 });

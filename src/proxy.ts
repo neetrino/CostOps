@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { COOKIE_NAME } from '@/config/constants';
+import { readDashboardAuth } from '@/shared/auth/dashboard-auth-env';
 import { isPublicRequestPath } from '@/shared/auth/public-paths';
 import { verifySessionToken } from '@/shared/auth/verify-session-token';
 
@@ -14,18 +15,16 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
     return NextResponse.next();
   }
 
-  const dashboardPassword = process.env.DASHBOARD_PASSWORD;
-  if (!dashboardPassword) {
+  const auth = readDashboardAuth(process.env);
+  if (auth.status === 'disabled') {
     return NextResponse.next();
   }
-
-  const jwtSecret = process.env.JWT_SECRET;
-  if (!jwtSecret) {
+  if (auth.status === 'misconfigured') {
     return NextResponse.redirect(new URL('/login?error=config', request.url));
   }
 
   const token = request.cookies.get(COOKIE_NAME)?.value;
-  const ok = token ? await verifySessionToken(token, jwtSecret) : false;
+  const ok = token ? await verifySessionToken(token, auth.jwtSecret) : false;
 
   if (pathname.startsWith('/api/')) {
     if (!ok) {

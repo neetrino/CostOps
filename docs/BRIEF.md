@@ -53,7 +53,7 @@ The job is **control spend**, not reconcile a provider invoice.
 - PostgreSQL + Prisma
 - Tailwind CSS + Recharts (reuse Neon UI)
 - Pino, Zod, Vercel Cron, Telegram Bot API
-- Auth: reused Neon dashboard password + httpOnly JWT session
+- Auth: shared dashboard login + password, httpOnly JWT session (`DASHBOARD_LOGIN`, `DASHBOARD_PASSWORD`)
 
 ---
 
