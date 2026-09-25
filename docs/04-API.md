@@ -1,6 +1,6 @@
 # API — Neetrino CostOps
 
-Internal JSON API. No public versioning in v1. All routes except login, cron, and health require a dashboard session when `DASHBOARD_PASSWORD` is set.
+Internal JSON API. No public versioning in v1. All routes except login, cron, and health require a dashboard session when `DASHBOARD_LOGIN` and `DASHBOARD_PASSWORD` are set.
 
 Validate query/body with Zod. Never return secrets.
 
@@ -10,7 +10,7 @@ Validate query/body with Zod. Never return secrets.
 
 | Method | Path | Auth | Purpose |
 |--------|------|------|---------|
-| POST | `/api/auth/login` | public | Set session cookie |
+| POST | `/api/auth/login` | public | Body `{ login, password }`. Sets session cookie |
 | POST | `/api/auth/logout` | session | Clear cookie |
 | GET | `/api/health` | public | Liveness, no heavy DB |
 | GET | `/api/cron/sync` | `CRON_SECRET` | Telegram pass over stored today (no provider pull) |

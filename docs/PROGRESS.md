@@ -2,7 +2,7 @@
 
 **Phase.** 4 — Upstash + VPS FIXED  
 **Overall.** 96% (Neon + Vercel + project totals + Upstash + Hetzner/VPS fixed lines; operator mapping still open)  
-**Updated.** 2026-09-19 (dashboard read cache + RSC boards)
+**Updated.** 2026-09-26 (dashboard login + password)
 
 ---
 
@@ -33,7 +33,7 @@
 - [x] Size B folders (`src/app`, `features`, `core`, `providers`, `notifications`, `shared`, `config`)
 - [x] Prisma 7 schema from `DATA_MODEL.md` (including `CredentialAlert`) + initial migration
 - [x] Zod env, Pino logger, Prisma client
-- [x] Password + httpOnly JWT auth (Next.js 16 `src/proxy.ts` request gate)
+- [x] Login + password + httpOnly JWT auth (Next.js 16 `src/proxy.ts` request gate)
 - [x] Routes: `/`, `/login`, `/api/health`, `/api/auth/login`, `/api/auth/logout`
 - [x] ESLint, Prettier, Vitest, Husky, commitlint, CI (Node 24)
 - [x] Seed: Provider `NEON`/`VERCEL` + ProviderAccount from `NEON_ORG_ID` / `VERCEL_TEAM_ID` when set

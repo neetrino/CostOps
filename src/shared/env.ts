@@ -29,6 +29,7 @@ export const envSchema = z
     DATABASE_CONNECTION_LIMIT: optionalPositiveInt,
     DATABASE_POOL_TIMEOUT: optionalPositiveInt,
     DATABASE_STATEMENT_TIMEOUT_MS: optionalPositiveInt,
+    DASHBOARD_LOGIN: optionalNonEmptyString,
     DASHBOARD_PASSWORD: optionalNonEmptyString,
     JWT_SECRET: z.preprocess(
       (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
@@ -71,18 +72,27 @@ export const envSchema = z
     OLD_NEON_PROJECT_DATABASE_URL: optionalNonEmptyString,
   })
   .superRefine((value, ctx) => {
-    if (value.DASHBOARD_PASSWORD && !value.JWT_SECRET) {
+    const hasLogin = Boolean(value.DASHBOARD_LOGIN);
+    const hasPassword = Boolean(value.DASHBOARD_PASSWORD);
+    if (hasLogin !== hasPassword) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'JWT_SECRET is required when DASHBOARD_PASSWORD is set (session signing).',
+        message: 'DASHBOARD_LOGIN and DASHBOARD_PASSWORD must be set together.',
+        path: [hasLogin ? 'DASHBOARD_PASSWORD' : 'DASHBOARD_LOGIN'],
+      });
+    }
+    if ((hasLogin || hasPassword) && !value.JWT_SECRET) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'JWT_SECRET is required when dashboard auth is set (session signing).',
         path: ['JWT_SECRET'],
       });
     }
-    if (value.NODE_ENV === 'production' && !value.DASHBOARD_PASSWORD) {
+    if (value.NODE_ENV === 'production' && (!hasLogin || !hasPassword)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'DASHBOARD_PASSWORD is required in production.',
-        path: ['DASHBOARD_PASSWORD'],
+        message: 'DASHBOARD_LOGIN and DASHBOARD_PASSWORD are required in production.',
+        path: ['DASHBOARD_LOGIN'],
       });
     }
   });
@@ -116,6 +126,8 @@ export function resetEnvCache(): void {
 
 export function getPublicEnv(): { hasDashboardAuth: boolean } {
   return {
-    hasDashboardAuth: Boolean(process.env.DASHBOARD_PASSWORD?.length),
+    hasDashboardAuth: Boolean(
+      process.env.DASHBOARD_LOGIN?.trim().length && process.env.DASHBOARD_PASSWORD?.length,
+    ),
   };
 }

@@ -139,10 +139,11 @@ Cache tag `dashboard-reads` is dropped after sync, backfill, reconcile, and dash
 ### Auth
 
 ```
-Optional DASHBOARD_PASSWORD
+DASHBOARD_LOGIN + DASHBOARD_PASSWORD (both required in production)
   → login sets httpOnly JWT cookie
   → middleware allows /login, /api/cron/*, health
-  → all other UI/API require a valid session when password is set
+  → all other UI/API require a valid session when auth is configured
+  → a partial pair redirects to /login?error=config
 ```
 
 ---
@@ -183,7 +184,7 @@ See [DATA_MODEL.md](./DATA_MODEL.md) and [05-DATABASE.md](./05-DATABASE.md).
 
 - Provider keys, Telegram token, DB URLs: server-only env
 - Cron: `Authorization: Bearer CRON_SECRET`
-- Dashboard: password session when configured (required in production)
+- Dashboard: login + password session when configured (both required in production)
 - Structured logs without secrets
 - v1 credentials: same env names as Neon (`NEON_API_KEY`, `NEON_ORG_ID`). ADR-003
 - Token expiry and 401 alerts: [CREDENTIAL_ROTATION.md](./CREDENTIAL_ROTATION.md)

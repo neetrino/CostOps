@@ -10,6 +10,7 @@ export function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
   const err = params.get('error');
+  const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -22,7 +23,7 @@ export function LoginForm() {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ login, password }),
       });
       if (!res.ok) {
         const body = (await res.json()) as { error?: string };
@@ -71,22 +72,44 @@ export function LoginForm() {
                 <AppIcon name="alert" size={18} className="mt-0.5 shrink-0" />
                 <p>
                   Set{' '}
-                  <code className="font-[family-name:var(--font-mono)] text-xs">JWT_SECRET</code>{' '}
-                  with{' '}
+                  <code className="font-[family-name:var(--font-mono)] text-xs">
+                    DASHBOARD_LOGIN
+                  </code>
+                  ,{' '}
                   <code className="font-[family-name:var(--font-mono)] text-xs">
                     DASHBOARD_PASSWORD
                   </code>
-                  .
+                  , and{' '}
+                  <code className="font-[family-name:var(--font-mono)] text-xs">JWT_SECRET</code>.
                 </p>
               </div>
             ) : null}
 
             <form onSubmit={(event) => void submit(event)} className="mt-8">
-              <label htmlFor="dashboard-password" className="eyebrow block">
-                Dashboard password
+              <label htmlFor="dashboard-login" className="eyebrow block">
+                Login
+              </label>
+              <input
+                id="dashboard-login"
+                name="username"
+                type="email"
+                autoComplete="username"
+                autoCapitalize="none"
+                spellCheck={false}
+                required
+                disabled={pending}
+                aria-describedby={message ? 'login-error' : undefined}
+                aria-invalid={message ? true : undefined}
+                value={login}
+                onChange={(event) => setLogin(event.target.value)}
+                className="field-control mt-2 min-h-12 text-base disabled:cursor-wait disabled:opacity-60"
+              />
+              <label htmlFor="dashboard-password" className="eyebrow mt-5 block">
+                Password
               </label>
               <input
                 id="dashboard-password"
+                name="password"
                 type="password"
                 autoComplete="current-password"
                 required

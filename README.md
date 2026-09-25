@@ -8,7 +8,7 @@ Internal multi-provider FinOps platform. Pulls usage and cost from infrastructur
 
 ## Status
 
-Phase 1 foundation is in place: runnable Next.js 16 app, Prisma 7 schema, dashboard password auth. Next: Neon adapter + sync (`docs/IMPLEMENTATION_PLAN.md`).
+Phase 1 foundation is in place: runnable Next.js 16 app, Prisma 7 schema, dashboard login and password auth. Next: Neon adapter + sync (`docs/IMPLEMENTATION_PLAN.md`).
 
 Docs index: [docs/README.md](./docs/README.md).
 

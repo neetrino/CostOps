@@ -20,3 +20,7 @@ Reuse that gate. Production must set `DASHBOARD_PASSWORD` and `JWT_SECRET`. Cron
 ## Consequences
 
 No RBAC, no password-reset flow. argon2 user hashes are N/A. Rate-limit login.
+
+## Amendment (2026-09-26)
+
+Sign-in requires `DASHBOARD_LOGIN` and `DASHBOARD_PASSWORD` together, plus `JWT_SECRET`. Login comparison is case-insensitive. A partial pair is a misconfiguration: the dashboard does not open on password alone.

@@ -79,8 +79,8 @@
 
 | # | Parameter | Decision | Status | Notes |
 |---|-----------|----------|--------|-------|
-| 5.1 | Solution | Custom password + httpOnly JWT | ✅ | ADR-005 |
-| 5.2 | Providers | Shared dashboard password | ✅ | |
+| 5.1 | Solution | Shared login + password, httpOnly JWT | ✅ | ADR-005 |
+| 5.2 | Providers | Shared dashboard login and password | ✅ | `DASHBOARD_LOGIN`, `DASHBOARD_PASSWORD` |
 | 5.3 | Session | Signed JWT cookie | ✅ | |
 | 5.4 | Roles / RBAC | not needed | ➖ | |
 | 5.5 | Email verification | not needed | ➖ | |

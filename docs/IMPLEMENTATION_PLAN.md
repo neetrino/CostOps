@@ -112,7 +112,7 @@ Study the Neon repo, run tests, and use the browser yourself. Update `PROGRESS.m
 
 - Dev `DATABASE_URL` / `DIRECT_URL` (non-prod Neon)
 - `NEON_API_KEY`, `NEON_ORG_ID`
-- `CRON_SECRET`, `JWT_SECRET`, `DASHBOARD_PASSWORD`
+- `CRON_SECRET`, `JWT_SECRET`, `DASHBOARD_LOGIN`, `DASHBOARD_PASSWORD`
 - `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` (or a staging bot)
 - `OLD_NEON_PROJECT_DATABASE_URL` — read-only Postgres of https://github.com/neetrino/neon; use only for `migrate-from-neon` ([OLD_NEON_DATABASE.md](./OLD_NEON_DATABASE.md)). Not the CostOps runtime DB.
 - Vercel project for CostOps (new, not the old Neon project)
