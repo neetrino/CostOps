@@ -2,7 +2,7 @@
 
 **Phase.** 4 — Upstash + VPS FIXED  
 **Overall.** 96% (Neon + Vercel + project totals + Upstash + Hetzner/VPS fixed lines; operator mapping still open)  
-**Updated.** 2026-09-26 (dashboard login + password)
+**Updated.** 2026-10-09 (VPS daily cron)
 
 ---
 
@@ -243,6 +243,11 @@ The `404 costs_not_found` was observed on a short UTC `from=today 00:00Z&to=now`
 - Operator-entered `$ / month` is still the source of truth. CostOps now writes one FIXED row per UTC day (`$fee / days_in_month`, last day absorbs remainder) so charts stay flat instead of dumping the whole fee on the 1st.
 - VPS start is a UTC **date**. Cost begins that day; a mid-month purchase bills fewer days this month. Add form defaults to today. Lines created today can be moved with `pnpm exec tsx src/scripts/rewrite-vps-daily-costs.ts --created-today-starts-today`.
 - Amount edits still rewrite the current UTC month only. A leftover 1st-of-month lump is rewritten as daily rows using that booked month amount.
+
+### 2026-10-09 — VPS opens the new month on a cron
+
+- September rows existed because creating or editing a line writes that month. October stayed empty: `/api/cron/sync/hetzner` was never scheduled.
+- `vercel.json` runs it daily at 00:30 UTC. One due sync writes the whole current month. The due interval is 23h so a run that finished a few minutes after 00:30 is still due the next day.
 
 ### 2026-09-19 — VPS amount change keeps earlier days
 

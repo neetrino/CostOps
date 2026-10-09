@@ -13,6 +13,10 @@
       "schedule": "20 * * * *"
     },
     {
+      "path": "/api/cron/sync/hetzner",
+      "schedule": "30 0 * * *"
+    },
+    {
       "path": "/api/cron/reconcile-yesterday/neon",
       "schedule": "0 2 * * *"
     },

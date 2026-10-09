@@ -75,7 +75,11 @@ export const HETZNER_CREDENTIAL_REF = 'HETZNER_FIXED';
 export const HETZNER_EXTERNAL_ACCOUNT_ID = 'internal';
 export const HETZNER_DISPLAY_NAME = 'VPS';
 export const HETZNER_RESOURCE_TYPE = 'vps_server';
-export const HETZNER_FIXED_SYNC_INTERVAL_MINUTES = 1440;
+/**
+ * Under 24h so the 00:30 UTC cron is still due when yesterday's run
+ * finished a few minutes after the trigger.
+ */
+export const HETZNER_FIXED_SYNC_INTERVAL_MINUTES = 23 * 60;
 
 export const SYNC_NOW_RATE_LIMIT_PER_MINUTE = 12;
 export const SYNC_NOW_RATE_WINDOW_MS = 60_000;
