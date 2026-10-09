@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { HETZNER_FIXED_SYNC_INTERVAL_MINUTES } from '@/config/constants';
 import { isAccountDue } from '@/core/sync/due-accounts';
 
 describe('isAccountDue', () => {
@@ -32,6 +33,19 @@ describe('isAccountDue', () => {
           recommendedSyncIntervalMinutes: 60,
         },
         now,
+      ),
+    ).toBe(true);
+  });
+
+  it('is due for the next VPS cron after a run that finished past 00:30 UTC', () => {
+    expect(
+      isAccountDue(
+        {
+          providerKey: 'HETZNER',
+          lastSuccessfulSyncAt: new Date('2026-10-01T00:32:00.000Z'),
+          recommendedSyncIntervalMinutes: HETZNER_FIXED_SYNC_INTERVAL_MINUTES,
+        },
+        new Date('2026-10-02T00:30:00.000Z'),
       ),
     ).toBe(true);
   });
